@@ -1,4 +1,4 @@
-# Python Project Template
+# MT5 Strategy Builder
 
 ## Installation Instructions
 
@@ -7,9 +7,10 @@
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/xMattC/python-project-template
+git clone https://github.com/xMattC/mt5-strategy-builder
 
-cd python-project-template
+
+cd mt5-strategy-builder
 ```
 
 ### Step 2: Set Up a Virtual Environment
