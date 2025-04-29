@@ -1,0 +1,40 @@
+ASO:
+  custom: true
+  indicator_path: "MyIndicators\\ASO.ex5"
+
+  inputs:
+    InpPeriod:
+      default: 9
+      min: 1
+      max: 50
+      step: 1
+      optimize: true
+
+    InpPeriodSm:
+      default: 1
+      min: 1
+      max: 10
+      step: 1
+      optimize: true
+
+    InpMode:
+      default: MODE_RSI
+      optimize: false
+
+    InpMethod:
+      default: MODE_SMA
+      optimize: false
+
+    InpAppliedPrice:
+      default: PRICE_CLOSE
+      optimize: false
+
+  buffers:
+    - name: Bulls
+      index: 0
+    - name: Bears
+      index: 1
+
+  base_conditions:
+    long: "Bulls[0] > Bears[0] && Bulls[1] < Bears[1]"
+    short: "Bulls[0] < Bears[0] && Bulls[1] > Bears[1]"
