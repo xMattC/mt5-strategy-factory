@@ -3,6 +3,7 @@ ASO:
   indicator_path: "MyIndicators\\ASO.ex5"
 
   inputs:
+
     InpPeriod:
       default: 9
       type: int
