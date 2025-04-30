@@ -7,7 +7,29 @@ INDICATOR_DIR = Path("indicators")  # Path to indicator YAML files
 OUTPUT_DIR = Path("outputs_dir")  # Path to the output MQL5 files
 
 
-def generate_code(yaml_path, template: Template, indicator_name: str, data: dict):
+def main():
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Loop through each YAML file in the indicators directory
+    for yaml_file in INDICATOR_DIR.glob("*.yaml"):
+        with open(yaml_file, "r") as f:
+            config = yaml.safe_load(f)
+
+        indicator_name = list(config.keys())[0]
+        data = config[indicator_name]
+
+        # Use the general template for all indicators
+        template_path = TEMPLATES_DIR / "template_mq5.j2"  # General template for all indicators
+
+        # Load the template
+        with open(template_path, "r") as f:
+            template = Template(f.read())
+
+        # Generate the MQL5 code for this indicator
+        generate_code(yaml_file, template, indicator_name, data)
+
+
+def generate_code(yaml_path, template, indicator_name: str, data: dict):
     # Collect input definitions
     input_lines = []
     if "inputs" in data:
@@ -37,28 +59,6 @@ def generate_code(yaml_path, template: Template, indicator_name: str, data: dict
         f.write(rendered)
 
     print(f"Generated: {output_file}")
-
-
-def main():
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Loop through each YAML file in the indicators directory
-    for yaml_file in INDICATOR_DIR.glob("*.yaml"):
-        with open(yaml_file, "r") as f:
-            config = yaml.safe_load(f)
-
-        indicator_name = list(config.keys())[0]
-        data = config[indicator_name]
-
-        # Use the general template for all indicators
-        template_path = TEMPLATES_DIR / "template_mq5.j2"  # General template for all indicators
-
-        # Load the template
-        with open(template_path, "r") as f:
-            template = Template(f.read())
-
-        # Generate the MQL5 code for this indicator
-        generate_code(yaml_file, template, indicator_name, data)
 
 
 if __name__ == "__main__":
