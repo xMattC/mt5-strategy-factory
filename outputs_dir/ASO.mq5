@@ -6,14 +6,14 @@ input int InpPeriod = 9;
 
 input int InpPeriodSm = 1;
 
-input ENUM_InpMode InpMode = MODE_RSI;
+input ENUM_MODE InpMode = MODE_RSI;
 
-input ENUM_InpMethod InpMethod = MODE_SMA;
+input ENUM_MA_METHOD InpMethod = MODE_SMA;
 
-input ENUM_InpAppliedPrice InpAppliedPrice = PRICE_CLOSE;
+input ENUM_APPLIED_PRICE InpAppliedPrice = PRICE_CLOSE;
 
 
-int indicator_handle[];
+int indicator_handle[];  // Handle array for indicators
 
 int OnInit(){
     EventSetTimer(60);
