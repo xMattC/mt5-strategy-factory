@@ -1,5 +1,5 @@
-# MT5 Strategy Builder
-
+# Meta Strategist
+Automation framework for generating, optimizing, and testing strategies in MetaTrader 5.
 ## Installation Instructions
 
 ### Step 1: Clone the Repository
@@ -7,10 +7,10 @@
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/xMattC/mt5-strategy-builder
+git clone https://github.com/xMattC/meta-strategist
 
 
-cd mt5-strategy-builder
+cd meta-strategist
 ```
 
 ### Step 2: Set Up a Virtual Environment
