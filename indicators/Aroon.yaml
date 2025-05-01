@@ -1,0 +1,38 @@
+AROON:
+  custom: true
+  indicator_path: "MyIndicators/AROON.ex5"
+
+  inputs:
+    InpPeriod:
+      default: 25
+      type: int
+      min: 2
+      max: 100
+      step: 1
+      optimize: true
+
+    InpOverbought:
+      default: 70.0
+      type: double
+      min: 0.1
+      max: 100.0
+      step: 0.1
+      optimize: false
+
+    InpOversold:
+      default: 30.0
+      type: double
+      min: 0.0
+      max: 99.9
+      step: 0.1
+      optimize: false
+
+  buffers:
+    - name: BufferUP
+      index: 0
+    - name: BufferDN
+      index: 1
+
+  base_conditions:
+    long: "BufferUP[0] > BufferDN[0] && BufferUP[1] < BufferDN[1]"
+    short: "BufferUP[0] < BufferDN[0] && BufferUP[1] > BufferDN[1]"

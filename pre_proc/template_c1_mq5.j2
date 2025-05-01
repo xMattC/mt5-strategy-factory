@@ -1,6 +1,11 @@
 #include <MyLibs/NNFX_TestFileHeader.mqh>
-//-------------------------------------------------------------------------------
+{% for include in includes %}
+#include <{{ include }}>
+{% endfor %}
 
+{% for enum in enum_definitions %}
+{{ enum }}
+{% endfor %}
 {% for line in input_lines %}
 {{ line }}
 {% endfor %}
@@ -36,10 +41,12 @@ double OnTester(){
 }
 
 void stratagy(string symbol, int indi_handle){
+
     {% for buf in buffers %}
     double {{ buf.name }}[];
     ArraySetAsSeries({{ buf.name }}, true);
     CopyBuffer(indi_handle, {{ buf.index }}, 1, 10, {{ buf.name }});
+
     {% endfor %}
 
     bool long_in = (

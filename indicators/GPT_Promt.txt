@@ -1,0 +1,586 @@
+Can you Generate me a YAML file from an MQ5 indicator?
+
+here are two examples of how this has been done before:
+
+INDICATOR:
+//+------------------------------------------------------------------+
+//|                                                          ASO.mq5 |
+//|                        Copyright 2018, MetaQuotes Software Corp. |
+//|                                                 https://mql5.com |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2018, MetaQuotes Software Corp."
+#property link      "https://mql5.com"
+#property version   "1.00"
+#property description "Absolute Strength Oscillator"
+#property indicator_separate_window
+#property indicator_buffers 9
+#property indicator_plots   2
+//--- plot Bulls
+#property indicator_label1  "Bulls strength"
+#property indicator_type1   DRAW_LINE
+#property indicator_color1  clrGreen
+#property indicator_style1  STYLE_SOLID
+#property indicator_width1  1
+//--- plot Bears
+#property indicator_label2  "Bears strength"
+#property indicator_type2   DRAW_LINE
+#property indicator_color2  clrRed
+#property indicator_style2  STYLE_SOLID
+#property indicator_width2  1
+//--- enums
+enum ENUM_MODE
+  {
+   MODE_RSI,   // RSI
+   MODE_STO    // Stochastic
+  };
+//--- input parameters
+input uint                 InpPeriod         =  9;             // Period
+input uint                 InpPeriodSm       =  1;             // Smoothing
+input ENUM_MODE            InpMode           =  MODE_RSI;      // Mode
+input ENUM_MA_METHOD       InpMethod         =  MODE_SMA;      // Method
+input ENUM_APPLIED_PRICE   InpAppliedPrice   =  PRICE_CLOSE;   // Applied price
+//--- indicator buffers
+double         BufferBulls[];
+double         BufferBears[];
+double         BufferBL[];
+double         BufferBR[];
+double         BufferAvgBL[];
+double         BufferAvgBR[];
+double         BufferAvgSmBL[];
+double         BufferAvgSmBR[];
+double         BufferMA[];
+//--- global variables
+int            period_ind;
+int            period_sm;
+int            period_max;
+int            handle_ma;
+int            weight_sum_bl;
+int            weight_sum_br;
+int            weight_sum_sbl;
+int            weight_sum_sbr;
+//--- includes
+#include <MovingAverages.mqh>
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+  {
+//--- set global variables
+   period_ind=int(InpPeriod<1 ? 1 : InpPeriod);
+   period_sm=int(InpPeriodSm<2 ? 2 : InpPeriodSm);
+   period_max=fmax(period_ind,period_sm);
+//--- indicator buffers mapping
+   SetIndexBuffer(0,BufferBulls,INDICATOR_DATA);
+   SetIndexBuffer(1,BufferBears,INDICATOR_DATA);
+   SetIndexBuffer(2,BufferBL,INDICATOR_CALCULATIONS);
+   SetIndexBuffer(3,BufferBR,INDICATOR_CALCULATIONS);
+   SetIndexBuffer(4,BufferAvgBL,INDICATOR_CALCULATIONS);
+   SetIndexBuffer(5,BufferAvgBR,INDICATOR_CALCULATIONS);
+   SetIndexBuffer(6,BufferAvgSmBL,INDICATOR_CALCULATIONS);
+   SetIndexBuffer(7,BufferAvgSmBR,INDICATOR_CALCULATIONS);
+   SetIndexBuffer(8,BufferMA,INDICATOR_CALCULATIONS);
+//--- setting indicator parameters
+   string method=StringSubstr(EnumToString(InpMode),5);
+   IndicatorSetString(INDICATOR_SHORTNAME,"ASO ("+(string)period_ind+","+(string)period_sm+")");
+   IndicatorSetInteger(INDICATOR_DIGITS,Digits());
+//--- setting buffer arrays as timeseries
+   ArraySetAsSeries(BufferBulls,true);
+   ArraySetAsSeries(BufferBears,true);
+   ArraySetAsSeries(BufferBL,true);
+   ArraySetAsSeries(BufferBR,true);
+   ArraySetAsSeries(BufferAvgBL,true);
+   ArraySetAsSeries(BufferAvgBR,true);
+   ArraySetAsSeries(BufferAvgSmBL,true);
+   ArraySetAsSeries(BufferAvgSmBR,true);
+   ArraySetAsSeries(BufferMA,true);
+//--- create MA's handles
+   ResetLastError();
+   handle_ma=iMA(NULL,PERIOD_CURRENT,1,0,MODE_SMA,InpAppliedPrice);
+   if(handle_ma==INVALID_HANDLE)
+     {
+      Print("The iMA(1) object was not created: Error ",GetLastError());
+      return INIT_FAILED;
+     }
+//---
+   return(INIT_SUCCEEDED);
+  }
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+  {
+//--- Установка массивов буферов как таймсерий
+   ArraySetAsSeries(high,true);
+   ArraySetAsSeries(low,true);
+//--- Проверка и расчёт количества просчитываемых баров
+   if(rates_total<fmax(period_max,4) || Point()==0) return 0;
+//--- Проверка и расчёт количества просчитываемых баров
+   int limit=rates_total-prev_calculated;
+   if(limit>1)
+     {
+      limit=rates_total-2;
+      ArrayInitialize(BufferBulls,EMPTY_VALUE);
+      ArrayInitialize(BufferBears,EMPTY_VALUE);
+      ArrayInitialize(BufferBL,0);
+      ArrayInitialize(BufferBR,0);
+      ArrayInitialize(BufferAvgBL,0);
+      ArrayInitialize(BufferAvgBR,0);
+      ArrayInitialize(BufferAvgSmBL,0);
+      ArrayInitialize(BufferAvgSmBR,0);
+      ArrayInitialize(BufferMA,0);
+     }
+//--- Подготовка данных
+   int bars=(limit>1 ? rates_total : 1),copied=0;
+   copied=CopyBuffer(handle_ma,0,0,bars,BufferMA);
+   if(copied!=bars) return 0;
+   
+   for(int i=limit; i>=0 && !IsStopped(); i--)
+     {
+      double Pr0=BufferMA[i];
+      double Pr1=BufferMA[i+1];
+
+      if(InpMode==MODE_RSI)
+        {
+         BufferBL[i]=0.5*fabs(Pr0-Pr1)+Pr0-Pr1;
+         BufferBR[i]=0.5*fabs(Pr0-Pr1)-Pr0+Pr1;
+        }
+      else
+        {
+         int bh=Highest(period_ind,i);
+         int bl=Lowest(period_ind,i);
+         if(bh==WRONG_VALUE || bl==WRONG_VALUE)
+            continue;
+         double max=high[bh];
+         double min=low[bl];
+         BufferBL[i]=Pr0-min;
+         BufferBR[i]=max-Pr0;
+        }
+     }
+   switch(InpMethod)
+     {
+      case MODE_EMA  :
+        if(ExponentialMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBL,BufferAvgBL)==0) return 0;
+        if(ExponentialMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBR,BufferAvgBR)==0) return 0;
+        break;
+      case MODE_SMMA :
+        if(SmoothedMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBL,BufferAvgBL)==0) return 0;
+        if(SmoothedMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBR,BufferAvgBR)==0) return 0;
+        break;
+      case MODE_LWMA :
+        if(LinearWeightedMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBL,BufferAvgBL,weight_sum_bl)==0) return 0;
+        if(LinearWeightedMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBR,BufferAvgBR,weight_sum_br)==0) return 0;
+        break;
+      //---MODE_SMA
+      default        :
+        if(SimpleMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBL,BufferAvgBL)==0) return 0;
+        if(SimpleMAOnBuffer(rates_total,prev_calculated,0,period_ind,BufferBR,BufferAvgBR)==0) return 0;
+        break;
+     }
+   switch(InpMethod)
+     {
+      case MODE_EMA  :
+        if(ExponentialMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBL,BufferAvgSmBL)==0) return 0;
+        if(ExponentialMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBR,BufferAvgSmBR)==0) return 0;
+        break;
+      case MODE_SMMA :
+        if(SmoothedMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBL,BufferAvgSmBL)==0) return 0;
+        if(SmoothedMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBR,BufferAvgSmBR)==0) return 0;
+        break;
+      case MODE_LWMA :
+        if(LinearWeightedMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBL,BufferAvgSmBL,weight_sum_sbl)==0) return 0;
+        if(LinearWeightedMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBR,BufferAvgSmBR,weight_sum_sbr)==0) return 0;
+        break;
+      //---MODE_SMA
+      default        :
+        if(SimpleMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBL,BufferAvgSmBL)==0) return 0;
+        if(SimpleMAOnBuffer(rates_total,prev_calculated,period_ind,period_sm,BufferAvgBR,BufferAvgSmBR)==0) return 0;
+        break;
+     }
+
+//--- Расчёт индикатора
+   for(int i=limit; i>=0 && !IsStopped(); i--)
+     {
+      BufferBulls[i]=BufferAvgSmBL[i]/Point();
+      BufferBears[i]=BufferAvgSmBR[i]/Point();
+     }
+
+//--- return value of prev_calculated for next call
+   return(rates_total);
+  }
+//+------------------------------------------------------------------+
+//| Возвращает индекс максимального значения таймсерии High          |
+//+------------------------------------------------------------------+
+int Highest(const int count,const int start)
+  {
+   double array[];
+   ArraySetAsSeries(array,true);
+   return(CopyHigh(Symbol(),PERIOD_CURRENT,start,count,array)==count ? ArrayMaximum(array)+start : WRONG_VALUE);
+  }
+//+------------------------------------------------------------------+
+//| Возвращает индекс минимального значения таймсерии Low            |
+//+------------------------------------------------------------------+
+int Lowest(const int count,const int start)
+  {
+   double array[];
+   ArraySetAsSeries(array,true);
+   return(CopyLow(Symbol(),PERIOD_CURRENT,start,count,array)==count ? ArrayMinimum(array)+start : WRONG_VALUE);
+   return WRONG_VALUE;
+  }
+//+------------------------------------------------------------------+
+
+OUTPUT
+
+ASO:
+  custom: true
+  indicator_path: "MyIndicators/ASO.ex5"
+
+  inputs:
+    InpPeriod:
+      default: 9
+      type: int
+      min: 1
+      max: 50
+      step: 1
+      optimize: true
+
+    InpPeriodSm:
+      default: 1
+      type: int
+      min: 1
+      max: 10
+      step: 1
+      optimize: true
+
+    InpMode:
+      default: MODE_RSI
+      type: ENUM_MODE
+      optimize: false
+
+    InpMethod:
+      default: MODE_SMA
+      type: ENUM_MA_METHOD
+      optimize: false
+
+    InpAppliedPrice:
+      default: PRICE_CLOSE
+      type: ENUM_APPLIED_PRICE
+      optimize: false
+
+  enums:
+    ENUM_MODE:
+      - MODE_RSI
+      - MODE_MACD
+
+  buffers:
+    - name: Bulls
+      index: 0
+    - name: Bears
+      index: 1
+
+  base_conditions:
+    long: ""
+    short: ""
+
+
+------------------- note: 
+  enums:
+    ENUM_MODE:
+      - MODE_RSI
+      - MODE_MACD
+should only be  added to the output if custom enums are defined in the indicator, so in this example, this is defined as:
+//--- enums
+enum ENUM_MODE
+  {
+   MODE_RSI,   // RSI
+   MODE_STO    // Stochastic
+  };
+------------------- 
+
+
+SECOND EXAMPLE
+
+INDICATOR:
+//+---------------------------------------------------------------------+
+//|                                                  Color3rdGenXMA.mq5 | 
+//|                                         Copyright � 2011, EarnForex |
+//|                                           http://www.earnforex.com/ |
+//+---------------------------------------------------------------------+ 
+//| For the indicator to work, place the file SmoothAlgorithms.mqh      |
+//| in the directory: terminal_data_folder\MQL5\Include                 |
+//+---------------------------------------------------------------------+
+#property copyright "Copyright � 2011, EarnForex"
+#property link      "http://www.earnforex.com"
+//---- indicator version number
+#property version   "1.10"
+//---- drawing the indicator in the main window
+#property indicator_chart_window 
+//---- number of indicator buffers
+#property indicator_buffers 2 
+//---- only one plot is used
+#property indicator_plots   1
+//+-----------------------------------+
+//|  Indicator drawing parameters     |
+//+-----------------------------------+
+//---- drawing the indicator as a multicolored line
+#property indicator_type1   DRAW_COLOR_LINE
+//---- colors of the three-color line are
+#property indicator_color1  clrDeepPink,clrGray,clrBlue
+//---- the indicator line is a continuous curve
+#property indicator_style1  STYLE_SOLID
+//---- Indicator line width is equal to 2
+#property indicator_width1  2
+//---- displaying the indicator label
+#property indicator_label1  "3rdGenXMA"
+
+//+-----------------------------------+
+//|  CXMA class description           |
+//+-----------------------------------+
+#include <SmoothAlgorithms.mqh> 
+//+-----------------------------------+
+
+//---- declaration of the CXMA class variables from the SmoothAlgorithms.mqh file
+CXMA XMA1,XMA2;
+//+-----------------------------------+
+//|  Declaration of enumerations      |
+//+-----------------------------------+
+enum Applied_price_ //Type od constant
+  {
+   PRICE_CLOSE_ = 1,     //Close
+   PRICE_OPEN_,          //Open
+   PRICE_HIGH_,          //High
+   PRICE_LOW_,           //Low
+   PRICE_MEDIAN_,        //Median Price (HL/2)
+   PRICE_TYPICAL_,       //Typical Price (HLC/3)
+   PRICE_WEIGHTED_,      //Weighted Close (HLCC/4)
+   PRICE_SIMPL_,         //Simpl Price (OC/2)
+   PRICE_QUARTER_,       //Quarted Price (HLOC/4) 
+   PRICE_TRENDFOLLOW0_,  //TrendFollow_1 Price 
+   PRICE_TRENDFOLLOW1_,  //TrendFollow_2 Price 
+   PRICE_DEMARK_         //Demark Price
+  };
+/*enum Smooth_Method - enumeration is declared in SmoothAlgorithms.mqh
+  {
+   MODE_SMA_,  //SMA
+   MODE_EMA_,  //EMA
+   MODE_SMMA_, //SMMA
+   MODE_LWMA_, //LWMA
+   MODE_JJMA,  //JJMA
+   MODE_JurX,  //JurX
+   MODE_ParMA, //ParMA
+   MODE_T3,    //T3
+   MODE_VIDYA, //VIDYA
+   MODE_AMA,   //AMA
+  }; */
+//+-----------------------------------+
+//|  INDICATOR INPUT PARAMETERS       |
+//+-----------------------------------+
+input Smooth_Method XMA_Method=MODE_EMA; //averaging method
+input uint XLength=50; //smoothing depth                    
+input int XPhase=15; //smoothing parameter,
+                     // for JJMA that can change withing the range -100 ... +100. It impacts the quality of the intermediate process of smoothing;
+// For VIDIA, it is a CMO period, for AMA, it is a slow moving average period
+input Applied_price_ IPC=PRICE_TYPICAL;//price constant�
+input int Shift=0; // horizontal shift of the indicator in bars
+input int PriceShift=0; // vertical shift of the indicator in points�
+//+-----------------------------------+
+
+//---- declaration of dynamic arrays that will further be 
+// used as indicator buffers
+double IndBuffer[];
+double ColorIndBuffer[];
+
+//---- Declaration of the average vertical shift value variable
+double dPriceShift;
+double Alpha;
+//---- Declaration of integer variables of data starting point
+int min_rates_total,min_rates_,SLength;
+//+------------------------------------------------------------------+   
+//| 3rdGenXMA indicator initialization function                      | 
+//+------------------------------------------------------------------+ 
+void OnInit()
+  {
+//---- Initialization of variables of the start of data calculation
+   SLength=int(2*XLength);
+   double Lambda=1.0*SLength/(1.0*XLength);
+   Alpha=Lambda *(SLength-1)/(SLength-Lambda);
+
+//---- Initialization of variables of the start of data calculation
+   min_rates_=XMA1.GetStartBars(XMA_Method,SLength,XPhase);
+   min_rates_total=min_rates_+XMA1.GetStartBars(XMA_Method,XLength,XPhase)+2;
+
+//---- setting alerts for invalid values of external parameters
+   XMA1.XMALengthCheck("XLength",XLength);
+//---- setting alerts for invalid values of external parameters
+   XMA1.XMAPhaseCheck("XPhase",XPhase,XMA_Method);
+
+//---- Initialization of the vertical shift
+   dPriceShift=_Point*PriceShift;
+
+//---- set dynamic array as an indicator buffer
+   SetIndexBuffer(0,IndBuffer,INDICATOR_DATA);
+//---- setting dynamic array as a color index buffer   
+   SetIndexBuffer(1,ColorIndBuffer,INDICATOR_COLOR_INDEX);
+
+//---- moving the indicator 1 horizontally
+   PlotIndexSetInteger(0,PLOT_SHIFT,Shift);
+//---- performing the shift of beginning of indicator drawing
+   PlotIndexSetInteger(0,PLOT_DRAW_BEGIN,min_rates_total);
+//--- Create label to display in DataWindow
+   PlotIndexSetString(0,PLOT_LABEL,"3rdGenXMA");
+//---- setting the indicator values that won't be visible on a chart
+   PlotIndexSetDouble(0,PLOT_EMPTY_VALUE,0.0);
+
+//---- initializations of variable for indicator short name
+   string shortname;
+   string Smooth=XMA1.GetString_MA_Method(XMA_Method);
+   StringConcatenate(shortname,"3rdGenXMA(",Smooth,", ",XLength,")");
+//---- creating name for displaying if separate sub-window and in tooltip
+   IndicatorSetString(INDICATOR_SHORTNAME,shortname);
+
+//---- determine the accuracy of displaying indicator values
+   IndicatorSetInteger(INDICATOR_DIGITS,_Digits+1);
+//---- end of initialization
+  }
+//+------------------------------------------------------------------+ 
+//| 3rdGenXMA iteration function                                     | 
+//+------------------------------------------------------------------+ 
+int OnCalculate(
+                const int rates_total,    // amount of history in bars at the current tick
+                const int prev_calculated,// amount of history in bars at the previous tick
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[]
+                )
+  {
+//---- checking the number of bars to be enough for calculation
+   if(rates_total<min_rates_total) return(0);
+
+//---- declaration of variables with a floating point  
+   double price,x1xma,x2xma,x3rdGenXMA;
+//---- Declaration of integer variables and getting the bars already calculated
+   int first,bar,clr;
+
+//---- calculation of the starting number first for the bar recalculation loop
+   if(prev_calculated>rates_total || prev_calculated<=0) // checking for the first start of calculation of an indicator
+     {
+      first=0; // starting number for calculation of all bars
+     }
+   else first=prev_calculated-1; // starting number for calculation of new bars
+
+//---- Main calculation loop of the indicator
+   for(bar=first; bar<rates_total && !IsStopped(); bar++)
+     {
+      //---- Calling the PriceSeries function to get the input price
+      price=PriceSeries(IPC,bar,open,low,high,close);
+
+      //---- XMASeries function two calls
+      x1xma=XMA1.XMASeries(0,prev_calculated,rates_total,XMA_Method,XPhase,SLength,price,bar,false);
+      x2xma=XMA2.XMASeries(min_rates_,prev_calculated,rates_total,XMA_Method,XPhase,XLength,x1xma,bar,false);
+      x3rdGenXMA=(Alpha+1)*x1xma-Alpha*x2xma;
+      //----       
+      IndBuffer[bar]=x3rdGenXMA+dPriceShift;
+     }
+
+//---- correction of the first variable value
+   if(prev_calculated>rates_total || prev_calculated<=0) // checking for the first start of calculation of an indicator
+      first=min_rates_total; // starting index for calculation of all bars
+
+//---- Main loop of the signal line coloring
+   for(bar=first; bar<rates_total; bar++)
+     {
+      clr=1;
+      if(IndBuffer[bar-1]<IndBuffer[bar]) clr=2;
+      if(IndBuffer[bar-1]>IndBuffer[bar]) clr=0;
+      ColorIndBuffer[bar]=clr;
+     }
+//----     
+   return(rates_total);
+  }
+//+------------------------------------------------------------------+
+
+
+OUTPUT:
+
+Color3rdGenXMA:
+  custom: true
+  indicator_path: "MyIndicators/color3rdgenxma.ex5"
+
+  includes:
+    - SmoothAlgorithms.mqh
+
+  inputs:
+    XMA_Method:
+      default: MODE_EMA
+      type: Smooth_Method
+      optimize: false
+
+    XLength:
+      default: 50
+      type: int
+      min: 5
+      max: 200
+      step: 5
+      optimize: true
+
+    XPhase:
+      default: 15
+      type: int
+      min: -100
+      max: 100
+      step: 5
+      optimize: true
+      
+    IPC:
+      default: PRICE_TYPICAL_
+      type: ENUM_APPLIED_PRICE_
+      optimize: false
+    
+    Shift:
+      default: 0
+      type: int
+      min: 0
+      max: 10
+      step: 1
+      optimize: false
+    
+    PriceShift:
+      default: 0
+      type: int
+      min: -50
+      max: 50
+      step: 1
+      optimize: false
+
+  buffers:
+    - name: IndBuffer
+      index: 0
+    - name: ColorIndBuffer
+      index: 1
+
+  base_conditions:
+    long: ""
+    short: ""
+
+------------------- note: 
+  includes:
+    - SmoothAlgorithms.mqh
+
+should only be  added to the output if custom includes are defined in the indicator, so in this example, this is defined as:
+#include <SmoothAlgorithms.mqh>;
+------------------- 
+
+Confirm you understand and and say if you are ready for my new indiactor 

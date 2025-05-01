@@ -1,0 +1,59 @@
+Color3rdGenXMA:
+  custom: true
+  indicator_path: "MyIndicators/color3rdgenxma.ex5"
+
+  includes:
+    - SmoothAlgorithms.mqh
+
+  inputs:
+    XMA_Method:
+      default: MODE_EMA
+      type: Smooth_Method
+      optimize: false
+
+    XLength:
+      default: 50
+      type: int
+      min: 5
+      max: 200
+      step: 5
+      optimize: true
+
+    XPhase:
+      default: 15
+      type: int
+      min: -100
+      max: 100
+      step: 5
+      optimize: true
+
+#    IPC:
+#      default: PRICE_TYPICAL_
+#      type: ENUM_APPLIED_PRICE_
+#      optimize: false
+#
+#    Shift:
+#      default: 0
+#      type: int
+#      min: 0
+#      max: 10
+#      step: 1
+#      optimize: false
+#
+#    PriceShift:
+#      default: 0
+#      type: int
+#      min: -50
+#      max: 50
+#      step: 1
+#      optimize: false
+
+  buffers:
+    - name: IndBuffer
+      index: 0
+    - name: ColorIndBuffer
+      index: 1
+
+  base_conditions:
+    long: ""
+    short: ""

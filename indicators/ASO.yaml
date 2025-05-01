@@ -1,9 +1,8 @@
 ASO:
   custom: true
-  indicator_path: "MyIndicators\\ASO.ex5"
+  indicator_path: "MyIndicators/ASO.ex5"
 
   inputs:
-
     InpPeriod:
       default: 9
       type: int
@@ -34,6 +33,11 @@ ASO:
       default: PRICE_CLOSE
       type: ENUM_APPLIED_PRICE
       optimize: false
+
+  enums:
+    ENUM_MODE:
+      - MODE_RSI
+      - MODE_MACD
 
   buffers:
     - name: Bulls
