@@ -1,6 +1,6 @@
 from pathlib import Path
 # from mt5_pipeline.ea_generator import generate_eas_from_yaml
-from mt5_pipeline.config_generator import generate_ini_config
+from dev_dir.config_generator import generate_ini_config
 from mt5_pipeline.runner import run_mt5_test
 from mt5_pipeline.results_parser import parse_mt5_results  # coming soon
 
