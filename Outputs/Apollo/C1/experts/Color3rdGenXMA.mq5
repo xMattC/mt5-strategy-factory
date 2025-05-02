@@ -46,11 +46,11 @@ void stratagy(string symbol, int indi_handle){
     CopyBuffer(indi_handle, 1, 1, 10, ColorIndBuffer);
 
 
-    bool long_in = (0
+    bool long_in = (
         
     );
 
-    bool short_in = (0
+    bool short_in = (
         
     );
 

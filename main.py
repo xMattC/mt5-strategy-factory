@@ -1,47 +1,63 @@
+from subprocess import run, CalledProcessError
+from time import perf_counter
 from pathlib import Path
-# from mt5_pipeline.ea_generator import generate_eas_from_yaml
-from dev_dir.config_generator import generate_ini_config
-from mt5_pipeline.runner import run_mt5_test
-from mt5_pipeline.results_parser import parse_mt5_results  # coming soon
 
-# --- Configurable paths ---
-# yaml_dir = Path("indicators")
-eas_dir = Path("ea")  # generated .mq5 files
-compiled_ea_dir = Path("C:/Users/mkcor/AppData/Roaming/MetaQuotes/Terminal/49CDDEAA95A409ED22BD2287BB67CB9C/MQL5/Experts/meta-strategist/outputs_dir/ea")
-config_dir = compiled_ea_dir
+from src.utils import create_structure
+from src.ini_generator import IniConfig, generate_all_ini_configs
+from src.ea_generator import generate_all_eas
+from src.path_config import load_paths
 
-results_dir = Path("C:/Users/mkcor/AppData/Roaming/MetaQuotes/Terminal/49CDDEAA95A409ED22BD2287BB67CB9C/MQL5/Experts/meta-strategist/outputs_dir/results")
 
-# # --- 1. Generate EA files from YAML ---
-# generate_eas_from_yaml(yaml_dir, eas_dir)
+def run_ea(mt5_terminal: Path, ini_file: Path):
+    start = perf_counter()
+    try:
+        run([str(mt5_terminal), f'/config:{ini_file}'], check=True)
+        print(f"[INFO] MT5 ran successfully in {perf_counter() - start:.2f}s.")
+    except CalledProcessError as e:
+        print(f"[ERROR] MT5 failed after {perf_counter() - start:.2f}s. Code: {e.returncode}")
+        raise
 
-# --- 2. Create .ini config for each EA ---
-for ea_path in compiled_ea_dir.glob("*.ex5"):
-    name = ea_path.stem
-    ini_path = config_dir / f"{name}.ini"
-    inputs = {}  # Load parsed input params from YAML or elsewhere
 
-    generate_ini_config(
-        expert_path=(Path("C:/Users/mkcor/AppData/Roaming/MetaQuotes/Terminal/49CDDEAA95A409ED22BD2287BB67CB9C/MQL5/Experts")),
-        output_path=ini_path,
-        start_date="2012.01.01",
-        end_date="2022.01.01",
-        period="Daily",
-        custom_criteria="4",
-        symbol_mode="1",
-        data_split="month",
-        risk=2.0,
-        sl=1.5,
-        tp=1.0,
-        report_name=f"{name}_ins",
-        inputs=inputs
+def main(run_name: str, indicator_type: str, base_config: IniConfig):
+    paths = load_paths()
+    output_base = paths["PRO_ROOT"] / 'Outputs' / run_name / indicator_type
+    ini_output_dir = output_base / 'ini_files'
+    compiled_ea_dir = output_base / 'experts'
+
+    # 1. Create output folders
+    create_structure(paths["PRO_ROOT"], run_name, indicator_type)
+
+    # 2. Generate Expert Advisors
+    template_path = paths["TEMPLATE_DIR"] / 'template_c1_mq5.j2'
+    generate_all_eas(template_path, paths["INDICATOR_DIR"], compiled_ea_dir)
+
+    # 3. Update config with actual output dir
+    base_config.output_dir = ini_output_dir
+
+    # 4. Generate .ini configs
+    generate_all_ini_configs(paths["INDICATOR_DIR"], compiled_ea_dir, base_config, in_sample=False)
+
+    # 5. RUN in sample
+    #  run_ea(paths["MT5_TERM_EXE"], ini_file)
+
+    # 6. process data
+
+    # 7. RUN out of sample
+
+
+if __name__ == "__main__":
+    RUN_NAME = 'Apollo'
+    INDICATOR_TYPE = 'C1'
+    BASE_CONFIG = IniConfig(
+        output_dir=Path("tbd"),  # Will be set inside main()
+        start_date="2023.01.01",
+        end_date="2023.12.31",
+        period="H1",
+        custom_criteria="ProfitFactor",
+        symbol_mode="ALL",
+        data_split="year",
+        risk=0.01,
+        sl=50,
+        tp=100
     )
-
-# --- 3. Run MT5 tests ---
-mt5_terminal_path = Path(r"C:/Program Files/FTMO MetaTrader 5/terminal64.exe")
-
-for ini_file in config_dir.glob("*.ini"):
-    run_mt5_test(mt5_terminal_path, ini_file)
-
-# --- 4. Post-process results (coming soon) ---
-parse_mt5_results(results_dir)
+    main(RUN_NAME, INDICATOR_TYPE, BASE_CONFIG)
