@@ -10,7 +10,7 @@ def load_paths() -> dict:
     Return a dictionary of key project paths based on hardcoded root inputs.
     Raises FileNotFoundError if any critical path is missing.
     """
-    pro_root = mt5_root / "MQL5" / "Experts" / "meta-strategist" / "dev_dir"
+    pro_root = mt5_root / "MQL5" / "Experts" / "meta-strategist"
 
     # Derived paths
     mt5_test_cache = mt5_terminal_exe.parent / "Tester" / "cache"
