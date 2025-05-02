@@ -2,39 +2,62 @@ from subprocess import run, CalledProcessError
 from time import perf_counter
 from pathlib import Path
 
-# Path to the MetaTrader 5 terminal executable
-MT5_TERM_EXE = Path(r'C:\Program Files\FTMO MetaTrader 5\terminal64.exe')
-
-# Path to the .ini configuration file for the test
-INI_FILE = Path(
-    r'C:\Users\mkcor\AppData\Roaming\MetaQuotes\Terminal\49CDDEAA95A409ED22BD2287BB67CB9C\MQL5\Experts\meta-strategist\dev_dir\Aroon.ini'
-)
-TEST_CASH = Path.joinpath(MT5_TERM_EXE, r"Tester\cache")
+from utils import create_structure
+from ini_generator import IniConfig, generate_all_ini_configs
+from ea_generator import generate_all_eas
+from path_config import load_paths
 
 
-def run_test(ini_file: Path):
-    """Launches MetaTrader 5 with a .ini configuration file.
-
-    param ini_file: Path to the .ini file used for testing or optimization.
-    """
-    start = perf_counter()  # Start high-precision timer
-
+def run_ea(mt5_terminal: Path, ini_file: Path):
+    start = perf_counter()
     try:
-        run([str(MT5_TERM_EXE), f'/config:{ini_file}'], check=True)
+        run([str(mt5_terminal), f'/config:{ini_file}'], check=True)
         print(f"[INFO] MT5 ran successfully in {perf_counter() - start:.2f}s.")
-
     except CalledProcessError as e:
         print(f"[ERROR] MT5 failed after {perf_counter() - start:.2f}s. Code: {e.returncode}")
         raise
 
 
-def delete_mt5_test_cache(test_cash):
-    """ Deletes all files in the MetaTrader 5 Tester\\cache directory."""
-    if test_cash.exists() and test_cash.is_dir():
-        for file in test_cash.iterdir():
-            if file.is_file():
-                file.unlink()
+def main(run_name: str, indicator_type: str, base_config: IniConfig):
+    paths = load_paths()
+    output_base = paths["PRO_ROOT"] / 'Outputs' / run_name / indicator_type
+    ini_output_dir = output_base / 'ini_files'
+    compiled_ea_dir = output_base / 'experts'
+
+    # 1. Create output folders
+    create_structure(paths["PRO_ROOT"], run_name, indicator_type)
+
+    # 2. Generate Expert Advisors
+    template_path = paths["TEMPLATE_DIR"] / 'template_c1_mq5.j2'
+    generate_all_eas(template_path, paths["INDICATOR_DIR"], compiled_ea_dir)
+
+    # 3. Update config with actual output dir
+    base_config.output_dir = ini_output_dir
+
+    # 4. Generate .ini configs
+    generate_all_ini_configs(paths["INDICATOR_DIR"], compiled_ea_dir, base_config, in_sample=False)
+
+    # 5. RUN in sample
+    #  run_ea(paths["MT5_TERM_EXE"], ini_file)
+
+    # 6. process data
+
+    # 7. RUN out of sample
 
 
 if __name__ == "__main__":
-    run_test(INI_FILE)
+    RUN_NAME = 'Apollo'
+    INDICATOR_TYPE = 'C1'
+    BASE_CONFIG = IniConfig(
+        output_dir=Path("tbd"),  # Will be set inside main()
+        start_date="2023.01.01",
+        end_date="2023.12.31",
+        period="H1",
+        custom_criteria="ProfitFactor",
+        symbol_mode="ALL",
+        data_split="year",
+        risk=0.01,
+        sl=50,
+        tp=100
+    )
+    main(RUN_NAME, INDICATOR_TYPE, BASE_CONFIG)
