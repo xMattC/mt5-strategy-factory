@@ -1,55 +1,43 @@
-from subprocess import run, CalledProcessError
-from time import perf_counter
-from pathlib import Path
-
 from src.utils import create_structure
 from src.ini_generator import IniConfig, generate_all_ini_configs
 from src.ea_generator import generate_all_eas
 from src.path_config import load_paths
+from src.run_ea import run_all_eas
 
 
-def run_ea(mt5_terminal: Path, ini_file: Path):
-    start = perf_counter()
-    try:
-        run([str(mt5_terminal), f'/config:{ini_file}'], check=True)
-        print(f"[INFO] MT5 ran successfully in {perf_counter() - start:.2f}s.")
-    except CalledProcessError as e:
-        print(f"[ERROR] MT5 failed after {perf_counter() - start:.2f}s. Code: {e.returncode}")
-        raise
+def main(indicator_type: str, base_config: IniConfig):
+    """ Main pipeline to generate and run MT5 Expert Advisors based on indicator templates and configurations.
 
+    param indicator_type: Type/category of indicators being processed (e.g., 'C1')
+    param base_config: Base configuration object for .ini file generation
+    """
+    paths = load_paths()  # Load static path settings
 
-def main(run_name: str, indicator_type: str, base_config: IniConfig):
-    paths = load_paths()
-    output_base = paths["PRO_ROOT"] / 'Outputs' / run_name / indicator_type
-    ini_output_dir = output_base / 'ini_files'
+    # Create all output folders for this run and get base path
+    output_base = create_structure(base_config.run_name, indicator_type)
+    ini_files_dir = output_base / 'ini_files'
     compiled_ea_dir = output_base / 'experts'
 
-    # 1. Create output folders
-    create_structure(paths["PRO_ROOT"], run_name, indicator_type)
+    # Generate EA source code (.mq5) from template for each indicator YAML
+    generate_all_eas(compiled_ea_dir)
 
-    # 2. Generate Expert Advisors
-    template_path = paths["TEMPLATE_DIR"] / 'template_c1_mq5.j2'
-    generate_all_eas(template_path, paths["INDICATOR_DIR"], compiled_ea_dir)
+    # Generate .ini configuration files for in-sample optimization
+    generate_all_ini_configs(expert_dir=compiled_ea_dir, config=base_config, ini_files_dir=ini_files_dir,
+                             in_sample=True)
 
-    # 3. Update config with actual output dir
-    base_config.output_dir = ini_output_dir
+    # Run all in-sample .ini files through MT5 Strategy Tester
+    run_all_eas(ini_files_dir)
 
-    # 4. Generate .ini configs
-    generate_all_ini_configs(paths["INDICATOR_DIR"], compiled_ea_dir, base_config, in_sample=False)
+    # TODO: Process results (e.g., parse XML reports, collect best parameters)
 
-    # 5. RUN in sample
-    #  run_ea(paths["MT5_TERM_EXE"], ini_file)
-
-    # 6. process data
-
-    # 7. RUN out of sample
+    # TODO: Generate and run out-of-sample .ini files
 
 
 if __name__ == "__main__":
-    RUN_NAME = 'Apollo'
     INDICATOR_TYPE = 'C1'
+
     BASE_CONFIG = IniConfig(
-        output_dir=Path("tbd"),  # Will be set inside main()
+        run_name='Apollo',
         start_date="2023.01.01",
         end_date="2023.12.31",
         period="H1",
@@ -60,4 +48,5 @@ if __name__ == "__main__":
         sl=50,
         tp=100
     )
-    main(RUN_NAME, INDICATOR_TYPE, BASE_CONFIG)
+
+    main(INDICATOR_TYPE, BASE_CONFIG)
