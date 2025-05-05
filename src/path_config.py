@@ -14,21 +14,18 @@ def load_paths() -> dict:
 
     # Derived paths
     mt5_test_cache = mt5_terminal_exe.parent / "Tester" / "cache"
+    mt5_experts_dir = mt5_root / "MQL5" / "Experts"
     template_dir = pro_root / "ea_templates"
     indicator_dir = pro_root / "indicators"
 
-    # Paths to validate
     required = {
         "MT5_ROOT": mt5_root,
         "MT5_TERM_EXE": mt5_terminal_exe,
+        "MT5_EXPERT_DIR": mt5_experts_dir,
         "PRO_ROOT": pro_root,
         "MT5_TEST_CACHE": mt5_test_cache,
         "TEMPLATE_DIR": template_dir,
         "INDICATOR_DIR": indicator_dir
     }
-
-    # for name, path in required.items():
-    #     if not path.exists():
-    #         raise FileNotFoundError(f"[CONFIG ERROR] {name} does not exist at: {path}")
 
     return required
