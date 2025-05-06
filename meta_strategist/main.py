@@ -1,6 +1,6 @@
-from meta_strategist.stages import get_stage
-from meta_strategist.ini_generator import IniConfig
-from meta_strategist.optimisation_pipeline import OptimizationPipeline
+from meta_strategist.core.stages import get_stage
+from meta_strategist.generators.ini_generator import IniConfig
+from meta_strategist.core.optimisation_pipeline import OptimizationPipeline
 
 CONFIG = IniConfig(
     run_name='Apollo',

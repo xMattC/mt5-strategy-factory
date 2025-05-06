@@ -3,8 +3,9 @@ import logging
 import yaml
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, Optional
 
-from meta_strategist.path_config import load_paths
+from meta_strategist.utils.pathing import load_paths
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +24,12 @@ class IniConfig:
     tp: float
 
 
-def generate_ini_for_indicator(indicator_name: str, expert_dir: Path, config: IniConfig, ini_files_dir: Path,
-                               in_sample: bool):
+def create_ini(indi_name: str, expert_dir: Path, config: IniConfig, ini_files_dir: Path, in_sample: bool,
+               optimized_parameters: Optional[Dict[str, str]] = None):
     """Generate a .ini file for a given indicator if .yaml and .ex5 exist."""
     paths = load_paths()
-    yaml_path = paths["INDICATOR_DIR"] / f"{indicator_name}.yaml"
-    ex5_path = expert_dir / f"{indicator_name}.ex5"
+    yaml_path = paths["INDICATOR_DIR"] / f"{indi_name}.yaml"
+    ex5_path = expert_dir / f"{indi_name}.ex5"
 
     if not yaml_path.exists():
         logger.warning(f"YAML file missing: {yaml_path.name}")
@@ -41,28 +42,29 @@ def generate_ini_for_indicator(indicator_name: str, expert_dir: Path, config: In
         data = yaml.safe_load(f)
 
     top_key = next(iter(data))
-    if indicator_name.lower() != top_key.lower():
-        logger.warning(f"YAML key '{top_key}' does not match filename '{indicator_name}'")
+    if indi_name.lower() != top_key.lower():
+        logger.warning(f"YAML key '{top_key}' does not match filename '{indi_name}'")
 
     inputs = data[top_key].get("inputs", {})
-    return _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample)
+    return _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample, optimized_parameters)
 
 
-def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool) -> Path:
+def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path, inputs: dict,
+                    in_sample: bool, optimized_parameters: Optional[Dict[str, str]]) -> Path:
     """Write a .ini configuration file with formatted sections."""
     cfg = configparser.ConfigParser()
     cfg.optionxform = str
 
-    indicator_name = expert_path.stem
+    indi_name = expert_path.stem
     sample_type = "IS" if in_sample else "OOS"
-    report_name = f"{indicator_name}_{sample_type}"
+    report_name = f"{indi_name}_{sample_type}"
 
     expert_rel_path = get_rel_expert_path(expert_path, load_paths()["MT5_EXPERT_DIR"])
 
     cfg["Tester"] = _build_tester_section(config, expert_rel_path, report_name)
-    cfg["TesterInputs"] = _build_tester_inputs(config, inputs, in_sample)
+    cfg["TesterInputs"] = _build_tester_inputs(config, inputs, in_sample, optimized_parameters)
 
-    ini_path = ini_dir / f"{indicator_name}_{sample_type}.ini"
+    ini_path = ini_dir / f"{indi_name}_{sample_type}.ini"
     ini_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(ini_path, "w", encoding="utf-16") as f:
@@ -96,7 +98,8 @@ def _build_tester_section(config: IniConfig, expert_path: str, report_name: str)
     }
 
 
-def _build_tester_inputs(config: IniConfig, inputs: dict, in_sample: bool) -> dict:
+def _build_tester_inputs(config: IniConfig, inputs: dict, in_sample: bool,
+                         optimized_parameters: Optional[Dict[str, str]]) -> dict:
     """Return dictionary for [TesterInputs] section."""
     tester_inputs = {
         "inp_lot_mode": "2||0||0||2||N",
@@ -112,7 +115,11 @@ def _build_tester_inputs(config: IniConfig, inputs: dict, in_sample: bool) -> di
     }
 
     for key, meta in inputs.items():
-        tester_inputs[key] = _format_input_line(meta, in_sample)
+        if optimized_parameters and key.lower() in optimized_parameters:
+            value = optimized_parameters[key.lower()]
+            tester_inputs[key] = f"{value}||0||0||1||N"
+        else:
+            tester_inputs[key] = _format_input_line(meta, in_sample)
 
     return tester_inputs
 
@@ -131,31 +138,15 @@ def _format_input_line(meta: dict, in_sample: bool) -> str:
 
 
 def _get_split_code(split_type: str, in_sample: bool) -> str:
-    """Return the correct split code string for the MT5 data split method.
-
-    This determines how MT5 should divide historical data into
-    in-sample (IS) and out-of-sample (OOS) segments during optimization.
-    """
-
     if split_type == "year":
-        if in_sample:
-            split_code = "2"  # IS year split
-        else:
-            split_code = "1"  # OOS year split
-
+        split_code = "2" if in_sample else "1"
     elif split_type == "month":
-        if in_sample:
-            split_code = "4"  # IS month split
-        else:
-            split_code = "3"  # OOS month split
-
+        split_code = "4" if in_sample else "3"
     else:
-        split_code = "0"  # No splitting
+        split_code = "0"
 
-    # This format is required by MT5: value||min||step||max||flag
     return f"{split_code}||0||0||3||N"
 
 
 def get_rel_expert_path(expert_path: Path, mt5_experts_dir: Path) -> str:
-    """Return MT5-compatible relative path to an EA from MQL5/Experts root."""
     return str(expert_path.relative_to(mt5_experts_dir))
