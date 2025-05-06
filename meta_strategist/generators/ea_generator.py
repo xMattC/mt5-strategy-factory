@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from jinja2 import Template
 
-from meta_strategist.path_config import load_paths
+from meta_strategist.utils.pathing import load_paths
 
 logger = logging.getLogger(__name__)
 
