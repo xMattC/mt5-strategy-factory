@@ -23,9 +23,8 @@ class IniConfig:
     tp: float
 
 
-def generate_ini_for_indicator(indicator_name: str, expert_dir: Path,
-                               config: IniConfig, ini_files_dir: Path,
-                               in_sample: bool) -> Path | None:
+def generate_ini_for_indicator(indicator_name: str, expert_dir: Path, config: IniConfig, ini_files_dir: Path,
+                               in_sample: bool):
     """Generate a .ini file for a given indicator if .yaml and .ex5 exist."""
     paths = load_paths()
     yaml_path = paths["INDICATOR_DIR"] / f"{indicator_name}.yaml"
@@ -49,8 +48,7 @@ def generate_ini_for_indicator(indicator_name: str, expert_dir: Path,
     return _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample)
 
 
-def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path,
-                    inputs: dict, in_sample: bool) -> Path:
+def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool) -> Path:
     """Write a .ini configuration file with formatted sections."""
     cfg = configparser.ConfigParser()
     cfg.optionxform = str
@@ -129,17 +127,33 @@ def _format_input_line(meta: dict, in_sample: bool) -> str:
         step = meta.get("step", 1)
         return f"{val}||{min_v}||{step}||{max_v}||Y"
 
-    # Fixed value format (non-optimized input)
     return f"{val}||0||0||1||N"
 
 
 def _get_split_code(split_type: str, in_sample: bool) -> str:
-    return {
-        (False, 'year'): '1',
-        (True, 'year'): '2',
-        (False, 'month'): '3',
-        (True, 'month'): '4',
-    }.get((in_sample, split_type), '0') + "||0||0||3||N"
+    """Return the correct split code string for the MT5 data split method.
+
+    This determines how MT5 should divide historical data into
+    in-sample (IS) and out-of-sample (OOS) segments during optimization.
+    """
+
+    if split_type == "year":
+        if in_sample:
+            split_code = "2"  # IS year split
+        else:
+            split_code = "1"  # OOS year split
+
+    elif split_type == "month":
+        if in_sample:
+            split_code = "4"  # IS month split
+        else:
+            split_code = "3"  # OOS month split
+
+    else:
+        split_code = "0"  # No splitting
+
+    # This format is required by MT5: value||min||step||max||flag
+    return f"{split_code}||0||0||3||N"
 
 
 def get_rel_expert_path(expert_path: Path, mt5_experts_dir: Path) -> str:
