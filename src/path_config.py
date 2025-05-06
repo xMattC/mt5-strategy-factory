@@ -6,9 +6,7 @@ mt5_terminal_exe = Path(r"C:\Program Files\FTMO MetaTrader 5\terminal64.exe")
 
 
 def load_paths() -> dict:
-    """
-    Return a dictionary of key project paths based on hardcoded root inputs.
-    Raises FileNotFoundError if any critical path is missing.
+    """ Return a dictionary of key project paths based on hardcoded root inputs.
     """
     pro_root = mt5_root / "MQL5" / "Experts" / "meta-strategist"
 
@@ -18,7 +16,7 @@ def load_paths() -> dict:
     template_dir = pro_root / "ea_templates"
     indicator_dir = pro_root / "indicators"
 
-    required = {
+    paths = {
         "MT5_ROOT": mt5_root,
         "MT5_TERM_EXE": mt5_terminal_exe,
         "MT5_EXPERT_DIR": mt5_experts_dir,
@@ -28,4 +26,4 @@ def load_paths() -> dict:
         "INDICATOR_DIR": indicator_dir
     }
 
-    return required
+    return paths
