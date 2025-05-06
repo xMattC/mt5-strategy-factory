@@ -11,19 +11,19 @@ from meta_strategist.reporting.result_summary import update_combined_results
 from meta_strategist.reporting.extract_top_parameters import extract_top_parameters
 
 
-class OptimizationPipeline:
+class Optimization:
     """ Coordinates the full MT5 optimization process for a single pipeline stage.
 
     This includes:
     - Setting up output directories and EA templates
-    - Running in-sample (IS) and out-of-sample (OOS) optimizations
-    - Extracting and logging optimized parameters from test results
+    - Running in-sample (IS) and out-of-sample (OOS) optimisations
+    - Extracting and logging optimised parameters from test results
     """
 
     def __init__(self, config: IniConfig, stage: Stage, recompile_ea: bool = True):
         """Initialize the pipeline with config, stage, and EA compilation preference.
 
-        param config: Optimization settings and test parameters
+        param config: Optimisation settings and test parameters
         param stage: Current stage (C1, C2, Volume, Exit, etc.)
         param recompile_ea: Whether to regenerate .mq5 files from templates
         """
@@ -135,5 +135,5 @@ if __name__ == "__main__":
         tp=1
     )
     STAGE = get_stage("Trigger")
-    pipeline = OptimizationPipeline(config=CONFIG, stage=STAGE, recompile_ea=False)
+    pipeline = Optimization(config=CONFIG, stage=STAGE, recompile_ea=False)
     pipeline.run_optimisation()
