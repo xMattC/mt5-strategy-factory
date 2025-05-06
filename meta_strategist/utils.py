@@ -3,6 +3,7 @@ import logging
 import shutil
 from datetime import datetime
 from pathlib import Path
+from xml.sax import ContentHandler, parse
 
 from meta_strategist.log_config import setup_logging
 from meta_strategist.path_config import load_paths
@@ -86,3 +87,28 @@ def init_stage_logger(stage_name: str, output_base: Path) -> logging.Logger:
     logger = logging.getLogger(stage_name)
     logger.info(f"Logging initialized for stage: {stage_name} optimisation")
     return logger
+
+
+class ExcelHandler(ContentHandler):
+    def __init__(self):
+        self.tables = []
+        self.chars = []
+
+    def characters(self, content):
+        self.chars.append(content)
+
+    def startElement(self, name, attrs):
+        if name == "Table":
+            self.rows = []
+        elif name == "Row":
+            self.cells = []
+        elif name == "Data":
+            self.chars = []
+
+    def endElement(self, name):
+        if name == "Table":
+            self.tables.append(self.rows)
+        elif name == "Row":
+            self.rows.append(self.cells)
+        elif name == "Data":
+            self.cells.append("".join(self.chars))
