@@ -1,6 +1,6 @@
 from meta_strategist.pipeline.stages import get_stage
 from meta_strategist.generators.ini_generator import IniConfig
-from meta_strategist.pipeline.optimisation_pipeline import OptimizationPipeline
+from meta_strategist.pipeline.optimisation import Optimization
 
 CONFIG = IniConfig(
     run_name='Apollo',
@@ -18,7 +18,7 @@ STAGE = get_stage("C1")
 
 
 def main():
-    pipeline = OptimizationPipeline(CONFIG, STAGE)
+    pipeline = Optimization(CONFIG, STAGE)
     pipeline.run_optimisation()
 
 
