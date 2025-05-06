@@ -1,22 +1,26 @@
-from src.stages import get_stage
-from src.ini_generator import IniConfig
-from src.optimisation_pipeline import OptimizationPipeline
+from meta_strategist.stages import get_stage
+from meta_strategist.ini_generator import IniConfig
+from meta_strategist.optimisation_pipeline import OptimizationPipeline
+
+CONFIG = IniConfig(
+    run_name='Apollo',
+    start_date="2023.01.01",
+    end_date="2023.12.31",
+    period="D1",
+    custom_criteria="ProfitFactor",
+    symbol_mode="ALL",
+    data_split="year",
+    risk=0.01,
+    sl=50,
+    tp=100
+)
+STAGE = get_stage("C1")
+
+
+def main():
+    pipeline = OptimizationPipeline(CONFIG, STAGE)
+    pipeline.run_optimisation()
 
 
 if __name__ == "__main__":
-    CONFIG = IniConfig(
-        run_name='Apollo',
-        start_date="2023.01.01",
-        end_date="2023.12.31",
-        period="H1",
-        custom_criteria="ProfitFactor",
-        symbol_mode="ALL",
-        data_split="year",
-        risk=0.01,
-        sl=50,
-        tp=100
-    )
-    STAGE = get_stage("C1")
-
-    pipeline = OptimizationPipeline(CONFIG, STAGE)
-    pipeline.run_optimisation()
+    main()

@@ -3,7 +3,7 @@ from subprocess import run, CalledProcessError
 from time import perf_counter
 from pathlib import Path
 
-from src.path_config import load_paths
+from meta_strategist.path_config import load_paths
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,10 @@ def run_ea(ini_file: Path):
     start = perf_counter()
     paths = load_paths()
     mt5_terminal = str(paths["MT5_TERM_EXE"])
+
+    if not ini_file:
+        logger.warning(f"No .ini files {ini_file} found")
+        return
 
     try:
         logger.info(f"Running MT5 with INI: {ini_file}")
