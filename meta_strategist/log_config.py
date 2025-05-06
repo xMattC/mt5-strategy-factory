@@ -9,7 +9,7 @@ def setup_logging(log_file: Path = None, level: int = logging.INFO):
     param log_file: Optional path to a log file
     param level: Logging level (e.g., logging.INFO, logging.DEBUG)
     """
-    log_format = "%(asctime)s [%(levelname)s] %(message)s"
+    log_format = "%(asctime)s [%(levelname)s] [%(funcName)s] %(message)s"
     handlers = [logging.StreamHandler()]
 
     if log_file:

@@ -1,21 +1,8 @@
-from src.post_processing import (
-    post_process_c1,
-    post_process_c2,
-    post_process_volume,
-    post_process_exit,
-    post_process_baseline,
-)
-
-from src.dependencies import (
-    inject_c1_constants,
-    inject_c1_c2_constants,
-    inject_all_constants,
-)
 
 
 class Stage:
     def __init__(self, name, template_name, post_process_is, depends_on):
-        """ Represents a single optimization stage (e.g., 'C1', 'Volume') in the MT5 pipeline.
+        """ Represents a single optimization stage (e.g., 'Trigger', 'Volume') in the MT5 pipeline.
 
         param name: Stage name, used in paths and console output
         param template_name: Name of the Jinja2 template file to use for this stage's EA
@@ -32,32 +19,42 @@ class Stage:
 
 
 def get_stage(name: str) -> Stage:
-    return next(stage for stage in STAGES if stage.name == name)
+    """ Retrieve a Stage object by its name.
+    param name: Name of the stage (e.g., 'Trigger', 'Conformation')
+    return: Stage object matching the name
+    raises: ValueError if no matching stage is found
+    """
+    matches = [stage for stage in STAGES if stage.name == name]
+
+    if matches:
+        return matches[0]
+    else:
+        raise ValueError(f"Invalid stage name: '{name}'")
 
 
 STAGES = [
-    Stage(name="C1",
+    Stage(name="Trigger",
           template_name="template_c1_mq5.j2",
-          post_process_is=post_process_c1,
+          post_process_is="post_process_trigger",
           depends_on=None),
 
-    Stage(name="C2",
+    Stage(name="Conformation",
           template_name="template_c2_mq5.j2",
-          post_process_is=post_process_c2,
-          depends_on=inject_c1_constants),
+          post_process_is="post_process_conf",
+          depends_on="inject_trigger_results"),
 
     Stage(name="Volume",
           template_name="template_volume_mq5.j2",
-          post_process_is=post_process_volume,
-          depends_on=inject_c1_c2_constants),
+          post_process_is="post_process_volume",
+          depends_on="inject_trig_conf_results"),
 
     Stage(name="Exit",
           template_name="template_exit_mq5.j2",
-          post_process_is=post_process_exit,
-          depends_on=inject_c1_c2_constants),
+          post_process_is="post_process_exit",
+          depends_on="inject_trig_conf_results"),
 
-    Stage(name="Baseline",
+    Stage(name="Trendline",
           template_name="template_baseline_mq5.j2",
-          post_process_is=post_process_baseline,
-          depends_on=inject_all_constants),
+          post_process_is="post_process_trendline",
+          depends_on="inject_all_results"),
 ]

@@ -4,8 +4,8 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from src.log_config import setup_logging
-from src.path_config import load_paths
+from meta_strategist.log_config import setup_logging
+from meta_strategist.path_config import load_paths
 
 logger = logging.getLogger(__name__)
 

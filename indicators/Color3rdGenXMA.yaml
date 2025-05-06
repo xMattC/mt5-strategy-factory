@@ -55,5 +55,5 @@ Color3rdGenXMA:
       index: 1
 
   base_conditions:
-    long: ""
-    short: ""
+    long: "0"
+    short: "0"
