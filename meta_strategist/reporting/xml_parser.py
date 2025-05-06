@@ -1,12 +1,4 @@
-from dataclasses import dataclass
-from typing import Dict
-import pandas as pd
-from pathlib import Path
 from xml.sax import parse, ContentHandler
-import pandas as pd
-from pathlib import Path
-from typing import Dict
-from dataclasses import dataclass
 
 
 class ExcelHandler(ContentHandler):
@@ -32,10 +24,3 @@ class ExcelHandler(ContentHandler):
             self.rows.append(self.cells)
         elif name == "Data":
             self.cells.append("".join(self.chars))
-
-
-
-
-
-
-
