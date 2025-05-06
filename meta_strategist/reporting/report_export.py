@@ -1,7 +1,7 @@
 from pathlib import Path
 from xml.sax import parse, ContentHandler
 import pandas as pd
-from meta_strategist.parsers.xml_parser import ExcelHandler
+from meta_strategist.reporting.xml_parser import ExcelHandler
 
 
 def pretty_print_xml_table(xml_path: Path, max_rows: int = 10):

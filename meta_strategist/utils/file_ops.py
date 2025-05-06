@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 import logging
 
-from meta_strategist.parsers.report_export import write_xml_to_csv
+from meta_strategist.reporting.report_export import write_xml_to_csv
 from meta_strategist.utils.pathing import load_paths
 
 logger = logging.getLogger(__name__)

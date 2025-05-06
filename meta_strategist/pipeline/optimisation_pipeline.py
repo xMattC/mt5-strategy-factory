@@ -1,14 +1,14 @@
-from meta_strategist.parsers.csv_parser import extract_optimization_result, OptimizationResult
+from meta_strategist.reporting.csv_parser import extract_optimization_result, OptimizationResult
 from meta_strategist.generators.ea_generator import generate_all_eas, get_compiled_indicators
-from meta_strategist.core.ea_runner import run_ea
+from meta_strategist.pipeline.mt5_ea_runner import run_ea
 from meta_strategist.generators.ini_generator import IniConfig, create_ini
 from meta_strategist.utils.pathing import load_paths
-from meta_strategist.core.stages import Stage, get_stage
+from meta_strategist.pipeline.stages import Stage, get_stage
 from meta_strategist.utils.file_ops import copy_mt5_report, create_dir_structure
 from meta_strategist.utils.systems import delete_mt5_test_cache
 from meta_strategist.utils.logging import init_stage_logger
-
-# from meta_strategist.post_processing import ResultPostProcessor  # optional
+from meta_strategist.reporting.result_summary import update_combined_results
+from meta_strategist.reporting.extract_top_parameters import extract_top_parameters
 
 
 class OptimizationPipeline:
@@ -49,10 +49,14 @@ class OptimizationPipeline:
         self.generate_expert_advisors()
 
     def run_optimisation(self):
-        """Run IS optimization for all compiled indicators, then OOS tests.
-        """
+
         for indicator in get_compiled_indicators(self.expert_dir):
             self.run_single_optimization(indicator)
+
+            update_combined_results(results_dir=self.results_dir, stage_name=self.stage.name, print_summary=False)
+
+        # Once all indicators are processed, extract top parameter sets
+        extract_top_parameters(results_dir=self.results_dir, top_n=5, sort_by="Res_OOS")
 
     def run_single_optimization(self, indi_name: str):
         """Run IS and (if successful) OOS optimization for a single EA.
@@ -101,6 +105,7 @@ class OptimizationPipeline:
             result = extract_optimization_result(self.results_dir, indi_name)
             self.logger.info(f"Optimized parameters for {indi_name}: {result.parameters}")
             return result
+
         except Exception as e:
             self.logger.error(f"Failed to parse optimization result for {indi_name}: {e}")
             return None
