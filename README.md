@@ -125,17 +125,14 @@ pipeline.run_optimisation()
 
 ### This will:
 
-1. Generate and compile EAs from YAML + Jinja2
-
-2. Produce .ini files for in-sample runs
-
-3. Run MT5 backtests for each compiled EA
-
-4. Extract optimal parameters
-
-5. Generate .ini for out-of-sample testing using the best in-sample parameters
-
-6. Run out-of-sample tests and parse those results
+1. Generate and compile EAs from YAML configurations using Jinja2 templates
+2. Produce `.ini` files for in-sample (IS) testing
+3. Iterate through each indicator and:
+   - Run MT5 in-sample optimisation for the corresponding EA
+   - Extract the optimal parameters from the results
+   - Generate an out-of-sample (OOS) `.ini` file using those parameters
+   - Run the OOS backtest and parse the results
+   - Repeat until all indicators have been processed
 
 ### 3. Example Output
 
