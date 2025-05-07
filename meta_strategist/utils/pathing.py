@@ -17,7 +17,7 @@ def _load_private_paths() -> dict:
         raise ValueError(
             "It looks like you're still using placeholder values in 'config/local_paths.yaml'.\n "
             "Please update the file with your actual MT5 installation paths."
-            )
+        )
 
     return config
 
@@ -27,16 +27,16 @@ _private_paths = _load_private_paths()
 mt5_root = Path(_private_paths["mt5_root"])
 mt5_terminal_exe = Path(_private_paths["mt5_terminal_exe"])
 mt5_meta_editor_exe = Path(_private_paths["mt5_meta_editor_exe"])
+pro_root = Path(_private_paths["ms_root"])
 
 
 def load_paths() -> dict:
     """Return a dictionary of key project paths based on private path config."""
-    pro_root = mt5_root / "MQL5" / "Experts" / "meta-strategist"
 
     # Derived paths
     mt5_test_cache = mt5_terminal_exe.parent / "Tester" / "cache"
     mt5_experts_dir = mt5_root / "MQL5" / "Experts"
-    template_dir = pro_root / "meta_strategist" / "generators" / "templates"
+    template_dir = pro_root / "meta_strategist" / "generators" / "ea_templates"
     indicator_dir = pro_root / "indicators"
 
     return {
