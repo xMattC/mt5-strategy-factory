@@ -1,5 +1,10 @@
 # Meta Strategist
 Automation framework for generating, optimizing, and testing strategies in MetaTrader 5.
+
+
+
+
+
 ## Installation Instructions
 
 ### Step 1: Clone the Repository
