@@ -1,14 +1,36 @@
 from pathlib import Path
+import yaml
 
-# Hardcoded root paths
-mt5_root = Path(r"C:\Users\mkcor\AppData\Roaming\MetaQuotes\Terminal\49CDDEAA95A409ED22BD2287BB67CB9C")
-mt5_terminal_exe = Path(r"C:\Program Files\FTMO MetaTrader 5\terminal64.exe")
-mt5_meta_editor_exe = Path(r"C:\Program Files\FTMO MetaTrader 5\metaeditor64.exe")
+
+def _load_private_paths() -> dict:
+    """Load private MT5 paths from a local YAML config file, and validate them."""
+    config_path = Path(__file__).parent.parent.parent / "config" / "local_paths.yaml"
+
+    if not config_path.exists():
+        raise FileNotFoundError(f"Missing config file: {config_path}.")
+
+    with config_path.open("r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+
+    # Detect if the user left the template placeholders unchanged
+    if "YOUR_USERNAME" in config["mt5_root"] or "YOUR_TERMINAL_ID" in config["mt5_root"]:
+        raise ValueError(
+            "It looks like you're still using placeholder values in 'config/local_paths.yaml'.\n "
+            "Please update the file with your actual MT5 installation paths."
+            )
+
+    return config
+
+
+# Load private path configuration
+_private_paths = _load_private_paths()
+mt5_root = Path(_private_paths["mt5_root"])
+mt5_terminal_exe = Path(_private_paths["mt5_terminal_exe"])
+mt5_meta_editor_exe = Path(_private_paths["mt5_meta_editor_exe"])
 
 
 def load_paths() -> dict:
-    """ Return a dictionary of key project paths based on hardcoded root inputs.
-    """
+    """Return a dictionary of key project paths based on private path config."""
     pro_root = mt5_root / "MQL5" / "Experts" / "meta-strategist"
 
     # Derived paths
@@ -17,7 +39,7 @@ def load_paths() -> dict:
     template_dir = pro_root / "meta_strategist" / "generators" / "templates"
     indicator_dir = pro_root / "indicators"
 
-    paths = {
+    return {
         "MT5_ROOT": mt5_root,
         "MT5_TERM_EXE": mt5_terminal_exe,
         "MT5_EXPERT_DIR": mt5_experts_dir,
@@ -27,5 +49,3 @@ def load_paths() -> dict:
         "TEMPLATE_DIR": template_dir,
         "INDICATOR_DIR": indicator_dir
     }
-
-    return paths
