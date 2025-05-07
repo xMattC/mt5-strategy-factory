@@ -1,39 +1,45 @@
 # MetaTrader 5 Strategy Optimization Pipeline
 
-This project is a Python-powered framework for automating the strategy development cycle in MetaTrader 5 (MT5). It handles EA generation, compilation, configuration, batch testing, optimisation, and result evaluation — all in a structured, repeatable, and extensible way.
+This project is a Python-based framework for automating the strategy development lifecycle in MetaTrader 5 (MT5). It handles EA generation, compilation, configuration, batch testing, optimisation, and result evaluation — all in a structured, repeatable, and extensible way.
 
-Although created for trading automation, this project demonstrates broader software development skills including:
+**MetaTrader 5 (MT5)** is a multi-asset trading platform widely used for developing and executing automated trading strategies. [Learn more](https://www.metatrader5.com/en)
 
-- Clean Python architecture
+While designed for trading automation, this project also demonstrates general software engineering practices such as:
 
-- External tool orchestration via CLI
-
-- Template-based code generation (Jinja2)
-
-- XML parsing
-
-- File-based data pipelines
-
-- Modular stage-based processing
-
-- Logging and output structure
+- Clean Python architecture  
+- CLI orchestration of external tools  
+- Template-based code generation with Jinja2  
+- XML parsing with custom handlers  
+- File-based data pipelines  
+- Modular, stage-based processing  
+- Structured logging and output management  
 
 ## Key Features
 
+- **Modular Optimisation Pipeline**: Stage-specific execution (Trigger, Confirmation, Volume, Exit, Baseline, etc.)
+- **Dynamic EA Templating**: Generates `.mq5` files from YAML-based indicator configurations using Jinja2
+- **MT5 CLI Integration**: Automates compilation and strategy testing via `metaeditor64.exe` and `terminal64.exe`
+- **Structured Config Generation**: Produces `.ini` files per EA and test mode (IS/OOS), with precise parameter control
+- **Robust XML Parsing**: Extracts results from MT5’s XML output using a custom SAX parser
+- **Post-Processing Tools**: Aggregates results into sorted `.csv` files, exports summaries, and logs failed tests
 
-- Modular Optimisation Pipeline: Structured per-stage execution (Trigger, Confirmation, Volume, Exit, Baseline, etc.)
+## Use Cases
 
-- Dynamic EA Templating: Uses Jinja2 to generate .mq5 files from user-defined YAML indicator configurations
+- Quantitative traders building indicator-based strategies  
+- Developers testing EA variations in batch  
+- Researchers optimising and comparing signal configurations  
 
-- MT5 CLI Integration: Automates EA compilation and strategy testing via metaeditor64.exe and terminal64.exe
+## Pipeline Overview
 
-- Structured Config Generation: .ini files built per EA and test mode (IS/OOS) with precise parameter control
-
-- Robust XML Parsing: Custom SAX handler to extract results from MT5 XML output files
-
-- Post-Processing: Result aggregation into sorted .csv, summary export, failed test logging
-
----
+```mermaid
+flowchart TD
+    A[Indicator YAML Config] --> B[EA Generation<br/>via Jinja2 Template]
+    B --> C[EA Compilation<br/>metaeditor64.exe]
+    C --> D[.ini Config Generation]
+    D --> E[Test Execution<br/>terminal64.exe]
+    E --> F[XML Result Parsing]
+    F --> G[CSV Aggregation + Summary Export]
+```
 
 ## Configuration
 
