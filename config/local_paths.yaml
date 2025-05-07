@@ -4,3 +4,6 @@ mt5_root: "C:/Users/YOUR_USERNAME/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMI
 mt5_terminal_exe: "C:/Program Files/YourBroker MetaTrader 5/terminal64.exe"
 
 mt5_meta_editor_exe: "C:/Program Files/YourBroker MetaTrader 5/metaeditor64.exe"
+
+ms_root: "C:/Users/YOUR_USERNAME/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts/meta-strategist"
+
