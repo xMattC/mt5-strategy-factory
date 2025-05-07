@@ -3,4 +3,4 @@
 __pycache__/
 /temp/
 /Outputs/
-#config/local_paths.yaml
+config/local_paths.yaml
