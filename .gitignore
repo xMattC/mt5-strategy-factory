@@ -1,5 +1,6 @@
 .env
 .idea
+__pycache__/
 /temp/
 /Outputs/
 config/local_paths.yaml
