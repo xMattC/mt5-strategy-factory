@@ -1,7 +1,9 @@
-import pandas as pd
 import yaml
+import logging
+import pandas as pd
 from pathlib import Path
-from typing import List
+
+logger = logging.getLogger(__name__)
 
 # Metrics to exclude when extracting parameter columns
 METRIC_COLUMNS = {
@@ -11,11 +13,11 @@ METRIC_COLUMNS = {
 
 
 def extract_top_parameters(
-    results_dir: Path,
-    top_n: int = 5,
-    sort_by: str = "Res_OOS",
-    csv_file: str = "1_top_parameter_sets.csv",
-    yaml_file: str = "1_top_parameter_sets.yaml"
+        results_dir: Path,
+        top_n: int = 5,
+        sort_by: str = "Res_OOS",
+        csv_file: str = "1_top_parameter_sets.csv",
+        yaml_file: str = "1_top_parameter_sets.yaml"
 ):
     """
     Extract best IS parameters for the top-N indicators based on the combined results CSV.
@@ -46,7 +48,7 @@ def extract_top_parameters(
     for name in top_indicators:
         is_csv = results_dir / f"{name}_IS.csv"
         if not is_csv.exists():
-            print(f"[WARNING] Missing IS CSV: {is_csv}")
+            logger.warning(f"Missing IS CSV: {is_csv}")
             continue
 
         df_is = pd.read_csv(is_csv).sort_values("Result", ascending=False)
@@ -66,25 +68,16 @@ def extract_top_parameters(
         extracted_yaml[name] = param_values
 
     if not extracted_rows:
-        print("[WARNING] No parameter sets extracted.")
+        logger.warning("No parameter sets extracted.")
         return
 
     # Save CSV
     csv_path = results_dir / csv_file
     pd.DataFrame(extracted_rows).to_csv(csv_path, index=False)
-    print(f"[INFO] Saved top {top_n} parameter sets to: {csv_path}")
+    logger.info(f"[INFO] Saved top {top_n} parameter sets to: {csv_path}")
 
     # Save YAML
     yaml_path = results_dir / yaml_file
     with open(yaml_path, "w") as f:
         yaml.dump(extracted_yaml, f, sort_keys=False)
-    print(f"[INFO] Saved YAML parameter sets to: {yaml_path}")
-
-
-if __name__ == "__main__":
-    # Example usage
-    extract_top_parameters(
-        results_dir=Path("path/to/your/results_dir"),  # Update this
-        top_n=5,
-        sort_by="Res_OOS"
-    )
+    logger.info(f"[INFO] Saved YAML parameter sets to: {yaml_path}")

@@ -8,12 +8,13 @@ if __name__ == "__main__":
         start_date="2023.01.01",
         end_date="2023.12.31",
         period="D1",
-        custom_criteria="ProfitFactor",
-        symbol_mode="ALL",
-        data_split="year",
-        risk=0.02,
-        sl=2,
-        tp=1
+        custom_criteria="2",
+        symbol_mode="2",
+        data_split="month",
+        risk=2.0,
+        sl=1,
+        tp=1.5,
+        max_iterations=200
     )
 
     STAGE = get_stage("Trigger")
