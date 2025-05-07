@@ -1,4 +1,4 @@
-# MetaTrader 5 Strategy Optimization Pipeline
+# Meta Strategist - MetaTrader 5 Strategy Optimization Pipeline
 
 This project is a Python-based framework for automating the strategy development lifecycle in MetaTrader 5 (MT5). It handles EA generation, compilation, configuration, batch testing, optimisation, and result evaluation — all in a structured, repeatable, and extensible way.
 
@@ -33,13 +33,32 @@ While designed for trading automation, this project also demonstrates general so
 
 ```mermaid
 flowchart TD
-    A[Indicator YAML Config] --> B[EA Generation<br/>via Jinja2 Template]
-    B --> C[EA Compilation<br/>metaeditor64.exe]
+    A[Indicator YAML Config] --> B[EA Generation via Jinja2 Template]
+    B --> C[EA Compilation - metaeditor64.exe]
     C --> D[.ini Config Generation]
-    D --> E[Test Execution<br/>terminal64.exe]
+    D --> E[Test Execution - terminal64.exe]
     E --> F[XML Result Parsing]
     F --> G[CSV Aggregation + Summary Export]
 ```
+
+## Requirements
+
+- Python 3.8+
+- MetaTrader 5 installed locally
+- Access to your MT5 `Experts` directory
+
+## Installation
+
+Clone the repository and install the required Python dependencies:
+
+```bash
+git clone https://github.com/xMattC/meta-strategist.git
+cd meta-strategist
+pip install -r requirements.txt
+```
+⚠️ Important:
+To enable EA compilation and testing within MetaTrader 5, this repository must be cloned into your MT5 Experts directory, for example:
+- C:\Users\YOUR_USERNAME\AppData\Roaming\MetaQuotes\Terminal\YOUR_MT5_INSTANCE_ID\MQL5\Experts
 
 ## Configuration
 
@@ -127,3 +146,6 @@ Outputs/{run_name}/{stage_name}/
 ├── results/        ← XML reports, combined CSVs
 └── logs/           ← Per-stage log output
 ```
+## Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
