@@ -66,15 +66,18 @@ Before running the pipeline, you must configure two key areas of the project:
 
 ### 1. MetaTrader 5 Paths
 
-Update the hardcoded paths in `meta_strategist/path_config.py` to match your own MetaTrader 5 installation:
+Update the hardcoded paths in `config/local_paths.yaml` to match your own MetaTrader 5 installation:
 
-```python
-# path_config.py
-mt5_root = Path(r"C:\Users\YourUser\AppData\Roaming\MetaQuotes\Terminal\YOUR_TERMINAL_ID")
-mt5_terminal_exe = Path(r"C:\Program Files\YourBroker MetaTrader 5\terminal64.exe")
-mt5_meta_editor_exe = Path(r"C:\Program Files\YourBroker MetaTrader 5\metaeditor64.exe")
+```yaml
+# config/local_paths.yaml
+# Replace the placeholders with your actual MetaTrader 5 paths
+
+mt5_root: "C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID"
+
+mt5_terminal_exe: "C:/Program Files/YourBroker MetaTrader 5/terminal64.exe"
+
+mt5_meta_editor_exe: "C:/Program Files/YourBroker MetaTrader 5/metaeditor64.exe"
 ```
-
 These paths are used to:
 - Locate and compile `.mq5` files
 - Run the MT5 Strategy Tester via command-line
