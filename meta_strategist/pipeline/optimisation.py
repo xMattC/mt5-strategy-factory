@@ -1,5 +1,7 @@
+from pathlib import Path
+
 # === Core Pipeline Components ===
-from meta_strategist.pipeline.stages import Stage, get_stage
+from meta_strategist.pipeline.stages import Stage
 from meta_strategist.pipeline.mt5_ea_runner import run_ea
 
 # === Generators ===
@@ -13,28 +15,17 @@ from meta_strategist.reporting.extract_top_parameters import extract_top_paramet
 
 # === Utilities ===
 from meta_strategist.utils.pathing import load_paths
-from meta_strategist.utils.file_ops import copy_mt5_report, create_dir_structure
-from meta_strategist.utils.systems import delete_mt5_test_cache
-from meta_strategist.utils.logging import init_stage_logger
+from meta_strategist.reporting.copy_mt5_report import copy_mt5_report
+from meta_strategist.utils.filesystems import create_dir_structure
+from meta_strategist.utils.clean_test_cache import delete_mt5_test_cache
+from meta_strategist.utils.logging_conf import init_stage_logger
 
 
-class Optimization:
-    """ Coordinates the full MT5 optimization process for a single pipeline stage.
-
-    Responsibilities:
-    - Create directory structures and generate EA + .ini files
-    - Run in-sample (IS) and out-of-sample (OOS) tests
-    - Extract and log optimised parameters
-    - Update and combine performance summaries
-    """
+class Optimiser:
+    """Coordinates the full MT5 optimisation process for a single pipeline stage."""
 
     def __init__(self, config: IniConfig, stage: Stage, recompile_ea: bool = True):
-        """ Initialise the optimization pipeline.
-
-        param config: Settings and trading parameters for MT5 tests
-        param stage: Pipeline stage (e.g. Trigger, Conformation, Volume, etc.)
-        param recompile_ea: Whether to generate new EAs from template
-        """
+        """Initialise the optimiser pipeline."""
         self.config = config
         self.stage = stage
         self.recompile_ea = recompile_ea
@@ -46,125 +37,127 @@ class Optimization:
         self.expert_dir = self.output_base / "experts"
         self.results_dir = self.output_base / "results"
 
-        # Locate EA template file
+        # Locate EA template
         self.ea_template_path = self.paths["TEMPLATE_DIR"] / self.stage.template_name
 
-        # Set up logging for this stage
+        # Set up logging
         self.logger = init_stage_logger(self.stage.name, self.output_base)
 
         # Clean MT5 environment
         delete_mt5_test_cache()
 
-        # Optionally generate EAs from templates (if recompile_ea = True)
-        self.generate_expert_advisors()
+        # Optionally generate EAs
+        self.generate_experts()
 
-    def run_optimisation(self):
-        """ Run optimisation for all compiled indicators (EAs) in this stage.
-        Performs both IS and OOS tests, and combines results.
-        """
-        for indicator in get_compiled_indicators(self.expert_dir):
-            self.run_single_optimization(indicator)
-
-            # Update results table after each EA is processed
-            update_combined_results(
-                results_dir=self.results_dir,
-                stage_name=self.stage.name,
-                print_summary=False
-            )
-
-        # Extract and save top-N performing parameter sets after all are done
-        extract_top_parameters(
-            results_dir=self.results_dir,
-            top_n=5,
-            sort_by="Res_OOS"
-        )
-
-    def run_single_optimization(self, indi_name: str):
-        """ Run IS and OOS tests for a single EA (indicator).
-
-        param indi_name: The name of the compiled EA/indicator
-        """
-        in_sample_result = self.run_optimization(indi_name, in_sample=True)
-
-        # Only proceed to OOS if IS result is valid
-        if in_sample_result:
-            self.run_optimization(indi_name, in_sample=False, result=in_sample_result)
-
-    def run_optimization(self, indi_name: str, in_sample: bool, result: OptimizationResult = None):
-        """ Run a single IS or OOS optimization pass.
-
-        param indi_name: EA name
-        param in_sample: True for IS phase, False for OOS
-        param result: Required only for OOS; the IS result parameters
-        return: OptimizationResult for IS phase, else None
-        """
-        # Generate .ini config file for this run
-        ini_path = create_ini(
-            indi_name=indi_name,
-            expert_dir=self.expert_dir,
-            config=self.config,
-            ini_files_dir=self.ini_dir,
-            in_sample=in_sample,
-            optimized_parameters=result.parameters if result else None
-        )
-
-        if not ini_path:
-            self.logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
-            return None
-
-        # Launch MT5 test run
-        run_ea(ini_path)
-
-        # Save .csv/.xml reports to results directory
-        copy_mt5_report(ini_path, self.results_dir)
-
-        # For IS: extract result for use in OOS
-        if in_sample:
-            return self.extract_result(indi_name)
-
-        self.logger.info(f"Completed OOS test for {indi_name}")
-
-    def extract_result(self, indi_name: str):
-        """ Parse result file to extract optimized parameters.
-
-        param indi_name: EA name to extract from
-        return: OptimizationResult object or None if parsing fails
-        """
-        try:
-            result = extract_optimization_result(self.results_dir, indi_name)
-            self.logger.info(f"Optimized parameters for {indi_name}: {result.parameters}")
-            return result
-
-        except Exception as e:
-            self.logger.error(f"Failed to parse optimization result for {indi_name}: {e}")
-            return None
-
-    def generate_expert_advisors(self):
-        """ Generate EA .mq5 files from template if recompile_ea is enabled.
-        """
+    def generate_experts(self):
+        """Generate EA .mq5 files from template if recompile_ea is enabled."""
         if self.recompile_ea:
             self.logger.info(f"Generating EAs for stage: {self.stage.name}")
             generate_all_eas(self.expert_dir, self.ea_template_path)
         else:
             self.logger.info(f"Skipping EA generation for stage: {self.stage.name}")
 
+    def run_stage_optimisations(self):
+        """Run optimisation for all compiled indicators (EAs) in this stage."""
+        for indicator in get_compiled_indicators(self.expert_dir):
+            self.optimise_indicator(indicator)
 
-# === Example Run ===
-if __name__ == "__main__":
-    CONFIG = IniConfig(
-        run_name='Apollo',
-        start_date="2023.01.01",
-        end_date="2023.12.31",
-        period="D1",
-        custom_criteria="ProfitFactor",
-        symbol_mode="ALL",
-        data_split="year",
-        risk=0.02,
-        sl=2,
-        tp=1
-    )
+            # ALWAYS update the combined results table
+            update_combined_results(
+                results_dir=self.results_dir,
+                stage_name=self.stage.name,
+                print_summary=False
+            )
 
-    STAGE = get_stage("Trigger")
+        # Finally, extract top-N performing parameter sets
+        extract_top_parameters(
+            results_dir=self.results_dir,
+            top_n=5,
+            sort_by="Res_OOS"
+        )
 
-    pipeline = Optimization(config=CONFIG, stage=STAGE, recompile_ea=False)
-    pipeline.run_optimisation()
+    def _has_is_results(self, indi_name: str) -> bool:
+        """Check if an in-sample results file already exists."""
+        return (self.results_dir / f"{indi_name}_IS.csv").exists()
+
+    def _has_oos_results(self, indi_name: str) -> bool:
+        """Check if an out-of-sample results file already exists."""
+        return (self.results_dir / f"{indi_name}_OOS.csv").exists()
+
+    def optimise_indicator(self, indi_name: str):
+        """Run IS and OOS tests for a single EA (indicator)."""
+
+        # --- In-sample pass ---
+        if self._has_is_results(indi_name):
+            is_csv = self.results_dir / f"{indi_name}_IS.csv"
+            self.logger.info(f"Skipping in-sample optimisation for {indi_name}: found existing {is_csv}")
+            try:
+                is_result = extract_optimization_result(self.results_dir, f"{indi_name}_IS")
+                self.logger.info(f"Extracted existing in-sample result for {indi_name}: {is_result.parameters}")
+            except Exception as e:
+                self.logger.error(f"Failed to parse existing in-sample result for {indi_name}: {e}")
+                is_result = None
+        else:
+            is_result = self.run_in_sample(indi_name)
+
+        # --- Out-of-sample pass ---
+        if is_result:
+            if self._has_oos_results(indi_name):
+                oos_csv = self.results_dir / f"{indi_name}_OOS.csv"
+                self.logger.info(f"Skipping out-of-sample optimisation for {indi_name}: found existing {oos_csv}")
+            else:
+                self.run_out_of_sample(indi_name, is_result)
+
+    def run_in_sample(self, indi_name: str) -> OptimizationResult | None:
+        """Run the in-sample (IS) optimisation pass."""
+        ini_path = create_ini(
+            indi_name=indi_name,
+            expert_dir=self.expert_dir,
+            config=self.config,
+            ini_files_dir=self.ini_dir,
+            in_sample=True,
+            optimized_parameters=None
+        )
+        if not ini_path:
+            self.logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
+            return None
+
+        run_ea(ini_path)
+        copy_mt5_report(ini_path, self.results_dir)
+
+        # rename the raw CSV to include the _IS suffix
+        raw_csv = self.results_dir / f"{indi_name}.csv"
+        is_csv = self.results_dir / f"{indi_name}_IS.csv"
+        raw_csv.rename(is_csv)
+
+        try:
+            result = extract_optimization_result(self.results_dir, f"{indi_name}_IS")
+            self.logger.info(f"Optimised parameters for {indi_name} (IS): {result.parameters}")
+            return result
+
+        except Exception as e:
+            self.logger.error(f"Failed to parse optimisation result for {indi_name} (IS): {e}")
+            return None
+
+    def run_out_of_sample(self, indi_name: str, optimisation_result: OptimizationResult):
+        """Run the out-of-sample (OOS) optimisation pass."""
+        ini_path = create_ini(
+            indi_name=indi_name,
+            expert_dir=self.expert_dir,
+            config=self.config,
+            ini_files_dir=self.ini_dir,
+            in_sample=False,
+            optimized_parameters=optimisation_result.parameters
+        )
+        if not ini_path:
+            self.logger.warning(f"Skipping OOS for {indi_name}: missing YAML or EX5.")
+            return
+
+        run_ea(ini_path)
+        copy_mt5_report(ini_path, self.results_dir)
+
+        raw_csv = self.results_dir / f"{indi_name}.csv"
+        oos_csv = self.results_dir / f"{indi_name}_OOS.csv"
+        raw_csv.rename(oos_csv)
+
+        self.logger.info(f"Completed OOS test for {indi_name}")

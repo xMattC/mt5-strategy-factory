@@ -1,0 +1,12 @@
+run_name: example_run
+start_date: # in this format 2023.01.01
+end_date: # int this format 2023.12.31
+period: D1 #chart time period
+custom_criteria: 0 # 0 or 1
+symbol_mode: 2 #
+data_split: month # Options: none, year, month
+risk: 2 # Risk in percent (used in lot size calculation)
+sl: 2  # Stop loss s
+tp: 1.5 # Take profit
+max_iterations: 100 # Max total parameter combinations
+
