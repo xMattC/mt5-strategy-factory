@@ -1,5 +1,5 @@
-import pytest
 from meta_strategist.generators.ini_generator import _build_tester_inputs, IniConfig
+
 
 def test_max_iterations_scaling_affects_step_size():
     inputs = {

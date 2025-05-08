@@ -1,0 +1,40 @@
+from pathlib import Path
+from meta_strategist.utils.filesystems import load_config_from_yaml
+from meta_strategist.pipeline.stages import get_stage
+from meta_strategist.pipeline.optimisation import Optimiser
+from meta_strategist.utils.config_validation import check_and_validate_config
+
+
+def main():
+    """ Entry point for executing a full MT5 optimisation pipeline.
+
+    Loads and validates the configuration file for the current run, then
+    sequentially executes all predefined optimisation stages (e.g., Trigger,
+    Conformation, Volume, Exit, Trendline) using the same configuration.
+
+    Assumes the config file is named {{ run_name }}.yaml and lives next to
+    this script.
+    """
+
+    # Load configuration YAML for this run
+    config_path = Path(__file__).parent / "{{ run_name }}.yaml"
+    config = load_config_from_yaml(config_path)
+    check_and_validate_config(config)
+
+    # Initialise all pipeline stages
+    stage_1 = get_stage("Trigger")
+    stage_2 = get_stage("Conformation")
+    stage_3 = get_stage("Volume")
+    stage_4 = get_stage("Exit")
+    stage_5 = get_stage("Trendline")
+
+    # Run each stage sequentially using the same config
+    Optimiser(config=config, stage=stage_1).run_stage_optimisations()
+    Optimiser(config=config, stage=stage_2).run_stage_optimisations()
+    Optimiser(config=config, stage=stage_3).run_stage_optimisations()
+    Optimiser(config=config, stage=stage_4).run_stage_optimisations()
+    Optimiser(config=config, stage=stage_5).run_stage_optimisations()
+
+
+if __name__ == "__main__":
+    main()

@@ -10,9 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def copy_mt5_report(ini_path: Path, dest_dir: Path):
-    """
-    Copies the MT5-generated report (XML) to the results directory
-    and generates a CSV version of it.
+    """ Copies the MT5-generated report (XML) to the results directory,
+    generates a CSV version of it, and deletes the copied XML.
 
     param ini_path: Path to the .ini file used for the MT5 run
     param dest_dir: Destination directory for reports
@@ -37,25 +36,7 @@ def copy_mt5_report(ini_path: Path, dest_dir: Path):
 
     try:
         write_xml_to_csv(dest_xml, dest_csv)
-        logger.info(f"Converted XML report to CSV: {dest_csv}")
+        dest_xml.unlink()  # delete the xml version of the results
+        logger.info(f"Converted and deleted XML report. CSV saved at: {dest_csv}")
     except Exception as e:
         logger.warning(f"Failed to convert report to CSV: {e}")
-
-
-def create_dir_structure(run_name: str, indicator_type: str) -> Path:
-    """ Create a standardized directory structure for a given run and return the base path.
-
-    param run_name: Name of the run (e.g., zuse, test1)
-    param indicator_type: Indicator type folder (e.g., C1, Volume)
-    return: Path to the run's base output directory
-    """
-    paths = load_paths()
-    base_path = paths["PRO_ROOT"]
-    indi_path = base_path / "Outputs" / run_name / indicator_type
-
-    (indi_path / "experts").mkdir(parents=True, exist_ok=True)
-    (indi_path / "ini_files").mkdir(parents=True, exist_ok=True)
-    (indi_path / "results").mkdir(parents=True, exist_ok=True)
-
-    logger.info(f"Created directory structure under: {indi_path}")
-    return indi_path
