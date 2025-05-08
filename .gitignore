@@ -2,5 +2,4 @@
 .idea
 __pycache__/
 /temp/
-/tests/.pytest_cache/
-/Outputs/
+
