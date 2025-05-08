@@ -1,9 +1,9 @@
 
-mt5_root: "C:/Users/mkcor/AppData/Roaming/MetaQuotes/Terminal/49CDDEAA95A409ED22BD2287BB67CB9C"
+mt5_root: "C:/Users/YOUR_USERNAME/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID"
 
-mt5_terminal_exe: "C:/Program Files/FTMO MetaTrader 5/terminal64.exe"
+mt5_terminal_exe: "C:/Program Files/YourBroker MetaTrader 5/terminal64.exe"
 
-mt5_meta_editor_exe: "C:/Program Files/FTMO MetaTrader 5/metaeditor64.exe"
+mt5_meta_editor_exe: "C:/Program Files/YourBroker MetaTrader 5/metaeditor64.exe"
 
-ms_root: "C:/Users/mkcor/AppData/Roaming/MetaQuotes/Terminal/49CDDEAA95A409ED22BD2287BB67CB9C/MQL5/Experts/meta-strategist-private"
+ms_root: "C:/Users/YOUR_USERNAME/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts/meta-strategist"
 
