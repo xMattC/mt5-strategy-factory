@@ -92,7 +92,7 @@ class Optimiser:
             is_csv = self.results_dir / f"{indi_name}_IS.csv"
             self.logger.info(f"Skipping in-sample optimisation for {indi_name}: found existing {is_csv}")
             try:
-                is_result = extract_optimization_result(self.results_dir, f"{indi_name}_IS")
+                is_result = extract_optimization_result(self.results_dir, indi_name)
                 self.logger.info(f"Extracted existing in-sample result for {indi_name}: {is_result.parameters}")
             except Exception as e:
                 self.logger.error(f"Failed to parse existing in-sample result for {indi_name}: {e}")
@@ -125,13 +125,13 @@ class Optimiser:
         run_ea(ini_path)
         copy_mt5_report(ini_path, self.results_dir)
 
-        # rename the raw CSV to include the _IS suffix
-        raw_csv = self.results_dir / f"{indi_name}.csv"
-        is_csv = self.results_dir / f"{indi_name}_IS.csv"
-        raw_csv.rename(is_csv)
+        # # Rename the raw CSV to include the _IS suffix
+        # raw_csv = self.results_dir / f"{indi_name}.csv"
+        # is_csv = self.results_dir / f"{indi_name}_IS.csv"
+        # raw_csv.rename(is_csv)
 
         try:
-            result = extract_optimization_result(self.results_dir, f"{indi_name}_IS")
+            result = extract_optimization_result(self.results_dir, indi_name)
             self.logger.info(f"Optimised parameters for {indi_name} (IS): {result.parameters}")
             return result
 
@@ -155,9 +155,5 @@ class Optimiser:
 
         run_ea(ini_path)
         copy_mt5_report(ini_path, self.results_dir)
-
-        raw_csv = self.results_dir / f"{indi_name}.csv"
-        oos_csv = self.results_dir / f"{indi_name}_OOS.csv"
-        raw_csv.rename(oos_csv)
 
         self.logger.info(f"Completed OOS test for {indi_name}")

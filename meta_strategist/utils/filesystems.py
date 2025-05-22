@@ -25,7 +25,7 @@ def create_dir_structure(run_name: str, indicator_type: str) -> Path:
     """
     paths = load_paths()
     base_path = paths["PRO_ROOT"]
-    indi_path = base_path / "Outputs" / run_name / indicator_type
+    indi_path = base_path / "outputs" / run_name / indicator_type
 
     (indi_path / "experts").mkdir(parents=True, exist_ok=True)
     (indi_path / "ini_files").mkdir(parents=True, exist_ok=True)
