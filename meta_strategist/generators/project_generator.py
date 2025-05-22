@@ -2,6 +2,7 @@ import random
 import string
 from pathlib import Path
 import logging
+import yaml
 
 from meta_strategist.utils.pathing import load_paths
 from meta_strategist.utils.render_template import render_template  # Assumes render_template is defined here
@@ -68,11 +69,25 @@ def generate_next_project_codename(pantheon_filter: str = None) -> str:
     raise RuntimeError("No suitable god name found for project codename.")
 
 
-import yaml
+def create_new_project(pantheon_filter: str = None) -> Path:
+    """
+    Create a new project directory with a sequential codename and populate it with
+    a default configuration and run script.
 
-def create_new_project() -> Path:
-    """Interactively generate a new project directory and populate it."""
-    run_name = generate_next_project_codename()
+    Parameters
+    ----------
+    pantheon_filter : str, optional
+        If provided, selects the next codename from a specific mythological pantheon. Valid options are:
+        ['greek', 'norse', 'roman', 'egyptian', 'aztec', 'hindu', 'celtic', 'slavic'].
+        If None, chooses from all pantheons at random.
+
+    Returns
+    -------
+    Path
+        The path to the newly created project directory.
+
+    """
+    run_name = generate_next_project_codename(pantheon_filter)
     paths = load_paths()
     project_dir = paths["OUTPUT_DIR"] / run_name
 
@@ -101,7 +116,12 @@ def create_new_project() -> Path:
         return project_dir
 
     except FileExistsError:
-        logger.warning(f"{run_name} project folder already exists")
+        logger.error(f"Project directory already exists: {project_dir}")
+        raise
+
+    except Exception as e:
+        logger.error(f"Failed to create project: {e}")
+        raise
 
 
 if __name__ == "__main__":
