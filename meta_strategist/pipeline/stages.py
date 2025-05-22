@@ -2,7 +2,7 @@
 
 class Stage:
     def __init__(self, name, template_name, post_process_is, depends_on):
-        """ Represents a single optimization stage (e.g., 'Trigger', 'Volume') in the MT5 pipeline.
+        """ Represents a single optimization stage (e.g., 'Trigger', 'Volume').
 
         param name: Stage name, used in paths and console output
         param template_name: Name of the Jinja2 template file to use for this stage's EA
@@ -34,12 +34,12 @@ def get_stage(name: str) -> Stage:
 
 STAGES = [
     Stage(name="Trigger",
-          template_name="template_c1_mq5.j2",
+          template_name="template_trigger.j2",
           post_process_is="post_process_trigger",
           depends_on=None),
 
     Stage(name="Conformation",
-          template_name="template_c2_mq5.j2",
+          template_name="template_conformation.j2",
           post_process_is="post_process_conf",
           depends_on="inject_trigger_results"),
 
