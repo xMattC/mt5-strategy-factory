@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional
 
-from meta_strategist.generators.ini_opt_param_scale import scale_parameters
+from meta_strategist.gen_config.ini_opt_param_scale import scale_parameters
 from meta_strategist.utils.pathing import load_paths
 
 logger = logging.getLogger(__name__)
