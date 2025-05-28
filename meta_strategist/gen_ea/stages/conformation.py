@@ -1,10 +1,12 @@
 import logging
 from pathlib import Path
 
-from .ea_render_strategies import render_confirmation_ea
-from .ea_base import BaseEAGenerator
-from .ea_utils import load_trigger_data
 from meta_strategist.pipeline import Stage
+
+from ..renderers.conformation import render_confirmation_ea
+from ..base import BaseEAGenerator
+from ..data_loaders import load_trigger_data
+
 
 logger = logging.getLogger(__name__)
 

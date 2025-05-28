@@ -1,4 +1,4 @@
-from meta_strategist.gen_ea import get_ea_generator_for_stage
+from meta_strategist.gen_ea import get_ea_generator
 from meta_strategist.gen_config import IniConfig, create_ini
 from meta_strategist.reporting import (
     extract_optimization_result,
@@ -60,7 +60,7 @@ class Optimiser:
         """ Generate EA .mq5 files from template if recompile_ea is enabled. """
         if self.recompile_ea:
             self.logger.info(f"Generating EAs for stage: {self.stage.name}")
-            generator = get_ea_generator_for_stage(self.stage, self.expert_dir, self.config.run_name)
+            generator = get_ea_generator(self.stage, self.expert_dir, self.config.run_name)
             generator.generate_all()
 
         else:

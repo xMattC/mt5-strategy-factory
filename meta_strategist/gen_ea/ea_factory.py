@@ -1,13 +1,13 @@
 import logging
 from pathlib import Path
 
-from .ea_trigger import TriggerEAGenerator
-from .ea_conformation import ConformationEAGenerator
+from .stages.trigger import TriggerEAGenerator
+from .stages.conformation import ConformationEAGenerator
 
 logger = logging.getLogger(__name__)
 
 
-def get_ea_generator_for_stage(stage, ea_dir: Path, run_name: str):
+def get_ea_generator(stage, ea_dir: Path, run_name: str):
     """ Factory function for EA generators.
 
     Returns a generator instance appropriate for the given optimisation stage. All generator

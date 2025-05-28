@@ -3,7 +3,7 @@ from pathlib import Path
 from jinja2 import Template
 import yaml
 
-from .ea_compiler import compile_ea
+from .compiler import compile_ea
 from meta_strategist.pipeline import Stage
 from meta_strategist.utils import load_paths
 
