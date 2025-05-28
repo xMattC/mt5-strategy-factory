@@ -1,23 +1,27 @@
 # === Core Pipeline Components ===
-from meta_strategist.pipeline.stages import Stage
-from meta_strategist.pipeline.mt5_ea_runner import run_ea
+from meta_strategist.pipeline import Stage, run_ea
 
 # === Generators ===
-from meta_strategist.generators.ea_generator import get_ea_generator_for_stage, BaseEAGenerator
-from meta_strategist.generators.ini_generator import IniConfig, create_ini
+from meta_strategist.gen_ea import get_ea_generator_for_stage
+from meta_strategist.gen_config import IniConfig, create_ini
 
 # === Reporting ===
-from meta_strategist.reporting.csv_parser import extract_optimization_result, OptimizationResult
-from meta_strategist.reporting.result_summary import update_combined_results
-from meta_strategist.reporting.extract_top_parameters import extract_top_parameters
-from meta_strategist.reporting.copy_mt5_report import copy_mt5_report
+from meta_strategist.reporting import (
+    extract_optimization_result,
+    OptimizationResult,
+    update_combined_results,
+    extract_top_parameters,
+    copy_mt5_report
+)
 
 # === Utilities ===
-from meta_strategist.utils.pathing import load_paths
-from meta_strategist.utils.filesystems import create_dir_structure
-from meta_strategist.utils.clean_test_cache import delete_mt5_test_cache
-from meta_strategist.utils.logging_conf import init_stage_logger
-
+from meta_strategist.utils import (
+    load_paths,
+    create_dir_structure,
+    get_compiled_indicators,
+    delete_mt5_test_cache,
+    init_stage_logger
+)
 
 class Optimiser:
     """ Coordinates the full MT5 optimisation process for a single pipeline stage.
@@ -63,12 +67,13 @@ class Optimiser:
             self.logger.info(f"Generating EAs for stage: {self.stage.name}")
             generator = get_ea_generator_for_stage(self.stage, self.expert_dir, self.config.run_name)
             generator.generate_all()
+
         else:
             self.logger.info(f"Skipping EA generation for stage: {self.stage.name}")
 
     def run_stage_optimisations(self):
         """ Run optimisation for all compiled indicators (EAs) in this stage. """
-        for indicator in BaseEAGenerator.get_compiled_indicators(self.expert_dir):
+        for indicator in get_compiled_indicators(self.expert_dir):
             self.optimise_indicator(indicator)
 
             # ALWAYS update the combined results table
