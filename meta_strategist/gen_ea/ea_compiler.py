@@ -1,6 +1,6 @@
 import subprocess
 from pathlib import Path
-from meta_strategist.utils.pathing import load_paths
+from meta_strategist.utils import load_paths
 import logging
 
 logger = logging.getLogger(__name__)

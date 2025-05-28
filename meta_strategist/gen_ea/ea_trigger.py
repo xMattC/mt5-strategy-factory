@@ -1,7 +1,8 @@
 import logging
 from pathlib import Path
-from meta_strategist.ea.ea_base import BaseEAGenerator
-from meta_strategist.ea.ea_render_strategies import render_trigger_ea
+
+from .ea_base import BaseEAGenerator
+from .ea_render_strategies import render_trigger_ea
 
 logger = logging.getLogger(__name__)
 

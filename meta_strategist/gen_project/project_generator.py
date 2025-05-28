@@ -4,16 +4,19 @@ from pathlib import Path
 import logging
 import yaml
 
-from meta_strategist.utils.pathing import load_paths
-from meta_strategist.utils.render_template import render_template  # Assumes render_template is defined here
+from meta_strategist.utils import load_paths
+from meta_strategist.utils import render_template  # Assumes render_template is defined here
 
 logger = logging.getLogger(__name__)
 
 
 def load_pantheons() -> dict:
     """Load pantheon data from the YAML file and convert to (name, description) tuples per pantheon."""
-    paths = load_paths()
-    name_file = paths["GENERATORS_DIR"] / "project_names.yaml"
+    # paths = load_paths()
+    # Find the directory this script is in
+    script_dir = Path(__file__).parent
+    # Compose the path to the YAML file relative to this script
+    name_file = script_dir / "project_names.yaml"
     if not name_file.exists():
         raise FileNotFoundError(f"Pantheon YAML file not found at: {name_file}")
 

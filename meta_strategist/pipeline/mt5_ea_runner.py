@@ -3,7 +3,7 @@ from subprocess import run, CalledProcessError
 from time import perf_counter
 from pathlib import Path
 
-from meta_strategist.utils.pathing import load_paths
+from meta_strategist.utils import load_paths
 
 logger = logging.getLogger(__name__)
 

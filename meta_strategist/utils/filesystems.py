@@ -1,8 +1,9 @@
 import yaml
 import logging
 from pathlib import Path
-from meta_strategist.gen_config.ini_generator import IniConfig
-from meta_strategist.utils.pathing import load_paths
+from meta_strategist.gen_config import IniConfig
+
+from .pathing import load_paths
 
 logger = logging.getLogger(__name__)
 

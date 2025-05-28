@@ -1,5 +1,5 @@
 import logging
-from meta_strategist.utils.pathing import load_paths
+from .pathing import load_paths
 
 logger = logging.getLogger(__name__)
 
