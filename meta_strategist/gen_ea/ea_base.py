@@ -3,9 +3,9 @@ from pathlib import Path
 from jinja2 import Template
 import yaml
 
-from meta_strategist.ea.ea_compiler import compile_ea
-from meta_strategist.pipeline.stages import Stage
-from meta_strategist.utils.pathing import load_paths
+from .ea_compiler import compile_ea
+from meta_strategist.pipeline import Stage
+from meta_strategist.utils import load_paths
 
 logger = logging.getLogger(__name__)
 

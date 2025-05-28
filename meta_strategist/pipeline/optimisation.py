@@ -1,11 +1,5 @@
-# === Core Pipeline Components ===
-from meta_strategist.pipeline import Stage, run_ea
-
-# === Generators ===
 from meta_strategist.gen_ea import get_ea_generator_for_stage
 from meta_strategist.gen_config import IniConfig, create_ini
-
-# === Reporting ===
 from meta_strategist.reporting import (
     extract_optimization_result,
     OptimizationResult,
@@ -13,8 +7,6 @@ from meta_strategist.reporting import (
     extract_top_parameters,
     copy_mt5_report
 )
-
-# === Utilities ===
 from meta_strategist.utils import (
     load_paths,
     create_dir_structure,
@@ -22,6 +14,9 @@ from meta_strategist.utils import (
     delete_mt5_test_cache,
     init_stage_logger
 )
+from .stages import Stage
+from .mt5_ea_runner import run_ea
+
 
 class Optimiser:
     """ Coordinates the full MT5 optimisation process for a single pipeline stage.

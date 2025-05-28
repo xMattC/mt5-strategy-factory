@@ -1,17 +1,14 @@
 import logging
 from pathlib import Path
-from jinja2 import Template
 import yaml
 
-from meta_strategist.utils.pathing import load_paths
-from meta_strategist.ea.ea_render_strategies import (
-    render_trigger_ea,
-    render_confirmation_ea,
-    # ... add more as needed
-)
-from meta_strategist.ea.ea_compiler import compile_ea
-from meta_strategist.pipeline.stages import Stage
-from meta_strategist.utils.pathing import load_paths
+from jinja2 import Template
+
+from meta_strategist.pipeline import Stage
+from meta_strategist.utils import load_paths
+
+from .ea_render_strategies import render_trigger_ea, render_confirmation_ea
+from .ea_compiler import compile_ea
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +21,14 @@ class BaseEAGenerator:
     """
 
     def __init__(self, ea_dir: Path, stage: Stage):
-        self.ea_dir = ea_dir                      # Output directory for this stage's EAs
-        self.stage = stage                        # Stage object (defines template, etc.)
-        self.logger = logger                      # Module-level logger
-        self.paths = load_paths()                 # Load project paths from central config
-        self.indicator_dir = self.paths["INDICATOR_DIR"]    # Directory with indicator YAMLs
-        self.template_path = self.paths["TEMPLATE_DIR"] / stage.template_name    # Path to .mq5 template
-        self.template = self._load_template(self.template_path)                  # Load and cache template
-        self.ea_dir.mkdir(parents=True, exist_ok=True)                           # Ensure output dir exists
+        self.ea_dir = ea_dir  # Output directory for this stage's EAs
+        self.stage = stage  # Stage object (defines template, etc.)
+        self.logger = logger  # Module-level logger
+        self.paths = load_paths()  # Load project paths from central config
+        self.indicator_dir = self.paths["INDICATOR_DIR"]  # Directory with indicator YAMLs
+        self.template_path = self.paths["TEMPLATE_DIR"] / stage.template_name  # Path to .mq5 template
+        self.template = self._load_template(self.template_path)  # Load and cache template
+        self.ea_dir.mkdir(parents=True, exist_ok=True)  # Ensure output dir exists
 
     def generate_all(self) -> None:
         """Generate and compile all EAs for every indicator YAML found for this stage.
