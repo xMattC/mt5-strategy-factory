@@ -1,1 +1,1 @@
-from .ea_generator import get_ea_generator_for_stage
+from .ea_factory import get_ea_generator
