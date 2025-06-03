@@ -9,7 +9,7 @@ from ..utils import build_input_lines, build_enum_definitions, load_indicator_da
 logger = logging.getLogger(__name__)
 
 
-class TriggerEAGenerator(BaseEAGenerator):
+class PreProcTestingEAGenerator(BaseEAGenerator):
     """EA generator for the Trigger stage.
 
     Implements _generate_mq5() to render the EA source for triggers.

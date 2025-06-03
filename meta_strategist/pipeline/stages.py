@@ -1,18 +1,14 @@
-
-
 class Stage:
-    def __init__(self, name, template_name, post_process_is, depends_on):
-        """ Represents a single optimization stage (e.g., 'Trigger', 'Volume').
+    def __init__(self, name, template_name, indi_dir=None):
+        """Represents a single optimisation stage (e.g., 'Trigger', 'Volume').
 
-        param name: Stage name, used in paths and console output
-        param template_name: Name of the Jinja2 template file to use for this stage's EA
-        param post_process_is: Function to handle parsing IS results and preparing for OOS run
-        param depends_on: Optional function to inject constants from previous stages
+        param name: Stage name
+        param template_name: Jinja2 template file for this stage's EA
+        param indi_dir: Subdirectory within INDICATOR_DIR for this stage's indicators
         """
         self.name = name
         self.template_name = template_name
-        self.post_process_is = post_process_is
-        self.depends_on = depends_on
+        self.indi_dir = indi_dir  # e.g., "trigger", "volume", etc. (or None for default)
 
     def __repr__(self):
         return f"<Stage {self.name}>"
@@ -33,28 +29,11 @@ def get_stage(name: str) -> Stage:
 
 
 STAGES = [
-    Stage(name="Trigger",
-          template_name="template_trigger.j2",
-          post_process_is="post_process_trigger",
-          depends_on=None),
-
-    Stage(name="Conformation",
-          template_name="template_conformation.j2",
-          post_process_is="post_process_conf",
-          depends_on="inject_trigger_results"),
-
-    Stage(name="Volume",
-          template_name="template_volume_mq5.j2",
-          post_process_is="post_process_volume",
-          depends_on="inject_trig_conf_results"),
-
-    Stage(name="Exit",
-          template_name="template_exit_mq5.j2",
-          post_process_is="post_process_exit",
-          depends_on="inject_trig_conf_results"),
-
-    Stage(name="Trendline",
-          template_name="template_baseline_mq5.j2",
-          post_process_is="post_process_trendline",
-          depends_on="inject_all_results"),
+    Stage(name="Pre_proc_testing", template_name="Pre_proc_testing.j2", indi_dir="indicators"),
+    # --- Trend-following dev pipeline:
+    Stage(name="Trigger", template_name="trigger.j2", indi_dir="trigger"),
+    Stage(name="Conformation", template_name="conformation.j2", indi_dir="trigger"),  # indi derived form trigger
+    Stage(name="Volume", template_name="volume_mq5.j2", indi_dir="volume"),
+    Stage(name="Exit", template_name="exit_mq5.j2", indi_dir="trigger"),  # indi derived form trigger
+    Stage(name="Trendline", template_name="trendline_mq5.j2"),
 ]
