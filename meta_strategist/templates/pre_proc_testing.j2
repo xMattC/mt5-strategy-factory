@@ -6,7 +6,7 @@
 {% for enum in enum_definitions %}
 {{ enum }}
 {% endfor %}
-{% for line in input_lines %}
+{% for line in trigger_input_lines %}
 {{ line }}
 {% endfor %}
 
@@ -14,10 +14,12 @@ int indicator_handle[];  // Handle array for indicators
 
 int OnInit(){
     EventSetTimer(60);
+    
     mf.get_white_list(inp_sym_mode, SymbolsArray);
     ArrayResize(indicator_handle, ArraySize(SymbolsArray));
+    
     for(int i = 0; i < ArraySize(SymbolsArray); i++){
-        indicator_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ indicator_path }}"{% for input in inputs %}, {{ input }}{% endfor %});
+        indicator_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_indicator_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
     }
     return(INIT_SUCCEEDED);
 }
@@ -26,9 +28,11 @@ void OnDeinit(const int reason){}
 
 void OnTimer(){
     if(!mf.in_test_period(inp_data_split_method)){return;}
+    
     if(!mf.is_new_bar(_Symbol, PERIOD_CURRENT, "00:05")){return;}
+    
     for(int i = 0; i < ArraySize(SymbolsArray); i++){
-        stratagy(SymbolsArray[i], indicator_handle[i]);
+        strategy(SymbolsArray[i], indicator_handle[i]);
     }
 }
 
@@ -36,19 +40,16 @@ double OnTester(){
     return cm.calculate_custom_criteria(inp_custom_criteria);
 }
 
-void stratagy(string symbol, int trigger_handle){
+void strategy(string symbol, int trigger_handle){
     bool trigger_long, trigger_short;
 
     // --- Call modular trigger signal logic
     trigger(trigger_handle, trigger_long, trigger_short);
 
-    // --- (If/when you add confirmation, call conformation(conf_handle, ...) here)
-
-    // Modular: Just AND with other logic as needed (currently trigger only)
     bool long_in  = trigger_long;
     bool short_in = trigger_short;
-    bool long_out = 0;
-    bool short_out = 0;
+    bool long_out = trigger_short;
+    bool short_out = trigger_long;
 
     //--- Manage orders
     om.close_buy_orders(symbol, long_out, 0, PERIOD_CURRENT, 42);
@@ -59,12 +60,13 @@ void stratagy(string symbol, int trigger_handle){
 
 // --- Trigger logic function (add more signal functions as needed)
 void trigger(int indi_handle, bool &trigger_long, bool &trigger_short){
-    {% for buf in buffers %}
+
+    {% for buf in trigger_buffers %}
     double {{ buf.name }}[];
     ArraySetAsSeries({{ buf.name }}, true);
     CopyBuffer(indi_handle, {{ buf.index }}, 1, 10, {{ buf.name }});
-    {% endfor %}
 
-    trigger_long  = ({{ base_conditions.long }});
-    trigger_short = ({{ base_conditions.short }});
+    {% endfor %}
+    trigger_long  = ({{ trigger_long_conditions }});
+    trigger_short = ({{ trigger_short_conditions }});
 }

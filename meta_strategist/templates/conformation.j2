@@ -1,0 +1,92 @@
+#include <MyLibs/NNFX_TestFileHeader.mqh>
+{% for enum in enum_definitions %}
+{{ enum }}
+{% endfor %}
+{% for line in conf_input_lines %}
+{{ line }}
+{% endfor %}
+
+int trigger_handle[];   // Handles for trigger indicators
+int conf_handle[];      // Handles for conformation indicators
+
+int OnInit(){
+    EventSetTimer(60);
+    mf.get_white_list(inp_sym_mode, SymbolsArray);
+
+    ArrayResize(trigger_handle, ArraySize(SymbolsArray));
+    ArrayResize(conf_handle, ArraySize(SymbolsArray));
+
+    for(int i = 0; i < ArraySize(SymbolsArray); i++){
+        trigger_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+        conf_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ conf_indicator_path }}"{% for input in conf_inputs %}, {{ input }}{% endfor %});
+    }
+    return(INIT_SUCCEEDED);
+}
+
+void OnDeinit(const int reason){}
+
+void OnTimer(){
+
+    if(!mf.in_test_period(inp_data_split_method)){return;}
+
+    if(!mf.is_new_bar(_Symbol, PERIOD_CURRENT, "00:05")){return;}
+
+    for(int i = 0; i < ArraySize(SymbolsArray); i++){
+        strategy(SymbolsArray[i], trigger_handle[i], conf_handle[i]);
+    }
+}
+
+double OnTester(){
+    return cm.calculate_custom_criteria(inp_custom_criteria);
+}
+
+// Main logic function
+void strategy(string symbol, int trigger_hand, int conf_hand){
+
+    bool trigger_long, trigger_short;
+    trigger(trigger_hand, trigger_long, trigger_short);
+
+    bool conf_long, conf_short;
+    conformation(conf_hand, conf_long, conf_short);
+
+    bool long_in = (trigger_long
+                    && conf_long);
+
+    bool short_in = (trigger_short
+                     && conf_short);
+
+    bool long_out = 0;
+    bool short_out = 0;
+
+    //--- Manage orders
+    om.close_buy_orders(symbol, long_out, 0, PERIOD_CURRENT, 42);
+    om.close_sell_orders(symbol, short_out, 0, PERIOD_CURRENT, 42);
+    om.open_buy_orders(symbol, long_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
+    om.open_sell_orders(symbol, short_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
+}
+
+// Conformation logic (from indicator YAML)
+void conformation(int indi_handle, bool &conf_long, bool &conf_short){
+
+    {% for buf in conf_buffers %}
+    double {{ buf.name }}[];
+    ArraySetAsSeries({{ buf.name }}, true);
+    CopyBuffer(indi_handle, {{ buf.index }}, 1, 10, {{ buf.name }});
+
+    {% endfor %}
+    conf_long = ({{ conf_long_conditions }});
+    conf_short = ({{ conf_short_conditions }});
+}
+
+// Trigger logic (from IS-optimised trigger YAML/result)
+void trigger(int indi_handle, bool &trigger_long, bool &trigger_short){
+
+    {% for buf in trigger_buffers %}
+    double {{ buf.name }}[];
+    ArraySetAsSeries({{ buf.name }}, true);
+    CopyBuffer(indi_handle, {{ buf.index }}, 1, 10, {{ buf.name }});
+
+    {% endfor %}
+    trigger_long = ({{ trigger_long_conditions }});
+    trigger_short = ({{ trigger_short_conditions }});
+}
