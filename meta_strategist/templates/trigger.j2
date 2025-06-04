@@ -1,4 +1,4 @@
-#include <MyLibs/NNFX_TestFileHeader.mqh>
+#include <MyLibs/EA_FileHeader.mqh>
 {% for include in includes %}
 #include <{{ include }}>
 {% endfor %}
@@ -37,7 +37,7 @@ void OnTimer(){
 }
 
 double OnTester(){
-    return cm.calculate_custom_criteria(inp_custom_criteria);
+    return cm.calculate_custom_criteria(inp_custom_criteria, inp_opt_min_trades);
 }
 
 void strategy(string symbol, int trigger_handle){

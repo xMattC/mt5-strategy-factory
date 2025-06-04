@@ -72,6 +72,30 @@ def generate_next_project_codename(pantheon_filter: str = None) -> str:
     raise RuntimeError("No suitable god name found for project codename.")
 
 
+def write_make_stage_yaml_script(run_dir: Path):
+    """
+    Drop a default make_stage_yaml.py script into run_dir.
+    Do nothing if file already exists.
+    """
+    script_path = run_dir / "make_stage_yaml.py"
+    if script_path.exists():
+        logger.info(f"{script_path} already exists. Delete it to remake.")
+        return
+
+    content = (
+        "from meta_strategist.utils import maker\n"
+        "from pathlib import Path\n\n"
+        "if __name__ == \"__main__\":\n"
+        "    run_dir = Path(__file__).parent.resolve()\n"
+        "    maker(run_dir=run_dir, phase=\"trigger\", indicator=\"ASO\")\n"
+    )
+    script_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(script_path, "w") as f:
+        f.write(content)
+
+    logger.info(f"make_stage_yaml.py written to: {script_path}")
+
+
 def create_new_project(pantheon_filter: str = None) -> Path:
     """
     Create a new project directory with a sequential codename and populate it with
@@ -114,6 +138,9 @@ def create_new_project(pantheon_filter: str = None) -> Path:
         run_file = project_dir / f"{run_name}_run.py"
         run_file_code = render_template("run_script.j2", {"run_name": run_name})
         run_file.write_text(run_file_code)
+
+        # Place make_stage_yaml.py at the run_dir level
+        write_make_stage_yaml_script(project_dir)
 
         logger.info(f"Created project structure in: {project_dir}")
         return project_dir

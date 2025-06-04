@@ -1,1 +1,1 @@
-from .ini_generator import IniConfig, create_ini
+from .ini_generator import create_ini

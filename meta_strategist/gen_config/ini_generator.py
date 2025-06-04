@@ -1,30 +1,14 @@
 import configparser
 import logging
 import yaml
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from meta_strategist.gen_config.ini_opt_param_scale import scale_parameters
-from meta_strategist.utils.pathing import load_paths
+from meta_strategist.utils import load_paths, Config
+from meta_strategist.pipeline import Stage
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class IniConfig:
-    """Configuration values used for .ini file generation."""
-    run_name: str
-    start_date: str
-    end_date: str
-    period: str
-    custom_criteria: str
-    symbol_mode: str
-    data_split: str
-    risk: float
-    sl: float
-    tp: float
-    max_iterations: int
 
 
 def extract_inputs_from_yaml(yaml_path: Path, expected_key: str) -> dict:
@@ -51,11 +35,11 @@ def extract_inputs_from_yaml(yaml_path: Path, expected_key: str) -> dict:
     return inputs
 
 
-def create_ini(indi_name: str, expert_dir: Path, config: IniConfig, ini_files_dir: Path,
-               in_sample: bool, optimized_parameters: Optional[Dict[str, str]] = None):
+def create_ini(indi_name: str, expert_dir: Path, config: Config, ini_files_dir: Path,
+               in_sample: bool, stage: Stage, optimized_parameters: Optional[Dict[str, str]] = None, ):
     """Generate a .ini file for a given indicator if corresponding .yaml and .ex5 files exist."""
     paths = load_paths()
-    yaml_path = paths["INDICATOR_DIR"] / f"{indi_name}.yaml"
+    yaml_path = paths["INDICATOR_DIR"] / stage.indi_dir / f"{indi_name}.yaml"
     ex5_path = expert_dir / f"{indi_name}.ex5"
 
     if not yaml_path.exists():
@@ -74,10 +58,10 @@ def create_ini(indi_name: str, expert_dir: Path, config: IniConfig, ini_files_di
         logger.warning(f"Failed to load inputs from YAML: {e}")
         return None
 
-    return _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample, optimized_parameters)
+    return _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample, stage, optimized_parameters)
 
 
-def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool,
+def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool, stage: Stage,
                     optimized_parameters: Optional[Dict[str, str]]) -> Path:
     """Write a .ini file for MetaTrader 5 backtesting/optimisation."""
     cfg = configparser.ConfigParser()
@@ -90,7 +74,7 @@ def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path, inputs:
     expert_rel_path = get_rel_expert_path(expert_path, load_paths()["MT5_EXPERT_DIR"])
 
     cfg["Tester"] = _build_tester_section(config, expert_rel_path, report_name)
-    cfg["TesterInputs"] = _build_tester_inputs(config, inputs, in_sample, optimized_parameters)
+    cfg["TesterInputs"] = _build_tester_inputs(config, inputs, in_sample, optimized_parameters, stage)
 
     ini_path = ini_dir / f"{indi_name}_{sample_type}.ini"
     ini_path.parent.mkdir(parents=True, exist_ok=True)
@@ -102,7 +86,7 @@ def _write_ini_file(config: IniConfig, expert_path: Path, ini_dir: Path, inputs:
     return ini_path
 
 
-def _build_tester_section(config: IniConfig, expert_path: str, report_name: str) -> dict:
+def _build_tester_section(config: Config, expert_path: str, report_name: str) -> dict:
     """Construct the [Tester] section for the .ini file."""
     return {
         "Expert": expert_path,
@@ -126,9 +110,19 @@ def _build_tester_section(config: IniConfig, expert_path: str, report_name: str)
     }
 
 
-def _build_tester_inputs(config: IniConfig, inputs: dict, in_sample: bool,
-                         optimized_parameters: Optional[Dict[str, str]]) -> dict:
-    """Construct the [TesterInputs] section for the .ini file."""
+def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
+                         optimized_parameters: Optional[Dict[str, str]], stage: Stage) -> dict:
+    """Construct the [TesterInputs] section for the .ini file.
+
+    param config: Configuration object with stage-specific custom_criteria dict
+    param inputs: Not used here but kept for compatibility
+    param in_sample: True if in-sample, else out-of-sample
+    param optimized_parameters: Not used here but kept for compatibility
+    param stage: String representing current optimisation stage, e.g. "C1", "Exit"
+    return: Dictionary of tester input lines for .ini
+    """
+    # Get the stage-specific custom_criteria, fall back to 0 if not found
+    criteria, min_trade = _get_stage_criteria(config, stage.name)
     tester_inputs = {
         "inp_lot_mode": "2||0||0||2||N",
         "inp_lot_var": f"{config.risk}||2.0||0.2||20||N",
@@ -136,13 +130,15 @@ def _build_tester_inputs(config: IniConfig, inputs: dict, in_sample: bool,
         "inp_sl_var": f"{config.sl}||1.0||0.1||10||N",
         "inp_tp_mode": "2||0||0||5||N",
         "inp_tp_var": f"{config.tp}||1.5||0.15||15||N",
-        "inp_custom_criteria": f"{config.custom_criteria}||0||0||1||N",
+        # Use the stage-specific value here
+        "inp_custom_criteria": f"{criteria}||0||0||1||N",
+        "inp_opt_min_trades": f"{min_trade}||0||0||1||N",
         "inp_sym_mode": f"{config.symbol_mode}||0||0||2||N",
         "inp_force_opt": "1||1||1||2||N" if in_sample else "1||1||1||2||Y",
         "inp_data_split_method": _get_split_code(config.data_split, in_sample),
     }
 
-    scaled_params = scale_parameters(inputs, max_total_iterations=config.max_iterations, mode=0)
+    scaled_params = scale_parameters(inputs, max_total_iterations=config.max_iterations)
 
     for name, param in scaled_params:
         if optimized_parameters and name.lower() in optimized_parameters:
@@ -169,6 +165,21 @@ def _get_split_code(split_type: str, in_sample: bool) -> str:
         split_code = "0"
 
     return f"{split_code}||0||0||3||N"
+
+
+def _get_stage_criteria(config, stage_name):
+    """
+    Return (criteria, min_trade) tuple for the given stage.
+    Raises KeyError if the stage is not present.
+    """
+    crit = config.custom_criteria
+    if not isinstance(crit, dict):
+        raise TypeError("custom_criteria must be a dict of CriterionSettings.")
+    try:
+        criterion = crit[stage_name]
+        return criterion.criteria, criterion.min_trade
+    except KeyError:
+        raise KeyError(f"custom_criteria not defined for stage '{stage_name}'")
 
 
 def get_rel_expert_path(expert_path: Path, mt5_experts_dir: Path) -> str:
