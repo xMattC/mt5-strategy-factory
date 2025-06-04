@@ -3,7 +3,7 @@ from pathlib import Path
 from ..base import BaseEAGenerator
 
 from jinja2 import Template
-from ..utils import build_input_lines, build_enum_definitions, load_indicator_data
+from ..ea_utils import build_input_lines, build_enum_definitions, load_indicator_data
 
 
 logger = logging.getLogger(__name__)

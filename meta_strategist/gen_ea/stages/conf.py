@@ -6,7 +6,7 @@ from jinja2 import Template
 from meta_strategist.pipeline import Stage, get_stage
 from meta_strategist.utils import Config
 from ..base import BaseEAGenerator
-from ..utils import load_indicator_data, build_input_lines, build_enum_definitions, load_results_data
+from ..ea_utils import load_indicator_data, build_input_lines, build_enum_definitions, load_results_data
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,7 @@ class ConformationEAGenerator(BaseEAGenerator):
         param stage: Current pipeline Stage object
         param run_name: Optimisation run name
         """
-        super().__init__(ea_dir, stage)
-        self.run_name = run_name
+        super().__init__(ea_dir, stage, run_name)
 
     def _generate_mq5(self, yaml_path: Path) -> Path:
         """Render and write the conformation EA, using trigger-optimised parameters.

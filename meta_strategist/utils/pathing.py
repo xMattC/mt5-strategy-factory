@@ -37,7 +37,7 @@ def load_paths() -> dict:
     mt5_test_cache = mt5_terminal_exe.parent / "Tester" / "cache"
     mt5_experts_dir = mt5_root / "MQL5" / "Experts"
     template_dir = pro_root / "meta_strategist" / "templates"
-    generators_dir = pro_root / "meta_strategist" /"generators"
+    # generators_dir = pro_root / "meta_strategist" /"generators"
     indicator_dir = pro_root / "indicators"
     output_dir = pro_root / "outputs"
 
@@ -51,5 +51,5 @@ def load_paths() -> dict:
         "TEMPLATE_DIR": template_dir,
         "INDICATOR_DIR": indicator_dir,
         "OUTPUT_DIR": output_dir,
-        "GENERATORS_DIR": generators_dir
+        # "GENERATORS_DIR": generators_dir
     }
