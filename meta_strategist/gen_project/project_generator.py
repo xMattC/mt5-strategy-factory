@@ -1,5 +1,3 @@
-import random
-import string
 from pathlib import Path
 import logging
 import yaml
@@ -7,93 +5,10 @@ import yaml
 from meta_strategist.utils import load_paths
 from meta_strategist.utils import render_template  # Assumes render_template is defined here
 
+from .project_code_name import generate_next_project_codename
+from .project_yaml_files import write_whitelist_yaml, write_make_stage_yaml_script
+
 logger = logging.getLogger(__name__)
-
-
-def load_pantheons() -> dict:
-    """Load pantheon data from the YAML file and convert to (name, description) tuples per pantheon."""
-    # paths = load_paths()
-    # Find the directory this script is in
-    script_dir = Path(__file__).parent
-    # Compose the path to the YAML file relative to this script
-    name_file = script_dir / "project_names.yaml"
-    if not name_file.exists():
-        raise FileNotFoundError(f"Pantheon YAML file not found at: {name_file}")
-
-    with open(name_file, encoding="utf-8") as f:
-        raw_data = yaml.safe_load(f)
-
-    return {
-        pantheon: [(entry["name"], entry["description"]) for entry in gods]
-        for pantheon, gods in raw_data.items()
-    }
-
-
-def get_all_gods(pantheon_filter: str = None):
-    """Flatten all gods into a list of (pantheon, name, description)."""
-    pantheons = load_pantheons()
-    pantheon_filter = pantheon_filter.lower() if pantheon_filter else None
-
-    if pantheon_filter and pantheon_filter not in pantheons:
-        raise ValueError(f"Pantheon '{pantheon_filter}' not recognised. Available: {list(pantheons)}")
-
-    return [
-        (pantheon, name, desc)
-        for pantheon, gods in pantheons.items()
-        if not pantheon_filter or pantheon == pantheon_filter
-        for name, desc in gods
-    ]
-
-
-def generate_next_project_codename(pantheon_filter: str = None) -> str:
-    """Interactive generation of the next available project codename."""
-    paths = load_paths()
-    outputs_dir = paths["OUTPUT_DIR"]
-
-    existing_dirs = [f.name for f in outputs_dir.iterdir() if f.is_dir()]
-    used_letters = {name[0].upper() for name in existing_dirs if name}
-
-    all_gods = get_all_gods(pantheon_filter)
-
-    for _ in range(2):  # Two full passes: once to check used letters, once for wrap-around
-        for letter in string.ascii_uppercase:
-            if letter not in used_letters:
-                candidates = [g for g in all_gods if g[1].upper().startswith(letter)]
-                if candidates:
-                    while candidates:
-                        pantheon, name, description = random.choice(candidates)
-                        print(f"Suggested: {name} - {pantheon.capitalize()} god - {description}")
-                        user_input = input("Accept this name? [Y/n]: ").strip().lower()
-                        if user_input in ("", "y"):
-                            return name
-                        candidates.remove((pantheon, name, description))
-        used_letters.clear()  # Allow wrap-around
-
-    raise RuntimeError("No suitable god name found for project codename.")
-
-
-def write_make_stage_yaml_script(run_dir: Path):
-    """
-    Drop a default make_stage_yaml.py script into run_dir.
-    Do nothing if file already exists.
-    """
-    script_path = run_dir / "make_stage_yaml.py"
-    if script_path.exists():
-        logger.info(f"{script_path} already exists. Delete it to remake.")
-        return
-
-    content = (
-        "from meta_strategist.utils import maker\n"
-        "from pathlib import Path\n\n"
-        "if __name__ == \"__main__\":\n"
-        "    run_dir = Path(__file__).parent.resolve()\n"
-        "    maker(run_dir=run_dir, phase=\"trigger\", indicator=\"ASO\")\n"
-    )
-    script_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(script_path, "w") as f:
-        f.write(content)
-
-    logger.info(f"make_stage_yaml.py written to: {script_path}")
 
 
 def create_new_project(pantheon_filter: str = None) -> Path:
@@ -141,6 +56,9 @@ def create_new_project(pantheon_filter: str = None) -> Path:
 
         # Place make_stage_yaml.py at the run_dir level
         write_make_stage_yaml_script(project_dir)
+
+        # Place whitelist.yaml at the run_dir level
+        write_whitelist_yaml(project_dir)
 
         logger.info(f"Created project structure in: {project_dir}")
         return project_dir

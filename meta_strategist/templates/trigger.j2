@@ -10,14 +10,12 @@
 {{ line }}
 {% endfor %}
 
+string SymbolsArray[] = {"EURUSD", "AUDNZD", "EURGBP", "AUDCAD", "CHFJPY"};
 int indicator_handle[];  // Handle array for indicators
 
 int OnInit(){
     EventSetTimer(60);
-    
-    mf.get_white_list(inp_sym_mode, SymbolsArray);
-    ArrayResize(indicator_handle, ArraySize(SymbolsArray));
-    
+
     for(int i = 0; i < ArraySize(SymbolsArray); i++){
         indicator_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_indicator_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
     }

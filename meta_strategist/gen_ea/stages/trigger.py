@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from ..base import BaseEAGenerator
 from jinja2 import Template
-from ..utils import build_input_lines, build_enum_definitions, load_indicator_data
+from ..ea_utils import build_input_lines, build_enum_definitions, load_indicator_data
 from meta_strategist.pipeline import Stage
 
 logger = logging.getLogger(__name__)
@@ -14,14 +14,14 @@ class TriggerEAGenerator(BaseEAGenerator):
     Implements _generate_mq5() to render the EA source for triggers.
     """
 
-    def __init__(self, ea_dir: Path, stage: Stage):
+    def __init__(self, ea_dir: Path, stage: Stage, run_name: str):
         """Initialise the ConformationEAGenerator.
 
         param ea_dir: Directory where EAs will be output
         param stage: Current pipeline Stage object
         param run_name: Optimisation run name
         """
-        super().__init__(ea_dir, stage)
+        super().__init__(ea_dir, stage, run_name)
 
     def _generate_mq5(self, yaml_path: Path) -> Path:
         """Render and write the trigger EA for a single indicator.
@@ -31,6 +31,8 @@ class TriggerEAGenerator(BaseEAGenerator):
         param data: Parsed YAML config dict for this indicator
         return: Path to written .mq5 file
         """
+
+
         # Load trigger indicator (to be optimised in this stage)
         trigger_indi_name, trigger_indi_data = load_indicator_data(yaml_path)
 

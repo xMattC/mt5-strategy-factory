@@ -73,7 +73,7 @@ def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: di
 
     expert_rel_path = get_rel_expert_path(expert_path, load_paths()["MT5_EXPERT_DIR"])
 
-    cfg["Tester"] = _build_tester_section(config, expert_rel_path, report_name)
+    cfg["Tester"] = _build_tester_section(config, expert_rel_path, report_name, stage)
     cfg["TesterInputs"] = _build_tester_inputs(config, inputs, in_sample, optimized_parameters, stage)
 
     ini_path = ini_dir / f"{indi_name}_{sample_type}.ini"
@@ -86,23 +86,25 @@ def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: di
     return ini_path
 
 
-def _build_tester_section(config: Config, expert_path: str, report_name: str) -> dict:
+def _build_tester_section(config: Config, expert_path: str, report_name: str, stage: Stage) -> dict:
     """Construct the [Tester] section for the .ini file."""
+    opt_criterion, _, _, _ = _get_stage_criteria(config, stage.name)
+
     return {
         "Expert": expert_path,
-        "Symbol": "EURUSD",
+        "Symbol": config.main_chart_symbol,
         "Period": config.period,
         "Model": "1",
         "FromDate": config.start_date,
         "ToDate": config.end_date,
         "ForwardMode": "0",
-        "Deposit": "100000",
-        "Currency": "USD",
+        "Deposit": config.deposit,
+        "Currency": config.currency,
         "ProfitInPips": "0",
-        "Leverage": "100",
+        "Leverage": config.leverage,
         "ExecutionMode": "0",
         "Optimization": "2",
-        "OptimizationCriterion": "6",
+        "OptimizationCriterion": str(opt_criterion),
         "Visual": "0",
         "ReplaceReport": "1",
         "ShutdownTerminal": "1",
@@ -122,7 +124,7 @@ def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
     return: Dictionary of tester input lines for .ini
     """
     # Get the stage-specific custom_criteria, fall back to 0 if not found
-    criteria, min_trade = _get_stage_criteria(config, stage.name)
+    _, criteria, min_trade, max_iterations = _get_stage_criteria(config, stage.name)
     tester_inputs = {
         "inp_lot_mode": "2||0||0||2||N",
         "inp_lot_var": f"{config.risk}||2.0||0.2||20||N",
@@ -138,7 +140,7 @@ def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
         "inp_data_split_method": _get_split_code(config.data_split, in_sample),
     }
 
-    scaled_params = scale_parameters(inputs, max_total_iterations=config.max_iterations)
+    scaled_params = scale_parameters(inputs, max_total_iterations=max_iterations)
 
     for name, param in scaled_params:
         if optimized_parameters and name.lower() in optimized_parameters:
@@ -172,12 +174,12 @@ def _get_stage_criteria(config, stage_name):
     Return (criteria, min_trade) tuple for the given stage.
     Raises KeyError if the stage is not present.
     """
-    crit = config.custom_criteria
+    crit = config.opt_settings
     if not isinstance(crit, dict):
         raise TypeError("custom_criteria must be a dict of CriterionSettings.")
     try:
         criterion = crit[stage_name]
-        return criterion.criteria, criterion.min_trade
+        return criterion.opt_criterion, criterion.custom_criterion, criterion.min_trade, criterion.max_iterations
     except KeyError:
         raise KeyError(f"custom_criteria not defined for stage '{stage_name}'")
 

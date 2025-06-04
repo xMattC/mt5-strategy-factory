@@ -1,5 +1,5 @@
-from meta_strategist.gen_ea.stages.trigger import render_trigger_ea
-from meta_strategist.gen_ea.stages.conformation import render_conformation_ea
+from ..stages.trigger import render_trigger_ea
+from ..stages.conf import render_conformation_ea
 # from .volume import render_volume_ea
 # from .exit import render_exit_ea
 # from .baseline import render_baseline_ea

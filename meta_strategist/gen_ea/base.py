@@ -3,7 +3,8 @@ from pathlib import Path
 from jinja2 import Template
 
 from meta_strategist.pipeline import Stage
-from meta_strategist.utils import load_paths, Config
+from meta_strategist.utils import load_paths
+from .ea_utils import load_whitelist
 
 from .compiler import compile_ea
 
@@ -17,15 +18,17 @@ class BaseEAGenerator:
         - generate_one(yaml_path): Process a single YAML.
     """
 
-    def __init__(self, ea_dir: Path, stage: Stage):
+    def __init__(self, ea_dir: Path, stage: Stage, run_name: str):
         self.ea_dir = ea_dir
         self.stage = stage
+        self.run_name = run_name  # Now available everywhere!
         self.logger = logging.getLogger(self.__class__.__name__)
         self.paths = load_paths()
         self.indicator_dir = self._resolve_indicator_dir()
         self.template_path = self.paths["TEMPLATE_DIR"] / self.stage.template_name
         self.template = self._load_template()
         self.ea_dir.mkdir(parents=True, exist_ok=True)
+        self.whitelist = load_whitelist(self.paths["OUTPUT_DIR"] / run_name)
 
     def generate_all(self) -> None:
         """Generate and compile all EAs for every indicator YAML found for this stage."""

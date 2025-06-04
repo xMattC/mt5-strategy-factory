@@ -1,25 +1,21 @@
 import logging
 from datetime import datetime
 from dataclasses import asdict, dataclass
-from typing import Dict, Union
+from typing import Dict
 from pathlib import Path
 import yaml
 
 logger = logging.getLogger(__name__)
 
-from dataclasses import dataclass
-from typing import Dict, Optional
-
 
 @dataclass
-class CriterionSettings:
+class OptSettings:
     """Settings for a single custom criterion.
-
-    value: The main parameter (e.g., enable/disable, mode, etc.)
-    min_trade: Minimum number of trades required for the criterion
     """
-    criteria: int
+    opt_criterion: int
+    custom_criterion: int
     min_trade: int
+    max_iterations: int
 
 
 @dataclass
@@ -33,13 +29,16 @@ class Config:
     start_date: str  # Format: YYYY.MM.DD
     end_date: str  # Format: YYYY.MM.DD
     period: str  # Allowed: M1, M5, M15, H1, H4, D1
-    custom_criteria: Dict[str, CriterionSettings]  # Per-stage criteria settings
+    main_chart_symbol: str
+    deposit: int
+    currency: str
+    leverage: int
     symbol_mode: int
     data_split: str  # Allowed: none, year, month
     risk: float
     sl: float
     tp: float
-    max_iterations: int  # Maximum number of iterations (per grid, etc.)
+    opt_settings: Dict[str, OptSettings]  # Per-stage criteria settings
 
 
 def load_config_from_yaml(config_path: Path) -> Config:
@@ -52,10 +51,8 @@ def load_config_from_yaml(config_path: Path) -> Config:
         data = yaml.safe_load(f)
 
     # Convert each custom_criteria entry to CriterionSettings
-    criteria_data = data.get("custom_criteria", {})
-    data["custom_criteria"] = {
-        k: CriterionSettings(**v) for k, v in criteria_data.items()
-    }
+    opt_data = data.get("opt_settings", {})
+    data["opt_settings"] = {k: OptSettings(**v) for k, v in opt_data.items()}
 
     return Config(**data)
 
@@ -77,6 +74,7 @@ def check_and_validate_config(config: Config):
         exit(1)
 
 
+# TODO update validate config
 def validate_config(config: dict):
     """ Validate the structure and values of the run configuration.
 
@@ -91,8 +89,8 @@ def validate_config(config: dict):
 
     # List all keys that must be present for the config to be valid
     required_keys = [
-        "run_name", "start_date", "end_date", "period", "custom_criteria",
-        "symbol_mode", "data_split", "risk", "sl", "tp", "max_iterations"
+        "run_name", "start_date", "end_date", "period", "opt_settings",
+        "symbol_mode", "data_split", "risk", "sl", "tp"
     ]
 
     # Check every required field is in the config
@@ -119,9 +117,6 @@ def validate_config(config: dict):
     for numeric_key in ["risk", "sl", "tp"]:
         if not isinstance(config[numeric_key], (int, float)):
             raise ValueError(f"'{numeric_key}' must be a number")
-
-    if not isinstance(config["max_iterations"], int):
-        raise ValueError("'max_iterations' must be an integer")
 
     # --- Enum / allowed-value validation ---
     allowed_periods = {"M1", "M5", "M15", "H1", "H4", "D1"}
