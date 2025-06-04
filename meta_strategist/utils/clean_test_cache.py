@@ -5,9 +5,7 @@ logger = logging.getLogger(__name__)
 
 
 def delete_mt5_test_cache():
-    """Deletes all files in the MetaTrader 5 Tester\\cache directory,
-    and all .xml files in the MT5 root directory.
-    """
+    """Deletes all files in the MetaTrader 5 Tester\\cache directory and all .xml files in the MT5 root directory."""
     paths = load_paths()
     test_cache_dir = paths["MT5_TEST_CACHE"]
     mt5_root = paths["MT5_ROOT"]

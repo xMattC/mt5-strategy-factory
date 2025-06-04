@@ -1,9 +1,0 @@
-Optimisation loss functions for each stage:
-
-| Stage    | Main Metric     | Sensible Alternatives                       |
-| -------- | --------------- | ------------------------------------------- |
-| C1       | Win Rate        | Expectancy, Profit Factor, Net Return       |
-| C2       | Win Rate        | Expectancy, Trade Duration, Trade Freq      |
-| Baseline | Max Drawdown    | Sharpe, Ulcer Index, Streaks, Volatility    |
-| Volume   | Profit Factor   | Return/Trade, % Time In, Missed Winners     |
-| Exit     | Avg. R-Multiple | Avg Win/Loss, Median Hold, Equity Smoothing |
