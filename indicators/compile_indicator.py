@@ -4,51 +4,7 @@ from meta_strategist.gen_ea.stages.trigger import TriggerEAGenerator
 from meta_strategist.utils import init_stage_logger
 
 
-def _process_yaml_files(indi_dir, yaml_files):
-    """ Process a given list of YAML filenames within the given directory.
-
-    param indi_dir: Name or path of the directory containing YAML files
-    param yaml_files: List of YAML filenames to process (relative to indi_dir)
-    return: List of successfully processed YAML filenames
-    """
-    base_dir = Path(__file__).parent / indi_dir
-    processed = []
-
-    for yaml_name in yaml_files:
-        yaml_path = base_dir / yaml_name
-        if yaml_path.exists():
-            print(f"Processing: {yaml_path.name}")
-            main(yaml_name, indi_dir)
-            processed.append(yaml_path.name)
-        else:
-            print(f"Warning: {yaml_path} does not exist and will be skipped.")
-    return processed
-
-
-def process_all_yaml_files_in_dir(indi_dir):
-    """ Iterate through all YAML files in the specified directory and process each one.
-
-    param indi_dir: Name or path of the directory containing YAML files
-    return: List of successfully processed YAML filenames
-    """
-    base_dir = Path(__file__).parent / indi_dir
-    yaml_files = sorted(
-        {p.name for ext in ("*.yaml", "*.yml") for p in base_dir.glob(ext)}
-    )
-    return _process_yaml_files(indi_dir, yaml_files)
-
-
-def process_yaml_file_list(indi_dir, yaml_files):
-    """ Process a specific list of YAML files within the given directory.
-
-    param indi_dir: Name or path of the directory containing YAML files
-    param yaml_files: List of YAML filenames to process (relative to indi_dir)
-    return: List of successfully processed YAML filenames
-    """
-    return _process_yaml_files(indi_dir, yaml_files)
-
-
-def main(yaml_filename, indi_dir):
+def generate_and_compile_ea(yaml_filename, indi_dir):
     """ Generate and compile a trigger EA based on a YAML config.
 
     param yaml_filename: Name of the YAML configuration file
@@ -78,6 +34,40 @@ def main(yaml_filename, indi_dir):
     logger.info(f"Done. Check the '{compiled_dir}' directory for output.")
 
 
+def process_all_yaml_files_in_dir(indi_dir):
+    """ Iterate through all YAML files in the specified directory and process each one.
+
+    param indi_dir: Name or path of the directory containing YAML files
+    return: List of successfully processed YAML filenames
+    """
+    base_dir = Path(__file__).parent / indi_dir
+    yaml_files = sorted(
+        {p.name for ext in ("*.yaml", "*.yml") for p in base_dir.glob(ext)}
+    )
+    return process_yaml_file_list(indi_dir, yaml_files)
+
+
+def process_yaml_file_list(indi_dir, yaml_files):
+    """ Process a given list of YAML filenames within the given directory.
+
+    param indi_dir: Name or path of the directory containing YAML files
+    param yaml_files: List of YAML filenames to process (relative to indi_dir)
+    return: List of successfully processed YAML filenames
+    """
+    base_dir = Path(__file__).parent / indi_dir
+    processed = []
+
+    for yaml_name in yaml_files:
+        yaml_path = base_dir / yaml_name
+        if yaml_path.exists():
+            print(f"Processing: {yaml_path.name}")
+            generate_and_compile_ea(yaml_name, indi_dir)
+            processed.append(yaml_path.name)
+        else:
+            print(f"Warning: {yaml_path} does not exist and will be skipped.")
+    return processed
+
+
 if __name__ == "__main__":
     file_list = [
         "Coral.yaml",
@@ -85,8 +75,8 @@ if __name__ == "__main__":
         # "MyOtherIndicator.yaml",
         # "MyOtherIndicator.yaml",
     ]
-    processed = process_yaml_file_list("trigger", file_list)
-    print(f"\nProcessed files: {processed}")
+    generated_eas = process_yaml_file_list("trigger", file_list)
+    print(f"\nProcessed files: {generated_eas}")
 
-    # all_processed = process_all_yaml_files_in_dir("trigger")
-    # print(f"\nAll processed files: {all_processed}")
+    # generated_eas = process_all_yaml_files_in_dir("trigger")
+    # print(f"\nAll processed files: {generated_eas}")
