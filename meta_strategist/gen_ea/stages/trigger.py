@@ -32,7 +32,6 @@ class TriggerEAGenerator(BaseEAGenerator):
         return: Path to written .mq5 file
         """
 
-
         # Load trigger indicator (to be optimised in this stage)
         trigger_indi_name, trigger_indi_data = load_indicator_data(yaml_path)
 
@@ -41,7 +40,8 @@ class TriggerEAGenerator(BaseEAGenerator):
             # self.config,
             self.template,
             trigger_indi_name,
-            trigger_indi_data
+            trigger_indi_data,
+            symbols_array=self.whitelist
         )
 
         # Write the rendered EA code to the output .mq5 file
@@ -52,7 +52,7 @@ class TriggerEAGenerator(BaseEAGenerator):
         return output_file
 
 
-def render_trigger_ea(template: Template, trigger_indi_name: str, trigger_indi_data: dict) -> str:
+def render_trigger_ea(template: Template, trigger_indi_name: str, trigger_indi_data: dict, symbols_array: list) -> str:
     """Render EA code for a trigger-only EA.
 
     param template: Jinja2 Template for this EA
@@ -67,6 +67,7 @@ def render_trigger_ea(template: Template, trigger_indi_name: str, trigger_indi_d
     # The most basic single-indicator EA (for trigger tests)
     return template.render(
         enum_definitions=build_enum_definitions(trigger_indi_data),  # MQL5 enum definitions
+        symbols_array=symbols_array,
 
         trigger_indicator_name=trigger_indi_name,
         trigger_input_lines=build_input_lines(trigger_indi_data),  # MQL5 input variable declarations

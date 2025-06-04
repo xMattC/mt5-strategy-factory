@@ -45,7 +45,7 @@ def write_whitelist_yaml(project_dir: Path, symbols=None, overwrite=False):
         logger.info(f"{whitelist_path} already exists. Delete it or set overwrite=True to recreate.")
         return
 
-    data = {"white_list": symbols}
+    data = {"whitelist": symbols}
     with open(whitelist_path, "w", encoding="utf-8") as f:
         yaml.safe_dump(data, f, sort_keys=False)
 

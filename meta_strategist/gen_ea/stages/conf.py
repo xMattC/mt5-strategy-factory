@@ -46,7 +46,8 @@ class ConformationEAGenerator(BaseEAGenerator):
             self.template,
             conf_indicator_name,
             conf_indicator_data,
-            trigger_indicator_data
+            trigger_indicator_data,
+            symbols_array=self.whitelist
         )
 
         # Write the rendered EA code to the output .mq5 file
@@ -58,7 +59,7 @@ class ConformationEAGenerator(BaseEAGenerator):
 
 
 def render_conformation_ea(template: Template, conf_indi_name: str, conf_indi_data: dict,
-                           trigger_indi_data: dict) -> str:
+                           trigger_indi_data: dict, symbols_array: list) -> str:
     """Render MQL5 code for conformation EA stage (two indicators).
 
     param template: Jinja2 template for the EA
@@ -74,6 +75,7 @@ def render_conformation_ea(template: Template, conf_indi_name: str, conf_indi_da
     # Prepare context for the template render call
     return template.render(
         enum_definitions=build_enum_definitions(conf_indi_data, trigger_indi_data),
+        symbols_array=symbols_array,
 
         # Conformation indicator (to be optimised)
         conf_indicator_name=conf_indi_name,
