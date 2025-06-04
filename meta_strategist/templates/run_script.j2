@@ -1,8 +1,6 @@
 from pathlib import Path
-from meta_strategist.utils.filesystems import load_config_from_yaml
-from meta_strategist.pipeline.stages import get_stage
-from meta_strategist.pipeline.optimisation import Optimiser
-from meta_strategist.utils.config_validation import check_and_validate_config
+from meta_strategist.utils import load_config_from_yaml, check_and_validate_config
+from meta_strategist.pipeline import get_stage, Optimiser
 
 
 def main():

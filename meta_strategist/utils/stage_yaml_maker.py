@@ -84,8 +84,7 @@ def create_stage_yaml(run_dir: Path, stage: Stage, indicator: str, out_filename:
 
 
 def maker(phase: str, indicator: str, run_dir: Path = None):
-    """
-    Convenience entry point to be called from a wrapper script.
+    """ Convenience entry point to be called from a wrapper script.
 
     param phase: Name of the stage (e.g., 'trigger', 'conformation')
     param indicator: Indicator name (e.g., 'aroon', 'aso')

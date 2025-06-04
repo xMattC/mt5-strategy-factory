@@ -1,0 +1,30 @@
+chande_momentum_oscillator:
+  custom: true
+  indicator_path: "MyIndicators/chande_momentum_oscillator.ex5"
+
+  inputs:
+    CMO_period:
+      default: 9
+      type: int
+      min: 1
+      max: 50
+      step: 1
+      optimize: true
+
+    CMO_Shift:
+      default: 0
+      type: int
+      min: 0
+      max: 20
+      step: 1
+      optimize: true
+
+  enums: {}
+
+  buffers:
+    - name: ExtLineBuffer
+      index: 0
+
+  base_conditions:
+    long: "ExtLineBuffer[0] > 0 && ExtLineBuffer[1] < 0"
+    short: "ExtLineBuffer[0] < 0 && ExtLineBuffer[1] > 0"

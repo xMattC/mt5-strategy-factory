@@ -1,5 +1,5 @@
 from meta_strategist.gen_ea import get_ea_generator
-from meta_strategist.gen_config import IniConfig, create_ini
+from meta_strategist.gen_config import create_ini
 from meta_strategist.reporting import (
     extract_optimization_result,
     OptimizationResult,
@@ -8,6 +8,7 @@ from meta_strategist.reporting import (
     copy_mt5_report
 )
 from meta_strategist.utils import (
+    Config,
     load_paths,
     create_dir_structure,
     get_compiled_indicators,
@@ -22,15 +23,15 @@ from .mt5_ea_runner import run_ea
 class Optimiser:
     """ Coordinates the full MT5 optimisation process for a single pipeline stage.
 
-    param config: IniConfig object containing run parameters
+    param config: Config object containing run parameters
     param stage: Stage object defining this optimisation phase
     param recompile_ea: If True, force EA regeneration from template
     """
 
-    def __init__(self, config: IniConfig, stage: Stage, recompile_ea: bool = True):
+    def __init__(self, config: Config, stage: Stage, recompile_ea: bool = True):
         """ Initialise the optimiser pipeline.
 
-        param config: IniConfig object containing run parameters
+        param config: Config object containing run parameters
         param stage: Stage object for this pipeline step
         param recompile_ea: If True, force EA regeneration from template
         """
@@ -116,7 +117,7 @@ class Optimiser:
         return: OptimizationResult object or None if failed
         """
         ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, config=self.config,
-                              ini_files_dir=self.ini_dir, in_sample=True, optimized_parameters=None)
+                              ini_files_dir=self.ini_dir, in_sample=True, stage=self.stage, optimized_parameters=None)
 
         if not ini_path:
             self.logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
@@ -141,7 +142,7 @@ class Optimiser:
         param optimisation_result: OptimizationResult from IS phase
         """
         ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, config=self.config,
-                              ini_files_dir=self.ini_dir, in_sample=False,
+                              ini_files_dir=self.ini_dir, in_sample=False, stage=self.stage,
                               optimized_parameters=optimisation_result.parameters)
 
         if not ini_path:

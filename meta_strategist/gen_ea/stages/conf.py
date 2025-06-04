@@ -4,6 +4,7 @@ from pathlib import Path
 from jinja2 import Template
 
 from meta_strategist.pipeline import Stage, get_stage
+from meta_strategist.utils import Config
 from ..base import BaseEAGenerator
 from ..utils import load_indicator_data, build_input_lines, build_enum_definitions, load_results_data
 
@@ -39,7 +40,6 @@ class ConformationEAGenerator(BaseEAGenerator):
         trigger_indicator_name, trigger_indicator_data = load_results_data(self.run_name, trigger_stage)
 
         # Load conformation indicator (to be optimised in this stage)
-        print(yaml_path)
         conf_indicator_name, conf_indicator_data = load_indicator_data(yaml_path)
 
         # Render the EA code using the template and both indicators' data
@@ -54,6 +54,7 @@ class ConformationEAGenerator(BaseEAGenerator):
         output_file = self.ea_dir / f"{yaml_path.stem}.mq5"
         with open(output_file, "w") as f:
             f.write(rendered)
+
         return output_file
 
 
@@ -71,19 +72,13 @@ def render_conformation_ea(template: Template, conf_indi_name: str, conf_indi_da
     conf_long_full = conf_indi_data.get("base_conditions", {}).get("long", "")
     conf_short_full = conf_indi_data.get("base_conditions", {}).get("short", "")
 
-    # Build MQL5 enum definitions from both indicators
-    enum_definitions = build_enum_definitions(conf_indi_data, trigger_indi_data)
-
-    # Build input variable lines for conformation indicator
-    conf_input_lines = build_input_lines(conf_indi_data)
-
     # Prepare context for the template render call
     return template.render(
-        enum_definitions=enum_definitions,
+        enum_definitions=build_enum_definitions(conf_indi_data, trigger_indi_data),
 
         # Conformation indicator (to be optimised)
         conf_indicator_name=conf_indi_name,
-        conf_input_lines=conf_input_lines,
+        conf_input_lines=build_input_lines(conf_indi_data),
         conf_indicator_path=conf_indi_data["indicator_path"],  # Path to indicator .ex5 or .mq5
         conf_inputs=[k for k in conf_indi_data.get("inputs", {})],  # List of input variable names
         conf_buffers=conf_indi_data.get("buffers", []),  # List of buffer indices or names

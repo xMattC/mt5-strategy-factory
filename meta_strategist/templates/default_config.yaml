@@ -1,12 +1,37 @@
 run_name: example_run
-start_date: # in this format 2023.01.01
-end_date: # int this format 2023.12.31
-period: D1 #chart time period
-custom_criteria: 0 # 0 or 1
+start_date: 2023.01.01  # in this format 2023.01.01
+end_date: 2024.01.01 # int this format 2023.12.31
+period: D1 # Chart time period
 symbol_mode: 2 #
 data_split: month # Options: none, year, month
 risk: 2 # Risk in percent (used in lot size calculation)
-sl: 2  # Stop loss s
-tp: 1.5 # Take profit
+sl: 1.5  # Stop loss s
+tp: 1 # Take profit
 max_iterations: 100 # Max total parameter combinations
+
+opt_settings:
+  Trigger:
+    opt_criterion: 6
+    custom_criterion: 1
+    min_trade: 100
+
+  Conformation:
+    opt_criterion: 6
+    custom_criterion: 1
+    min_trade: 200
+
+  Trendline:
+    opt_criterion: 5
+    custom_criterion: 99
+    min_trade: 0
+
+  Volume:
+    opt_criterion: 6
+    custom_criterion: 1
+    min_trade: 20
+
+  Exit:
+    opt_criterion: 6
+    custom_criterion: 1
+    min_trade: 30
 

@@ -79,14 +79,14 @@ def main(yaml_filename, indi_dir):
 
 
 if __name__ == "__main__":
-    # file_list = [
-    #     "Bears_Bulls_Impuls.yaml",
-    #     # "MyOtherIndicator.yaml",
-    #     # "MyOtherIndicator.yaml",
-    #     # "MyOtherIndicator.yaml",
-    # ]
-    # processed = process_yaml_file_list("trigger", file_list)
-    # print(f"\nProcessed files: {processed}")
+    file_list = [
+        "Coral.yaml",
+        # "MyOtherIndicator.yaml",
+        # "MyOtherIndicator.yaml",
+        # "MyOtherIndicator.yaml",
+    ]
+    processed = process_yaml_file_list("trigger", file_list)
+    print(f"\nProcessed files: {processed}")
 
-    all_processed = process_all_yaml_files_in_dir("trigger")
-    print(f"\nAll processed files: {all_processed}")
+    # all_processed = process_all_yaml_files_in_dir("trigger")
+    # print(f"\nAll processed files: {all_processed}")

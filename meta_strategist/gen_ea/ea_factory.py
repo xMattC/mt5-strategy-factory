@@ -25,7 +25,7 @@ def get_ea_generator(stage, ea_dir: Path, run_name: str):
     """
 
     if stage.name == "Trigger":
-        return TriggerEAGenerator(ea_dir, stage)
+        return TriggerEAGenerator(ea_dir, stage, run_name)
 
     elif stage.name == "Conformation":
         assert run_name is not None, "run_name must be provided for Conformation stage"

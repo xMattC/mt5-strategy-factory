@@ -3,7 +3,7 @@ from pathlib import Path
 from jinja2 import Template
 
 from meta_strategist.pipeline import Stage
-from meta_strategist.utils import load_paths
+from meta_strategist.utils import load_paths, Config
 
 from .compiler import compile_ea
 
@@ -26,8 +26,6 @@ class BaseEAGenerator:
         self.template_path = self.paths["TEMPLATE_DIR"] / self.stage.template_name
         self.template = self._load_template()
         self.ea_dir.mkdir(parents=True, exist_ok=True)
-
-        self.logger.info("HERE")
 
     def generate_all(self) -> None:
         """Generate and compile all EAs for every indicator YAML found for this stage."""
@@ -63,7 +61,7 @@ class BaseEAGenerator:
         raise NotImplementedError
 
     def _load_template(self) -> Template:
-        """Lazy-load and cache the Jinja2 template for this stage."""
+        """ Load Jinja2 template for this stage."""
         self.logger.info("Loading EA template from: %s", self.template_path)
         with open(self.template_path, "r") as f:
             self.template = Template(f.read(), trim_blocks=True, lstrip_blocks=True)
