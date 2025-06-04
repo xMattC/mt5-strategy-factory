@@ -3,7 +3,7 @@ from meta_strategist.utils.pathing import load_paths
 import yaml
 from pathlib import Path
 
-from meta_strategist.pipeline import Stage
+from meta_strategist.optimise import Stage
 
 logger = logging.getLogger(__name__)
 

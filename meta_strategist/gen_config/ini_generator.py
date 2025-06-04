@@ -1,38 +1,15 @@
 import configparser
 import logging
-import yaml
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
-from meta_strategist.gen_config.ini_opt_param_scale import scale_parameters
 from meta_strategist.utils import load_paths, Config
-from meta_strategist.pipeline import Stage
+from meta_strategist.optimise import Stage
+
+from .extract_inputs import extract_inputs_from_input_yaml
+from .scale_parameters import scale_parameters
 
 logger = logging.getLogger(__name__)
-
-
-def extract_inputs_from_yaml(yaml_path: Path, expected_key: str) -> dict:
-    """Extracts and validates the 'inputs' section from a YAML indicator file.
-
-    param yaml_path: Path to the .yaml file describing the indicator
-    param expected_key: Expected top-level key (indicator name) in the YAML
-    return: Dictionary of input parameter definitions
-    """
-    if not yaml_path.exists():
-        raise FileNotFoundError(f"YAML file not found: {yaml_path}")
-
-    with open(yaml_path, 'r') as f:
-        data = yaml.safe_load(f)
-
-    top_key = next(iter(data))
-    if top_key.lower() != expected_key.lower():
-        logger.warning(f"Top-level key '{top_key}' does not match expected name '{expected_key}'")
-
-    inputs = data[top_key].get("inputs", {})
-    if not isinstance(inputs, dict):
-        raise ValueError(f"'inputs' section in {yaml_path.name} must be a dictionary")
-
-    return inputs
 
 
 def create_ini(indi_name: str, expert_dir: Path, config: Config, ini_files_dir: Path,
@@ -50,15 +27,16 @@ def create_ini(indi_name: str, expert_dir: Path, config: Config, ini_files_dir: 
         logger.warning(f".ex5 file missing: {ex5_path.name}")
         return None
 
-    # conver yaml input into dict
     try:
-        inputs = extract_inputs_from_yaml(yaml_path, indi_name)
+        inputs = extract_inputs_from_input_yaml(yaml_path, indi_name)
 
     except Exception as e:
         logger.warning(f"Failed to load inputs from YAML: {e}")
         return None
 
-    return _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample, stage, optimized_parameters)
+    ini_file_path = _write_ini_file(config, ex5_path, ini_files_dir, inputs, in_sample, stage, optimized_parameters)
+
+    return ini_file_path
 
 
 def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool, stage: Stage,
@@ -76,19 +54,19 @@ def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: di
     cfg["Tester"] = _build_tester_section(config, expert_rel_path, report_name, stage)
     cfg["TesterInputs"] = _build_tester_inputs(config, inputs, in_sample, optimized_parameters, stage)
 
-    ini_path = ini_dir / f"{indi_name}_{sample_type}.ini"
-    ini_path.parent.mkdir(parents=True, exist_ok=True)
+    ini_file_path = ini_dir / f"{indi_name}_{sample_type}.ini"
+    ini_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(ini_path, "w", encoding="utf-16") as f:
+    with open(ini_file_path, "w", encoding="utf-16") as f:
         cfg.write(f)
 
-    logger.info(f"Generated .ini file: {ini_path}")
-    return ini_path
+    logger.info(f"Generated .ini file: {ini_file_path}")
+    return ini_file_path
 
 
 def _build_tester_section(config: Config, expert_path: str, report_name: str, stage: Stage) -> dict:
     """Construct the [Tester] section for the .ini file."""
-    opt_criterion, _, _, _ = _get_stage_criteria(config, stage.name)
+    opt_criterion, criteria, min_trade, max_iterations = _get_stage_criteria(config, stage.name)
 
     return {
         "Expert": expert_path,
@@ -124,7 +102,7 @@ def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
     return: Dictionary of tester input lines for .ini
     """
     # Get the stage-specific custom_criteria, fall back to 0 if not found
-    _, criteria, min_trade, max_iterations = _get_stage_criteria(config, stage.name)
+    opt_criterion, criteria, min_trade, max_iterations = _get_stage_criteria(config, stage.name)
     tester_inputs = {
         "inp_lot_mode": "2||0||0||2||N",
         "inp_lot_var": f"{config.risk}||2.0||0.2||20||N",
@@ -132,10 +110,8 @@ def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
         "inp_sl_var": f"{config.sl}||1.0||0.1||10||N",
         "inp_tp_mode": "2||0||0||5||N",
         "inp_tp_var": f"{config.tp}||1.5||0.15||15||N",
-        # Use the stage-specific value here
         "inp_custom_criteria": f"{criteria}||0||0||1||N",
         "inp_opt_min_trades": f"{min_trade}||0||0||1||N",
-        # "inp_sym_mode": f"{config.symbol_mode}||0||0||2||N",
         "inp_force_opt": "1||1||1||2||N" if in_sample else "1||1||1||2||Y",
         "inp_data_split_method": _get_split_code(config.data_split, in_sample),
     }

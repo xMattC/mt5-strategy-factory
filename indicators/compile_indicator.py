@@ -1,5 +1,5 @@
 from pathlib import Path
-from meta_strategist.pipeline import Stage, get_stage
+from meta_strategist.optimise import Stage, get_stage
 from meta_strategist.gen_ea.stages.trigger import TriggerEAGenerator
 from meta_strategist.utils import init_stage_logger
 

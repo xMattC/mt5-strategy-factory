@@ -3,7 +3,7 @@ from pathlib import Path
 
 from jinja2 import Template
 
-from meta_strategist.pipeline import Stage, get_stage
+from meta_strategist.optimise import Stage, get_stage
 from meta_strategist.utils import Config
 from ..base import BaseEAGenerator
 from ..ea_utils import load_indicator_data, build_input_lines, build_enum_definitions, load_results_data

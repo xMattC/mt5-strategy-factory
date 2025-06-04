@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from jinja2 import Template
 
-from meta_strategist.pipeline import Stage
+from meta_strategist.optimise import Stage
 from meta_strategist.utils import load_paths
 from .ea_utils import load_whitelist
 

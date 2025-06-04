@@ -13,21 +13,13 @@ logger = logging.getLogger(__name__)
 
 def create_new_project(pantheon_filter: str = None) -> Path:
     """
-    Create a new project directory with a sequential codename and populate it with
-    a default configuration and run script.
+    Create a new project directory with a sequential codename and populate it with a default configuration and run
+    script.
 
-    Parameters
-    ----------
     pantheon_filter : str, optional
         If provided, selects the next codename from a specific mythological pantheon. Valid options are:
         ['greek', 'norse', 'roman', 'egyptian', 'aztec', 'hindu', 'celtic', 'slavic'].
         If None, chooses from all pantheons at random.
-
-    Returns
-    -------
-    Path
-        The path to the newly created project directory.
-
     """
     run_name = generate_next_project_codename(pantheon_filter)
     paths = load_paths()
@@ -44,12 +36,12 @@ def create_new_project(pantheon_filter: str = None) -> Path:
         # Update run_name in config
         config_data["run_name"] = run_name
 
-        # Save updated config to new location
+        # create project config file
         config_dest = project_dir / f"{run_name}_config.yaml"
         with open(config_dest, "w", encoding="utf-8") as f:
             yaml.safe_dump(config_data, f, sort_keys=False)
 
-        # Create run file
+        # Create project run file
         run_file = project_dir / f"{run_name}_run.py"
         run_file_code = render_template("run_script.j2", {"run_name": run_name})
         run_file.write_text(run_file_code)
@@ -62,10 +54,6 @@ def create_new_project(pantheon_filter: str = None) -> Path:
 
         logger.info(f"Created project structure in: {project_dir}")
         return project_dir
-
-    except FileExistsError:
-        logger.error(f"Project directory already exists: {project_dir}")
-        raise
 
     except Exception as e:
         logger.error(f"Failed to create project: {e}")
