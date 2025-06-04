@@ -33,7 +33,6 @@ class Config:
     deposit: int
     currency: str
     leverage: int
-    symbol_mode: int
     data_split: str  # Allowed: none, year, month
     risk: float
     sl: float
@@ -90,7 +89,7 @@ def validate_config(config: dict):
     # List all keys that must be present for the config to be valid
     required_keys = [
         "run_name", "start_date", "end_date", "period", "opt_settings",
-        "symbol_mode", "data_split", "risk", "sl", "tp"
+         "data_split", "risk", "sl", "tp"
     ]
 
     # Check every required field is in the config

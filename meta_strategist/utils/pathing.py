@@ -34,7 +34,7 @@ def load_paths() -> dict:
     """Return a dictionary of key project paths based on private path config."""
 
     # Derived paths
-    mt5_test_cache = mt5_terminal_exe.parent / "Tester" / "cache"
+    mt5_test_cache = mt5_root / "Tester" / "cache"
     mt5_experts_dir = mt5_root / "MQL5" / "Experts"
     template_dir = pro_root / "meta_strategist" / "templates"
     # generators_dir = pro_root / "meta_strategist" /"generators"

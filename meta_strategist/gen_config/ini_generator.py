@@ -135,7 +135,7 @@ def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
         # Use the stage-specific value here
         "inp_custom_criteria": f"{criteria}||0||0||1||N",
         "inp_opt_min_trades": f"{min_trade}||0||0||1||N",
-        "inp_sym_mode": f"{config.symbol_mode}||0||0||2||N",
+        # "inp_sym_mode": f"{config.symbol_mode}||0||0||2||N",
         "inp_force_opt": "1||1||1||2||N" if in_sample else "1||1||1||2||Y",
         "inp_data_split_method": _get_split_code(config.data_split, in_sample),
     }
