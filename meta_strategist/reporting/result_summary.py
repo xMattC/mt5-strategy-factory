@@ -162,5 +162,6 @@ def percent_diff(a: float, b: float) -> float:
     """
     try:
         return round(abs(a - b) / b * 100, 2)
+
     except ZeroDivisionError:
         return 0.0

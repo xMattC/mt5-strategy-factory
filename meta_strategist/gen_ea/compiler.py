@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def compile_ea(ea_mq5_path: Path) -> None:
-    """ Compile a .mq5 file to .ex5 using MetaEditor.
+    """ Compile a .mq5 file to .ex5 using MetaEditor as a subprocess.
 
     param ea_mq5_path: Path to the .mq5 file to compile
     """

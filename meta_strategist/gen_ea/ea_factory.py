@@ -2,7 +2,8 @@ import logging
 from pathlib import Path
 
 from .stages.trigger import TriggerEAGenerator
-from .stages.conf import ConformationEAGenerator
+from .stages.conformation import ConformationEAGenerator
+
 # from .stages.volume import VolumeEAGenerator
 # from .stages.exit import ExitEAGenerator
 # from .stages.trendline import TrendlineEAGenerator
@@ -31,6 +32,10 @@ def get_ea_generator(stage, ea_dir: Path, run_name: str):
         assert run_name is not None, "run_name must be provided for Conformation stage"
         return ConformationEAGenerator(ea_dir, stage, run_name)
 
+    # elif stage.name == "Trendline":
+    #     # assert run_name is not None, "run_name must be provided for Trendline stage"
+    #     return TrendlineEAGenerator(ea_dir, stage)
+
     # elif stage.name == "Volume":
     #     # assert run_name is not None, "run_name must be provided for Volume stage"
     #     return VolumeEAGenerator(ea_dir, stage)
@@ -39,10 +44,6 @@ def get_ea_generator(stage, ea_dir: Path, run_name: str):
     #     # assert run_name is not None, "run_name must be provided for Exit stage"
     #     return ExitEAGenerator(ea_dir, stage)
     #
-    # elif stage.name == "Trendline":
-    #     # assert run_name is not None, "run_name must be provided for Trendline stage"
-    #     return TrendlineEAGenerator(ea_dir, stage)
 
     else:
         raise ValueError(f"No EA generator defined for stage: {stage.name}")
-

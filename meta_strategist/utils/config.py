@@ -37,7 +37,7 @@ class Config:
     risk: float
     sl: float
     tp: float
-    opt_settings: Dict[str, OptSettings]  # Per-stage criteria settings
+    opt_settings: Dict[str, OptSettings]  # Per-stage optimisation settings
 
 
 def load_config_from_yaml(config_path: Path) -> Config:
