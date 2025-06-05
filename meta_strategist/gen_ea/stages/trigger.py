@@ -71,7 +71,11 @@ def render_trigger_ea(template: Template, trigger_indi_name: str, trigger_indi_d
 
         trigger_indicator_name=trigger_indi_name,
         trigger_input_lines=build_input_lines(trigger_indi_data),  # MQL5 input variable declarations
-        trigger_indicator_path=trigger_indi_data["indicator_path"],  # Path to the indicator .ex5 or .mq5
+
+        trigger_custom=trigger_indi_data.get("custom"),
+        trigger_indicator_path=trigger_indi_data.get("indicator_path"),  # Path to the indicator .ex5 or .mq5
+        trigger_function=trigger_indi_data.get("function"),
+
         trigger_inputs=[k for k in trigger_indi_data.get("inputs", {})],  # List of input variable names
         trigger_buffers=trigger_indi_data.get("buffers", []),  # List of buffer indices or names
         trigger_long_conditions=trigger_indi_data.get("base_conditions", {}).get("long", "false"),
