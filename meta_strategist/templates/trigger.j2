@@ -39,7 +39,11 @@ int OnInit(){
     ArrayResize(indicator_handle, ArraySize(SymbolsArray));
 
     for(int i = 0; i < ArraySize(SymbolsArray); i++){
+    {% if trigger_custom %}
         indicator_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_indicator_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+    {% else %}
+        indicator_handle[i] = {{ trigger_function }}(SymbolsArray[i], PERIOD_CURRENT{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+    {% endif %}
     }
     return(INIT_SUCCEEDED);
 }
