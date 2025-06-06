@@ -1,7 +1,8 @@
 from pathlib import Path
 from meta_strategist.utils import load_config_from_yaml, check_and_validate_config
-from meta_strategist.pipeline import get_stage, Optimiser
-
+from meta_strategist.optimise_stage.stage_config import get_stage
+from meta_strategist.optimise_stage import Optimiser
+from meta_strategist.pipelines.trend_following.stages import STAGES
 
 def main():
     """ Entry point for executing a full MT5 optimisation pipeline.
@@ -20,7 +21,7 @@ def main():
 
     # Run each stage sequentially using the same config:
 
-    stage_1 = get_stage("Trigger")
+    stage_1 = get_stage(STAGES, "Trigger")
     Optimiser(config=config, stage=stage_1).run_stage_optimisations()
 
     # stage_2 = get_stage("Conformation")
