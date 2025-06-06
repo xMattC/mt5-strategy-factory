@@ -26,6 +26,8 @@ class ProjectConfig:
     custom_criteria is a mapping from stage name to CriterionSettings.
     """
     run_name: str
+    pipeline: str
+    whitelist_file: str
     start_date: str  # Format: YYYY.MM.DD
     end_date: str  # Format: YYYY.MM.DD
     period: str  # Allowed: M1, M5, M15, H1, H4, D1

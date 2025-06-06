@@ -1,5 +1,5 @@
-from meta_strategist.gen_ea.generate_ea import GenerateEA
-from meta_strategist.gen_project_config import create_ini
+from meta_strategist.gen_expert_advisor.generate_ea import GenerateEA
+from meta_strategist.gen_initilisation_file import create_ini
 from meta_strategist.reporting import (
     extract_optimization_result,
     OptimizationResult,
@@ -7,18 +7,14 @@ from meta_strategist.reporting import (
     extract_top_parameters,
     copy_mt5_report
 )
-from meta_strategist.utils import (
-    ProjectConfig,
-    load_paths,
-    create_dir_structure,
-    get_compiled_indicators,
-    delete_mt5_test_cache,
-    init_stage_logger,
-)
+from meta_strategist.utils import ProjectConfig, load_paths
 
-from meta_strategist.utils.whitelist_loader import load_whitelist
 from .stage_config import StageConfig
-from .mt5_ea_runner import run_ea
+from .ea_runner import run_ea
+from .clean_test_cache import delete_mt5_test_cache
+from .create_dir_structure import create_dir_structure
+from .get_compiled_indicators import get_compiled_indicators
+from .init_logger import init_stage_logger
 
 
 class StageRunner:
@@ -29,7 +25,8 @@ class StageRunner:
     param recompile_ea: If True, force EA regeneration from template
     """
 
-    def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, recompile_ea: bool = True):
+    def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, whitelist: list,
+                 recompile_ea: bool = True):
         """ Initialise the optimiser pipeline.
 
         param project_config: Config object containing run parameters
@@ -38,6 +35,7 @@ class StageRunner:
         """
         self.project_config = project_config
         self.stage_config = stage_config
+        self.whitelist = whitelist
         self.recompile_ea = recompile_ea
         self.paths = load_paths()
 
@@ -66,25 +64,22 @@ class StageRunner:
 
             # Log which stage_config is being processed
             self.logger.info(f"Generating EAs for stage_config: {self.stage_config.name}")
-
             run_name = self.project_config.run_name
 
-            # Load the whitelist for this run (which pairs to trade)
-            whitelist = load_whitelist("CHART_SYMBOL_ONLY")
-
             # Generate individual Expert Advisor:
-            GenerateEA(self.expert_dir, self.stage_config, run_name, whitelist).generate_all()
+            GenerateEA(self.expert_dir, self.stage_config, run_name, self.whitelist).generate_all()
 
         else:
             self.logger.info(f"Skipping EA generation for stage_config: {self.stage_config.name}")
 
-    def run_stage_config_optimisations(self):
+    def run_stage_optimisations(self):
         """ Run optimisation for all compiled indicators (EAs) in this stage_config. """
         for indicator in get_compiled_indicators(self.expert_dir):
             self.optimise_indicator(indicator)
 
             # ALWAYS update the combined results table
-            update_combined_results(results_dir=self.results_dir, stage_name=self.stage_config.name, print_summary=False)
+            update_combined_results(results_dir=self.results_dir, stage_name=self.stage_config.name,
+                                    print_summary=False)
 
         # Finally, extract top-N performing parameter sets
         extract_top_parameters(results_dir=self.results_dir, top_n=5, sort_by="Res_OOS")
@@ -127,7 +122,8 @@ class StageRunner:
         return: OptimizationResult object or None if failed
         """
         ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, project_config=self.project_config,
-                              ini_files_dir=self.ini_dir, in_sample=True, stage_config=self.stage_config, optimized_parameters=None)
+                              ini_files_dir=self.ini_dir, in_sample=True, stage_config=self.stage_config,
+                              optimized_parameters=None)
 
         if not ini_path:
             self.logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
