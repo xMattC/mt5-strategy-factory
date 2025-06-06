@@ -8,14 +8,15 @@ from meta_strategist.reporting import (
     copy_mt5_report
 )
 from meta_strategist.utils import (
-    Config,
+    ProjectConfig,
     load_paths,
     create_dir_structure,
     get_compiled_indicators,
     delete_mt5_test_cache,
-    init_stage_logger
+    init_stage_logger,
 )
 
+from meta_strategist.utils.whitelist_loader import load_whitelist
 from .stages import Stage
 from .mt5_ea_runner import run_ea
 
@@ -28,7 +29,7 @@ class Optimiser:
     param recompile_ea: If True, force EA regeneration from template
     """
 
-    def __init__(self, config: Config, stage: Stage, recompile_ea: bool = True):
+    def __init__(self, config: ProjectConfig, stage: Stage, recompile_ea: bool = True):
         """ Initialise the optimiser pipeline.
 
         param config: Config object containing run parameters
@@ -60,9 +61,21 @@ class Optimiser:
 
     def generate_experts(self):
         """ Generate EA .mq5 files from template if recompile_ea is enabled. """
+        # Only generate if the flag is set
         if self.recompile_ea:
+
+            # Log which stage is being processed
             self.logger.info(f"Generating EAs for stage: {self.stage.name}")
-            generator = get_ea_generator(self.stage, self.expert_dir, self.config.run_name)
+
+            run_name = self.config.run_name
+
+            # Load the whitelist for this run (which pairs to trade)
+            white_list = load_whitelist(self.paths["OUTPUT_DIR"] / run_name)
+
+            # Get the correct EA generator for this stage and settings
+            generator = get_ea_generator(self.stage, self.expert_dir, run_name, white_list)
+
+            # Generate all EAs (writes .mq5 files)
             generator.generate_all()
 
         else:

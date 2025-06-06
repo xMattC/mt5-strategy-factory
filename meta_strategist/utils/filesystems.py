@@ -7,8 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_dir_structure(run_name: str, indicator_type: str) -> Path:
-    """
-    Create standard directory structure for a run, and drop make_stage_yaml.py in the run root.
+    """ Create standard directory structure for a run, and drop make_stage_yaml.py in the run root.
 
     param run_name: The run (project) name (e.g. 'Apollo')
     param indicator_type: The phase/stage name (e.g. 'Trigger')
