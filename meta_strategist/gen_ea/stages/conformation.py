@@ -4,7 +4,6 @@ from pathlib import Path
 from jinja2 import Template
 
 from meta_strategist.optimise import Stage, get_stage
-from meta_strategist.utils import Config
 from ..base import BaseEAGenerator
 from ..ea_utils import load_indicator_data, build_input_lines, build_enum_definitions, load_results_data
 
@@ -14,19 +13,19 @@ logger = logging.getLogger(__name__)
 class ConformationEAGenerator(BaseEAGenerator):
     """EA generator for the Conformation stage.
 
-    param ea_dir: Output directory for EAs
+    param ea_output_dir: Output directory for EAs
     param stage: The current Stage object
     param run_name: The optimisation run name (used to find trigger output)
     """
 
-    def __init__(self, ea_dir: Path, stage: Stage, run_name: str):
+    def __init__(self, ea_output_dir: Path, stage: Stage, run_name: str, whitelist:list):
         """Initialise the ConformationEAGenerator.
 
-        param ea_dir: Directory where EAs will be output
+        param ea_output_dir: Directory where EAs will be output
         param stage: Current pipeline Stage object
         param run_name: Optimisation run name
         """
-        super().__init__(ea_dir, stage, run_name)
+        super().__init__(ea_output_dir, stage, run_name, whitelist)
 
     def _generate_mq5(self, yaml_path: Path) -> Path:
         """Render and write the conformation EA, using trigger-optimised parameters.
@@ -34,9 +33,6 @@ class ConformationEAGenerator(BaseEAGenerator):
         param yaml_path: Path to the indicator YAML
         return: Path to written .mq5 file
         """
-        # Load optimised result for the trigger indicator (from previous pipeline stage)
-        trigger_stage = get_stage("Trigger")
-        trigger_indicator_name, trigger_indicator_data = load_results_data(self.run_name, trigger_stage)
 
         # Load conformation indicator (to be optimised in this stage)
         conf_indicator_name, conf_indicator_data = load_indicator_data(yaml_path)
@@ -51,7 +47,7 @@ class ConformationEAGenerator(BaseEAGenerator):
         )
 
         # Write the rendered EA code to the output .mq5 file
-        output_file = self.ea_dir / f"{yaml_path.stem}.mq5"
+        output_file = self.ea_output_dir / f"{yaml_path.stem}.mq5"
         with open(output_file, "w") as f:
             f.write(rendered)
 
@@ -68,6 +64,10 @@ def render_conformation_ea(template: Template, conf_indi_name: str, conf_indi_da
     param trigger_indi_data: Dict of trigger indicator result data
     return: Rendered MQL5 code as string
     """
+    # Load optimised result for the trigger indicator (from previous pipeline stage)
+    trigger_stage = get_stage("Trigger")
+    trigger_indicator_name, trigger_indicator_data = load_results_data(self.run_name, trigger_stage)
+
     # Extract base conditions for the conformation indicator (long and short)
     conf_long_full = conf_indi_data.get("base_conditions", {}).get("long", "")
     conf_short_full = conf_indi_data.get("base_conditions", {}).get("short", "")

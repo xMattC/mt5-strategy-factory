@@ -14,14 +14,14 @@ class TriggerEAGenerator(BaseEAGenerator):
     Implements _generate_mq5() to render the EA source for triggers.
     """
 
-    def __init__(self, ea_dir: Path, stage: Stage, run_name: str):
-        """Initialise the ConformationEAGenerator.
+    def __init__(self, ea_output_dir: Path, stage: Stage, run_name: str, whitelist: list):
+        """Initialise the .
 
-        param ea_dir: Directory where EAs will be output
+        param ea_output_dir: Directory where EAs will be output
         param stage: Current pipeline Stage object
         param run_name: Optimisation run name
         """
-        super().__init__(ea_dir, stage, run_name)
+        super().__init__(ea_output_dir, stage, run_name, whitelist)
 
     def _generate_mq5(self, yaml_path: Path) -> Path:
         """Render and write the trigger EA for a single indicator.
@@ -45,7 +45,7 @@ class TriggerEAGenerator(BaseEAGenerator):
         )
 
         # Write the rendered EA code to the output .mq5 file
-        output_file = self.ea_dir / f"{yaml_path.stem}.mq5"
+        output_file = self.ea_output_dir / f"{yaml_path.stem}.mq5"
         with open(output_file, "w") as f:
             f.write(rendered)
 

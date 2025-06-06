@@ -1,25 +1,48 @@
-#include <MyLibs/NNFX_TestFileHeader.mqh>
-{% for include in includes %}
-#include <{{ include }}>
-{% endfor %}
+#include <MyLibs/Myfunctions.mqh>
+#include <MyLibs/OrderManagement.mqh>
+#include <MyLibs/MyEnums.mqh>
+#include <MyLibs/CustomMax.mqh>
+CustomMax cm;
+MyFunctions mf;
+OrderManagment om;
+
+input LOT_MODE  inp_lot_mode    = LOT_MODE_PCT_RISK;    // Lot Size Mode
+input double    inp_lot_var     = 2;                    // Lot Size Var
+input SL_MODE   inp_sl_mode     = SL_ATR_MULTIPLE;      // Stop-loss Mode
+input double    inp_sl_var      = 1.5;                    // Stop-loss Var
+input TP_MODE   inp_tp_mode     = TP_ATR_MULTIPLE;      // Take-profit Mode
+input double    inp_tp_var      = 1;                  // Take-Profit Var
+string lot_mode = EnumToString(inp_lot_mode);
+string sl_mode  = EnumToString(inp_sl_mode);
+string tp_mode  = EnumToString(inp_tp_mode);
+input CUSTOM_MAX_TYPE inp_custom_criteria = CM_WIN_PERCENT;
+input int inp_opt_min_trades = 0; // 0/off
+input MODE_SPLIT_DATA inp_data_split_method = NO_SPLIT;
+input int inp_force_opt = 1;
 
 {% for enum in enum_definitions %}
 {{ enum }}
 {% endfor %}
+
 {% for line in trigger_input_lines %}
 {{ line }}
 {% endfor %}
+
+string SymbolsArray[] = { {% for s in symbols_array %}"{{ s }}"{% if not loop.last %}, {% endif %}{% endfor %} };
 
 int indicator_handle[];  // Handle array for indicators
 
 int OnInit(){
     EventSetTimer(60);
-    
-    mf.get_white_list(inp_sym_mode, SymbolsArray);
+
     ArrayResize(indicator_handle, ArraySize(SymbolsArray));
-    
+
     for(int i = 0; i < ArraySize(SymbolsArray); i++){
+    {% if trigger_custom %}
         indicator_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_indicator_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+    {% else %}
+        indicator_handle[i] = {{ trigger_function }}(SymbolsArray[i], PERIOD_CURRENT{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+    {% endif %}
     }
     return(INIT_SUCCEEDED);
 }
@@ -41,25 +64,23 @@ double OnTester(){
 }
 
 void strategy(string symbol, int trigger_handle){
-    bool trigger_long, trigger_short;
 
     // --- Call modular trigger signal logic
-    trigger(trigger_handle, trigger_long, trigger_short);
-
-    bool long_in  = trigger_long;
-    bool short_in = trigger_short;
-    bool long_out = trigger_short;
-    bool short_out = trigger_long;
+    bool trigger_long, trigger_short;
+    trigger(symbol, trigger_handle, trigger_long, trigger_short);
 
     //--- Manage orders
-    om.close_buy_orders(symbol, long_out, 0, PERIOD_CURRENT, 42);
-    om.close_sell_orders(symbol, short_out, 0, PERIOD_CURRENT, 42);
-    om.open_buy_orders(symbol, long_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
-    om.open_sell_orders(symbol, short_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
+    om.close_buy_orders(symbol, trigger_short, 0, PERIOD_CURRENT, 42);
+    om.close_sell_orders(symbol, trigger_long, 0, PERIOD_CURRENT, 42);
+    om.open_buy_orders(symbol, trigger_long, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
+    om.open_sell_orders(symbol, trigger_short, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
 }
 
 // --- Trigger logic function (add more signal functions as needed)
-void trigger(int indi_handle, bool &trigger_long, bool &trigger_short){
+void trigger(string symbol, int indi_handle, bool &trigger_long, bool &trigger_short){
+
+    double close_0 = iClose(symbol,PERIOD_CURRENT, 0);
+    double close_1 = iClose(symbol,PERIOD_CURRENT, 1);
 
     {% for buf in trigger_buffers %}
     double {{ buf.name }}[];

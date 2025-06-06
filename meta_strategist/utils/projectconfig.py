@@ -19,7 +19,7 @@ class OptSettings:
 
 
 @dataclass
-class Config:
+class ProjectConfig:
     """Represents all configuration values needed for run file generation.
 
     Each field corresponds to a user-editable option in the YAML config.
@@ -40,7 +40,7 @@ class Config:
     opt_settings: Dict[str, OptSettings]  # Per-stage optimisation settings
 
 
-def load_config_from_yaml(config_path: Path) -> Config:
+def load_config_from_yaml(config_path: Path) -> ProjectConfig:
     """Load a YAML config file and return a Config dataclass instance.
 
     param config_path: Path to the YAML configuration file
@@ -53,10 +53,10 @@ def load_config_from_yaml(config_path: Path) -> Config:
     opt_data = data.get("opt_settings", {})
     data["opt_settings"] = {k: OptSettings(**v) for k, v in opt_data.items()}
 
-    return Config(**data)
+    return ProjectConfig(**data)
 
 
-def check_and_validate_config(config: Config):
+def check_and_validate_config(config: ProjectConfig):
     """ Validate the config object, printing and exiting on any error.
 
     param config: Config instance to validate

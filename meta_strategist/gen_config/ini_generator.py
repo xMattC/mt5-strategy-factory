@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional
 
-from meta_strategist.utils import load_paths, Config
+from meta_strategist.utils import load_paths, ProjectConfig
 from meta_strategist.optimise import Stage
 
 from .extract_inputs import extract_inputs_from_input_yaml
@@ -12,7 +12,7 @@ from .scale_parameters import scale_parameters
 logger = logging.getLogger(__name__)
 
 
-def create_ini(indi_name: str, expert_dir: Path, config: Config, ini_files_dir: Path,
+def create_ini(indi_name: str, expert_dir: Path, config: ProjectConfig, ini_files_dir: Path,
                in_sample: bool, stage: Stage, optimized_parameters: Optional[Dict[str, str]] = None, ):
     """Generate a .ini file for a given indicator if corresponding .yaml and .ex5 files exist."""
     paths = load_paths()
@@ -39,7 +39,7 @@ def create_ini(indi_name: str, expert_dir: Path, config: Config, ini_files_dir: 
     return ini_file_path
 
 
-def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool, stage: Stage,
+def _write_ini_file(config: ProjectConfig, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool, stage: Stage,
                     optimized_parameters: Optional[Dict[str, str]]) -> Path:
     """Write a .ini file for MetaTrader 5 backtesting/optimisation."""
     cfg = configparser.ConfigParser()
@@ -64,7 +64,7 @@ def _write_ini_file(config: Config, expert_path: Path, ini_dir: Path, inputs: di
     return ini_file_path
 
 
-def _build_tester_section(config: Config, expert_path: str, report_name: str, stage: Stage) -> dict:
+def _build_tester_section(config: ProjectConfig, expert_path: str, report_name: str, stage: Stage) -> dict:
     """Construct the [Tester] section for the .ini file."""
     opt_criterion, criteria, min_trade, max_iterations = _get_stage_criteria(config, stage.name)
 
@@ -90,7 +90,7 @@ def _build_tester_section(config: Config, expert_path: str, report_name: str, st
     }
 
 
-def _build_tester_inputs(config: Config, inputs: dict, in_sample: bool,
+def _build_tester_inputs(config: ProjectConfig, inputs: dict, in_sample: bool,
                          optimized_parameters: Optional[Dict[str, str]], stage: Stage) -> dict:
     """Construct the [TesterInputs] section for the .ini file.
 
