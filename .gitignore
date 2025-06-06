@@ -5,3 +5,4 @@ __pycache__/
 /config/
 /outputs/
 /indicators/mt5_built_in_indicators/
+/docs/

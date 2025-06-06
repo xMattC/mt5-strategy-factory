@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from meta_strategist.stage_execution.stage_config import StageConfig
-from meta_strategist.utils import load_paths
+from meta_strategist.utils import load_paths, ProjectConfig
 
 from .generator_tools import load_indicator_data, load_template, load_render_func
 from .compiler import compile_ea
@@ -11,20 +11,19 @@ from .compiler import compile_ea
 class GenerateEA:
     """Generic EA generator."""
 
-    def __init__(self, ea_output_dir: Path, stage: StageConfig, run_name: str, whitelist: list):
+    def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, ea_output_dir: Path, whitelist: list):
+        self.project_config = project_config
+        self.stage_config = stage_config
         self.ea_output_dir = ea_output_dir
-        self.stage = stage
-        self.run_name = run_name
+        self.whitelist = whitelist
         self.logger = logging.getLogger(self.__class__.__name__)
         self.paths = load_paths()
         self.indicator_dir = self._resolve_indicator_dir()
-        self.whitelist = whitelist
-        self.render_func = load_render_func(stage.render_func)
-        self.template = load_template(stage.ea_template)
+        self.render_func = load_render_func(stage_config.render_func)
         self.ea_output_dir.mkdir(parents=True, exist_ok=True)
 
     def generate_all(self) -> None:
-        """Generate and compile all EAs for every indicator YAML found in stage indi dir."""
+        """Generate and compile all EAs for every indicator YAML found in stage_config indi dir."""
         yaml_files = list(self.indicator_dir.glob("*.yaml"))
         if not yaml_files:
             self.logger.warning("No indicator YAML files found in %s", self.indicator_dir)
@@ -47,8 +46,10 @@ class GenerateEA:
     def _generate_mq5(self, yaml_path: Path) -> Path:
         """Render and write the EA for a single indicator using the pipeline's render function."""
         indi_name, indi_data = load_indicator_data(yaml_path)
+
         rendered = self.render_func(
-            self.template,
+            self.project_config,
+            self.stage_config,
             indi_name,
             indi_data,
             symbols_array=self.whitelist
@@ -59,7 +60,7 @@ class GenerateEA:
         return output_file
 
     def _resolve_indicator_dir(self) -> Path:
-        """Resolve the full path to the indicator directory for this stage."""
-        if not getattr(self.stage, "indi_dir", None):
-            raise ValueError(f"Stage {self.stage.name} must define indi_dir.")
-        return self.paths["INDICATOR_DIR"] / self.stage.indi_dir
+        """Resolve the full path to the indicator directory for this stage_config."""
+        if not getattr(self.stage_config, "indi_dir", None):
+            raise ValueError(f"Stage {self.stage_config.name} must define indi_dir.")
+        return self.paths["INDICATOR_DIR"] / self.stage_config.indi_dir

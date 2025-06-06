@@ -19,22 +19,20 @@ def main():
     config = load_config_from_yaml(config_path)
     check_and_validate_config(config)
 
-    # Run each stage sequentially using the same config:
-
     stage_1 = get_stage(STAGES, "Trigger")
     Optimiser(config=config, stage=stage_1).run_stage_optimisations()
 
-    # stage_2 = get_stage("Conformation")
-    # Optimiser(config=config, stage=stage_2).run_stage_optimisations()
+    stage_2 = get_stage("Conformation")
+    Optimiser(config=config, stage=stage_2).run_stage_optimisations()
 
-    # stage_3 = get_stage("Volume")
-    # Optimiser(config=config, stage=stage_3).run_stage_optimisations()
+    stage_3 = get_stage("Volume")
+    Optimiser(config=config, stage=stage_3).run_stage_optimisations()
 
-    # stage_4 = get_stage("Exit")
-    # Optimiser(config=config, stage=stage_4).run_stage_optimisations()
+    stage_4 = get_stage("Exit")
+    Optimiser(config=config, stage=stage_4).run_stage_optimisations()
 
-    # stage_5 = get_stage("Trendline")
-    # Optimiser(config=config, stage=stage_5).run_stage_optimisations()
+    stage_5 = get_stage("Trendline")
+    Optimiser(config=config, stage=stage_5).run_stage_optimisations()
 
 
 if __name__ == "__main__":

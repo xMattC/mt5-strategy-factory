@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 class StageConfig:
-    def __init__(self, name, indi_dir, pipline_dir, ea_generator, ea_template, render_func):
+    def __init__(self, name, indi_dir, pipline_dir, ea_template, render_func):
         """Container for a single pipeline stage.
 
         param name: Stage name (str)
@@ -14,7 +14,6 @@ class StageConfig:
         self.name = name
         self.indi_dir = indi_dir
         self.pipline_dir = pipline_dir
-        self.ea_generator = ea_generator
         self.ea_template = ea_template
         self.render_func = render_func
 

@@ -29,7 +29,7 @@ def load_render_func(rf):
     return rf
 
 
-def load_indicator_data(yaml_file: Path) -> tuple[str, dict]:
+def load_indicator_data(indicator_yaml_file: Path) -> tuple[str, dict]:
     """ Load and validate a single-indicator YAML configuration file.
 
     This function expects the YAML file to have exactly one top-level key, representing the indicator name, with its
@@ -42,18 +42,18 @@ def load_indicator_data(yaml_file: Path) -> tuple[str, dict]:
             some_input: 5
           buffers: [0, 1]
 
-    param yaml_file: Path to the indicator YAML config file.
+    param indicator_yaml_file: Path to the indicator YAML config file.
     return: A tuple (indicator_name, data), where indicator_name is a string and data is a dict of its configuration.
     raises: ValueError if the YAML file does not contain exactly one indicator.
     """
     # Open the YAML file and parse its contents.
-    with open(yaml_file, "r") as f:
+    with open(indicator_yaml_file, "r") as f:
         config = yaml.safe_load(f)
 
     # Ensure the loaded config is a dict with exactly one top-level key.
     if not isinstance(config, dict) or len(config) != 1:
         raise ValueError(
-            f"{yaml_file.name} should have a single top-level indicator (found "
+            f"{indicator_yaml_file.name} should have a single top-level indicator (found "
             f"{len(config) if isinstance(config, dict) else 'non-dict'})."
         )
 

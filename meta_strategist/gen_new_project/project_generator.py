@@ -11,7 +11,7 @@ from .project_yaml_files import write_whitelist_yaml, write_make_stage_yaml_scri
 logger = logging.getLogger(__name__)
 
 
-def create_new_project(pantheon_filter: str = None) -> Path:
+def create_new_project(pipeline: str, pantheon_filter: str = None) -> Path:
     """
     Create a new project directory with a sequential codename and populate it with a default configuration and run
     script.
