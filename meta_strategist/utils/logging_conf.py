@@ -1,8 +1,7 @@
-from datetime import datetime
-from pathlib import Path
-
 import sys
 import logging
+from pathlib import Path
+from datetime import datetime
 
 
 def setup_logging(log_file: Path = None, level: int = logging.INFO):
@@ -28,10 +27,6 @@ def setup_logging(log_file: Path = None, level: int = logging.INFO):
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
 
-
-import logging
-from pathlib import Path
-from datetime import datetime
 
 def init_stage_logger(stage_name: str, output_base: Path) -> logging.Logger:
     """
@@ -70,4 +65,3 @@ def init_stage_logger(stage_name: str, output_base: Path) -> logging.Logger:
 
     logger.info(f"Logging initialized for stage: {stage_name}")
     return logger
-

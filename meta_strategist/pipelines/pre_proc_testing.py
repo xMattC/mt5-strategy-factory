@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 from meta_strategist.gen_ea.base import BaseEAGenerator
-from meta_strategist.optimise_stage import StageConfig
+from meta_strategist.stage_execution import StageConfig
 
 from jinja2 import Template
 from meta_strategist.gen_ea.ea_utils import build_input_lines, build_enum_definitions, load_indicator_data

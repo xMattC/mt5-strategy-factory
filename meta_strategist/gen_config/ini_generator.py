@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from meta_strategist.utils import load_paths, ProjectConfig
-from meta_strategist.optimise_stage.stage_config import StageConfig
+from meta_strategist.stage_execution.stage_config import StageConfig
 
 from .extract_inputs import extract_inputs_from_input_yaml
 from .scale_parameters import scale_parameters

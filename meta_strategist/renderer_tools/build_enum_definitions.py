@@ -1,14 +1,3 @@
-def flatten_enums(enum_obj):
-    if not enum_obj:
-        return []
-    if isinstance(enum_obj, list):
-        return enum_obj
-    if isinstance(enum_obj, dict):
-        # Convert dict to list of MQL5 enum code
-        return [f"enum {k} {{ " + ", ".join(v) + " };" for k, v in enum_obj.items()]
-    return [str(enum_obj)]
-
-
 def build_enum_definitions(*data_sets: dict) -> list[str]:
     """Generate MQL5 enum definitions from multiple YAML `enums` sections.
 

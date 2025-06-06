@@ -1,5 +1,5 @@
 from meta_strategist.gen_ea.generate_ea import GenerateEA
-from meta_strategist.gen_config import create_ini
+from meta_strategist.gen_project_config import create_ini
 from meta_strategist.reporting import (
     extract_optimization_result,
     OptimizationResult,
@@ -17,46 +17,46 @@ from meta_strategist.utils import (
 )
 
 from meta_strategist.utils.whitelist_loader import load_whitelist
-from meta_strategist.pipelines.trend_following.stages import StageConfig
+from .stage_config import StageConfig
 from .mt5_ea_runner import run_ea
 
 
-class Optimiser:
-    """ Coordinates the full MT5 optimisation process for a single pipeline stage.
+class StageRunner:
+    """ Coordinates the full MT5 optimisation process for a single pipeline stage_config.
 
-    param config: Config object containing run parameters
-    param stage: Stage object defining this optimisation phase
+    param project_config: Config object containing run parameters
+    param stage_config: Stage object defining this optimisation phase
     param recompile_ea: If True, force EA regeneration from template
     """
 
-    def __init__(self, config: ProjectConfig, stage: StageConfig, recompile_ea: bool = True):
+    def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, recompile_ea: bool = True):
         """ Initialise the optimiser pipeline.
 
-        param config: Config object containing run parameters
-        param stage: Stage object for this pipeline step
+        param project_config: Config object containing run parameters
+        param stage_config: Stage object for this pipeline step
         param recompile_ea: If True, force EA regeneration from template
         """
-        self.config = config
-        self.stage = stage
+        self.project_config = project_config
+        self.stage_config = stage_config
         self.recompile_ea = recompile_ea
         self.paths = load_paths()
 
-        # Set up output folder structure for this run/stage
-        self.output_base = create_dir_structure(self.config.run_name, self.stage.name)
+        # Set up output folder structure for this stage
+        self.output_base = create_dir_structure(self.project_config.run_name, self.stage_config.name)
         self.ini_dir = self.output_base / "ini_files"
         self.expert_dir = self.output_base / "experts"
         self.results_dir = self.output_base / "results"
 
-        # Locate the EA template file for this stage
-        self.ea_template_path = self.paths["TEMPLATE_DIR"] / self.stage.ea_template
+        # Locate the EA template file for this stage_config
+        self.ea_template_path = self.paths["TEMPLATE_DIR"] / self.stage_config.ea_template
 
-        # Set up logging for this stage/run
-        self.logger = init_stage_logger(self.stage.name, self.output_base)
+        # Set up logging for this stage_config/run
+        self.logger = init_stage_logger(self.stage_config.name, self.output_base)
 
         # Clean the MT5 environment (delete cache)
         delete_mt5_test_cache()
 
-        # Optionally (re)generate all EAs for this stage
+        # Optionally (re)generate all EAs for this stage_config
         self.generate_experts()
 
     def generate_experts(self):
@@ -64,27 +64,27 @@ class Optimiser:
         # Only generate if the flag is set
         if self.recompile_ea:
 
-            # Log which stage is being processed
-            self.logger.info(f"Generating EAs for stage: {self.stage.name}")
+            # Log which stage_config is being processed
+            self.logger.info(f"Generating EAs for stage_config: {self.stage_config.name}")
 
-            run_name = self.config.run_name
+            run_name = self.project_config.run_name
 
             # Load the whitelist for this run (which pairs to trade)
             whitelist = load_whitelist("CHART_SYMBOL_ONLY")
 
             # Generate individual Expert Advisor:
-            GenerateEA(self.expert_dir, self.stage, run_name, whitelist).generate_all()
+            GenerateEA(self.expert_dir, self.stage_config, run_name, whitelist).generate_all()
 
         else:
-            self.logger.info(f"Skipping EA generation for stage: {self.stage.name}")
+            self.logger.info(f"Skipping EA generation for stage_config: {self.stage_config.name}")
 
-    def run_stage_optimisations(self):
-        """ Run optimisation for all compiled indicators (EAs) in this stage. """
+    def run_stage_config_optimisations(self):
+        """ Run optimisation for all compiled indicators (EAs) in this stage_config. """
         for indicator in get_compiled_indicators(self.expert_dir):
             self.optimise_indicator(indicator)
 
             # ALWAYS update the combined results table
-            update_combined_results(results_dir=self.results_dir, stage_name=self.stage.name, print_summary=False)
+            update_combined_results(results_dir=self.results_dir, stage_name=self.stage_config.name, print_summary=False)
 
         # Finally, extract top-N performing parameter sets
         extract_top_parameters(results_dir=self.results_dir, top_n=5, sort_by="Res_OOS")
@@ -126,8 +126,8 @@ class Optimiser:
         param indi_name: Base name of the EA/indicator
         return: OptimizationResult object or None if failed
         """
-        ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, config=self.config,
-                              ini_files_dir=self.ini_dir, in_sample=True, stage=self.stage, optimized_parameters=None)
+        ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, project_config=self.project_config,
+                              ini_files_dir=self.ini_dir, in_sample=True, stage_config=self.stage_config, optimized_parameters=None)
 
         if not ini_path:
             self.logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
@@ -151,8 +151,8 @@ class Optimiser:
         param indi_name: Base name of the EA/indicator
         param optimisation_result: OptimizationResult from IS phase
         """
-        ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, config=self.config,
-                              ini_files_dir=self.ini_dir, in_sample=False, stage=self.stage,
+        ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, project_config=self.project_config,
+                              ini_files_dir=self.ini_dir, in_sample=False, stage_config=self.stage_config,
                               optimized_parameters=optimisation_result.parameters)
 
         if not ini_path:
