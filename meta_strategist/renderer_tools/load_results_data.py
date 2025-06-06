@@ -2,7 +2,7 @@ import logging
 from meta_strategist.utils.pathing import load_paths
 import yaml
 
-from meta_strategist.optimise_stage.stage_config import StageConfig
+from meta_strategist.stage_execution.stage_config import StageConfig
 
 logger = logging.getLogger(__name__)
 

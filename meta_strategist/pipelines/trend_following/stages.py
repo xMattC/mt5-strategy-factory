@@ -1,5 +1,5 @@
 from pathlib import Path
-from meta_strategist.optimise_stage.stage_config import StageConfig
+from meta_strategist.stage_execution.stage_config import StageConfig
 
 pipline_dir = "meta_strategist.pipelines.trend_following"
 

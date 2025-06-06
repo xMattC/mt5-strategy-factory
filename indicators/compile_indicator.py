@@ -1,6 +1,6 @@
 from pathlib import Path
 import logging
-from meta_strategist.optimise_stage import get_stage
+from meta_strategist.stage_execution import get_stage
 from meta_strategist.pipelines.pre_proc_testing import PreProcTestingEAGenerator
 from meta_strategist.utils.whitelist_loader import load_whitelist
 

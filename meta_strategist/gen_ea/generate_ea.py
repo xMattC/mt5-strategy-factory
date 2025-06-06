@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from meta_strategist.optimise_stage.stage_config import StageConfig
+from meta_strategist.stage_execution.stage_config import StageConfig
 from meta_strategist.utils import load_paths
 
 from .generator_tools import load_indicator_data, load_template, load_render_func
@@ -9,7 +9,7 @@ from .compiler import compile_ea
 
 
 class GenerateEA:
-    """Generic, pipeline-configurable EA generator."""
+    """Generic EA generator."""
 
     def __init__(self, ea_output_dir: Path, stage: StageConfig, run_name: str, whitelist: list):
         self.ea_output_dir = ea_output_dir
@@ -24,7 +24,7 @@ class GenerateEA:
         self.ea_output_dir.mkdir(parents=True, exist_ok=True)
 
     def generate_all(self) -> None:
-        """Generate and compile all EAs for every indicator YAML found for this stage."""
+        """Generate and compile all EAs for every indicator YAML found in stage indi dir."""
         yaml_files = list(self.indicator_dir.glob("*.yaml"))
         if not yaml_files:
             self.logger.warning("No indicator YAML files found in %s", self.indicator_dir)
