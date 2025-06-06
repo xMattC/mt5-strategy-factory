@@ -1,6 +1,6 @@
 from pathlib import Path
 import yaml
-from meta_strategist.optimise import Stage
+from meta_strategist.optimise_stage.stage_config import StageConfig
 
 
 def get_output_yaml_path(run_dir: Path, phase: str) -> Path:
@@ -50,7 +50,7 @@ def extract_minimal_defaults(indicator_yaml: Path) -> tuple[str, dict]:
     return indicator_name, minimal
 
 
-def create_stage_yaml(run_dir: Path, stage: Stage, indicator: str, out_filename: Path = None):
+def create_stage_yaml(run_dir: Path, stage: StageConfig, indicator: str, out_filename: Path = None):
     """Create a minimal stage YAML for a specific indicator and stage.
 
     param run_dir: Root directory for the run
@@ -90,7 +90,7 @@ def maker(phase: str, indicator: str, run_dir: Path = None):
     param indicator: Indicator name (e.g., 'aroon', 'aso')
     param run_dir: Root directory for this run (defaults to the script's directory)
     """
-    from meta_strategist.optimise import get_stage  # Import get_stage inside the function
+    from meta_strategist.optimise_stage import get_stage  # Import get_stage inside the function
     if run_dir is None:
         run_dir = Path(__file__).parent.resolve()  # Use script location if not given
     stage = get_stage(phase.capitalize())  # Get the Stage object for this phase

@@ -1,11 +1,32 @@
 import logging
-from meta_strategist.utils.pathing import load_paths
 import yaml
+import importlib
 from pathlib import Path
-
-from meta_strategist.optimise import Stage
+from jinja2 import Template
 
 logger = logging.getLogger(__name__)
+
+
+def import_from_string(import_path: str):
+    """Dynamically import a function or class from a string."""
+    module_path, func_name = import_path.rsplit('.', 1)
+    mod = importlib.import_module(module_path)
+    return getattr(mod, func_name)
+
+
+def load_template(tmpl):
+    """Load and return a Jinja2 Template from a file path or return the Template object as is."""
+    if isinstance(tmpl, (str, Path)):
+        with open(tmpl, "r") as f:
+            return Template(f.read(), trim_blocks=True, lstrip_blocks=True)
+    return tmpl
+
+
+def load_render_func(rf):
+    """Load the render function, either from string or directly."""
+    if isinstance(rf, str):
+        return import_from_string(rf)
+    return rf
 
 
 def load_indicator_data(yaml_file: Path) -> tuple[str, dict]:

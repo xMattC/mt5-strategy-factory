@@ -1,4 +1,4 @@
-from meta_strategist.gen_ea import get_ea_generator
+from meta_strategist.gen_ea.generate_ea import GenerateEA
 from meta_strategist.gen_config import create_ini
 from meta_strategist.reporting import (
     extract_optimization_result,
@@ -17,7 +17,7 @@ from meta_strategist.utils import (
 )
 
 from meta_strategist.utils.whitelist_loader import load_whitelist
-from .stages import Stage
+from meta_strategist.pipelines.trend_following.stages import StageConfig
 from .mt5_ea_runner import run_ea
 
 
@@ -29,7 +29,7 @@ class Optimiser:
     param recompile_ea: If True, force EA regeneration from template
     """
 
-    def __init__(self, config: ProjectConfig, stage: Stage, recompile_ea: bool = True):
+    def __init__(self, config: ProjectConfig, stage: StageConfig, recompile_ea: bool = True):
         """ Initialise the optimiser pipeline.
 
         param config: Config object containing run parameters
@@ -48,7 +48,7 @@ class Optimiser:
         self.results_dir = self.output_base / "results"
 
         # Locate the EA template file for this stage
-        self.ea_template_path = self.paths["TEMPLATE_DIR"] / self.stage.template_name
+        self.ea_template_path = self.paths["TEMPLATE_DIR"] / self.stage.ea_template
 
         # Set up logging for this stage/run
         self.logger = init_stage_logger(self.stage.name, self.output_base)
@@ -70,13 +70,10 @@ class Optimiser:
             run_name = self.config.run_name
 
             # Load the whitelist for this run (which pairs to trade)
-            white_list = load_whitelist(self.paths["OUTPUT_DIR"] / run_name)
+            whitelist = load_whitelist("CHART_SYMBOL_ONLY")
 
-            # Get the correct EA generator for this stage and settings
-            generator = get_ea_generator(self.stage, self.expert_dir, run_name, white_list)
-
-            # Generate all EAs (writes .mq5 files)
-            generator.generate_all()
+            # Generate individual Expert Advisor:
+            GenerateEA(self.expert_dir, self.stage, run_name, whitelist).generate_all()
 
         else:
             self.logger.info(f"Skipping EA generation for stage: {self.stage.name}")

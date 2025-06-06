@@ -2,12 +2,12 @@ import logging
 from meta_strategist.utils.pathing import load_paths
 import yaml
 
-from meta_strategist.optimise import Stage
+from meta_strategist.optimise_stage.stage_config import StageConfig
 
 logger = logging.getLogger(__name__)
 
 
-def load_results_data(run_name: str, stage: Stage) -> tuple[str, dict]:
+def load_results_data(run_name: str, stage: StageConfig) -> tuple[str, dict]:
     """Load optimised indicator parameters for any stage and merge with base YAML.
 
     Reads the optimised values from the results YAML for this run/stage,
