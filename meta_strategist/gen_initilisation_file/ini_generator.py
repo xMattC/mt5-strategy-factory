@@ -12,12 +12,12 @@ from .scale_parameters import scale_parameters
 logger = logging.getLogger(__name__)
 
 
-def create_ini(indi_name: str, expert_dir: Path, project_config: ProjectConfig, ini_files_dir: Path,
+def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfig, ini_files_dir: Path,
                in_sample: bool, stage_config: StageConfig, optimized_parameters: Optional[Dict[str, str]] = None, ):
     """Generate a .ini file for a given indicator if corresponding .yaml and .ex5 files exist."""
     paths = load_paths()
     yaml_path = paths["INDICATOR_DIR"] / stage_config.indi_dir / f"{indi_name}.yaml"
-    ex5_path = expert_dir / f"{indi_name}.ex5"
+    ex5_path = ea_output_dir / f"{indi_name}.ex5"
 
     if not yaml_path.exists():
         logger.warning(f"YAML file missing: {yaml_path.name}")

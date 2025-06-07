@@ -1,12 +1,9 @@
 from pathlib import Path
 import logging
-import yaml
+import shutil
 
 from meta_strategist.utils import load_paths
-from meta_strategist.utils import render_template  # Assumes render_template is defined here
-
-from .project_code_name import generate_next_project_codename
-from .project_yaml_files import write_whitelist_yaml, write_make_stage_yaml_script
+from meta_strategist.gen_new_project.project_code_name import generate_next_project_codename
 
 logger = logging.getLogger(__name__)
 
@@ -24,33 +21,34 @@ def create_new_project(pipeline: str, pantheon_filter: str = None) -> Path:
     run_name = generate_next_project_codename(pantheon_filter)
     paths = load_paths()
     project_dir = paths["OUTPUT_DIR"] / run_name
+    pipelines_dir = paths["PIPELINE_DIR"] / pipeline
 
     try:
         project_dir.mkdir(parents=True, exist_ok=False)
 
-        # Load and update config template
-        template_config_path = paths["TEMPLATE_DIR"] / "default_config.yaml"
-        with open(template_config_path, encoding="utf-8") as f:
-            config_data = yaml.safe_load(f)
+        # Copy and patch config.yaml
+        config_src = pipelines_dir / "config.yaml"
+        config_dst = project_dir / "config.yaml"
+        with open(config_src, "r") as fin, open(config_dst, "w") as f_out:
+            first_line = fin.readline()
+            # Replace run_name in the first line
+            if first_line.lower().startswith("run_name:"):
+                f_out.write(f"run_name: {run_name}\n")
+            else:
+                f_out.write(first_line)
+            # Copy rest of the file
+            for line in fin:
+                f_out.write(line)
 
-        # Update run_name in config
-        config_data["run_name"] = run_name
+        # Copy and rename run_template.py
+        run_template_src = pipelines_dir / "run_template.py"
+        run_template_dst = project_dir / f"{run_name}_run.py"
+        shutil.copyfile(run_template_src, run_template_dst)
 
-        # create project config file
-        config_dest = project_dir / f"{run_name}_config.yaml"
-        with open(config_dest, "w", encoding="utf-8") as f:
-            yaml.safe_dump(config_data, f, sort_keys=False)
-
-        # Create project run file
-        run_file = project_dir / f"{run_name}_run.py"
-        run_file_code = render_template("run_script.j2", {"run_name": run_name})
-        run_file.write_text(run_file_code)
-
-        # Place make_stage_yaml.py at the run_dir level
-        write_make_stage_yaml_script(project_dir)
-
-        # Place whitelist.yaml at the run_dir level
-        write_whitelist_yaml(project_dir)
+        # Copy whitelist.yaml
+        whitelist_src = pipelines_dir / "whitelist.yaml"
+        whitelist_dst = project_dir / "whitelist.yaml"
+        shutil.copyfile(whitelist_src, whitelist_dst)
 
         logger.info(f"Created project structure in: {project_dir}")
         return project_dir
@@ -61,4 +59,4 @@ def create_new_project(pipeline: str, pantheon_filter: str = None) -> Path:
 
 
 if __name__ == "__main__":
-    create_new_project()
+    create_new_project("trend_following")

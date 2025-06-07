@@ -1,17 +1,20 @@
 run_name: example_run
-start_date: 2023.01.01  # in this format 2023.01.01
-end_date: 2024.01.01 # int this format 2023.12.31
-period: D1 # Chart time period
+pipeline: trend_following
+whitelist_file: whitelist.yaml # CHART_SYMBOL_ONLY
+start_date: 2023.01.01
+end_date: 2024.01.01
+period: D1
 main_chart_symbol: EURUSD
 currency: USD
 deposit: 100000
 leverage: 100
-data_split: month # Options: none, year, month
-risk: 2 # Risk in percent (used in lot size calculation)
-sl: 1.5  # Stop loss s
-tp: 1 # Take profit
+data_split: month
+risk: 2
+sl: 1.5
+tp: 1
 
 opt_settings:
+
   Trigger:
     opt_criterion: 6
     custom_criterion: 1
@@ -21,7 +24,7 @@ opt_settings:
   Conformation:
     opt_criterion: 6
     custom_criterion: 1
-    min_trade: 200
+    min_trade: 20
     max_iterations: 100
 
   Trendline:

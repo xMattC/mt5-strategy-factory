@@ -1,17 +1,21 @@
-import logging
 from datetime import datetime
 from dataclasses import asdict, dataclass
-from typing import Dict
+from dataclasses import dataclass, field
+import sys
+import logging
 from pathlib import Path
+from pprint import pformat  # Pretty print for dicts/lists
+
 import yaml
+
+from .whitelist_loader import load_whitelist
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class OptSettings:
-    """Settings for a single custom criterion.
-    """
+    """Settings for a single custom criterion."""
     opt_criterion: int
     custom_criterion: int
     min_trade: int
@@ -20,42 +24,60 @@ class OptSettings:
 
 @dataclass
 class ProjectConfig:
-    """Represents all configuration values needed for run file generation.
-
-    Each field corresponds to a user-editable option in the YAML config.
-    custom_criteria is a mapping from stage name to CriterionSettings.
-    """
-    run_name: str
-    pipeline: str
-    whitelist_file: str
-    start_date: str  # Format: YYYY.MM.DD
-    end_date: str  # Format: YYYY.MM.DD
-    period: str  # Allowed: M1, M5, M15, H1, H4, D1
-    main_chart_symbol: str
-    deposit: int
-    currency: str
-    leverage: int
-    data_split: str  # Allowed: none, year, month
-    risk: float
-    sl: float
-    tp: float
-    opt_settings: Dict[str, OptSettings]  # Per-stage optimisation settings
+    run_name: str = "TestRun"
+    pipeline: str = "trend_following"
+    whitelist_file: str = ""
+    whitelist: list[str] = field(default_factory=list)
+    start_date: str = ""
+    end_date: str = ""
+    period: str = "D1"
+    main_chart_symbol: str = ""
+    deposit: int = 0
+    currency: str = "USD"
+    leverage: int = 100
+    data_split: str = "none"
+    risk: float = 0.0
+    sl: float = 0.0
+    tp: float = 0.0
+    opt_settings: dict = field(default_factory=dict)
 
 
 def load_config_from_yaml(config_path: Path) -> ProjectConfig:
-    """Load a YAML config file and return a Config dataclass instance.
+    """
+    Load a YAML config file and return a Config dataclass instance. Loads whitelist from a separate file specified in
+    config, or sets to [Symbol()] if whitelist_file is 'CHART_SYMBOL_ONLY'.
 
-    param config_path: Path to the YAML configuration file
-    return: Config object populated with data from YAML
+    Exits with an error if the whitelist file does not exist,
+    and suggests using 'CHART_SYMBOL_ONLY'.
     """
     with open(config_path, "r") as f:
         data = yaml.safe_load(f)
 
-    # Convert each custom_criteria entry to CriterionSettings
+    # Load opt_settings as before
     opt_data = data.get("opt_settings", {})
     data["opt_settings"] = {k: OptSettings(**v) for k, v in opt_data.items()}
 
-    return ProjectConfig(**data)
+    whitelist_file = data.get("whitelist_file")
+    if isinstance(whitelist_file, str) and whitelist_file.upper() == "CHART_SYMBOL_ONLY":
+        data["whitelist"] = ["Symbol()"]
+
+    else:
+        whitelist_path = Path(whitelist_file)
+
+        if not whitelist_path.exists():
+            logger.error(f" Whitelist file not found: {whitelist_path}\nYou may specify 'CHART_SYMBOL_ONLY' in your "
+                         f"config to use the current chart symbol instead.")
+            sys.exit(1)
+
+        data["whitelist"] = load_whitelist(whitelist_path)
+
+    # --- LOG THE LOADED CONFIG ---
+    config = ProjectConfig(**data)
+    config_dict = asdict(config)
+    config_dict.pop("opt_settings", None)  # Remove opt_settings if present
+    logger.info("\nFull config (excluding opt_settings):\n%s", pformat(config_dict, indent=20, width=120))
+
+    return config
 
 
 def check_and_validate_config(config: ProjectConfig):
@@ -91,7 +113,7 @@ def validate_config(config: dict):
     # List all keys that must be present for the config to be valid
     required_keys = [
         "run_name", "start_date", "end_date", "period", "opt_settings",
-         "data_split", "risk", "sl", "tp"
+        "data_split", "risk", "sl", "tp"
     ]
 
     # Check every required field is in the config
