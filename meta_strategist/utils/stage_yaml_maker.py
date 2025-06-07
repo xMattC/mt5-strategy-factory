@@ -83,7 +83,7 @@ def create_stage_yaml(run_dir: Path, stage: StageConfig, indicator: str, out_fil
     print(f"Stage YAML created: {out_path}")
 
 
-def maker(phase: str, indicator: str, run_dir: Path = None):
+def maker(stages, phase: str, indicator: str, run_dir: Path = None):
     """ Convenience entry point to be called from a wrapper script.
 
     param phase: Name of the stage (e.g., 'trigger', 'conformation')
@@ -92,5 +92,5 @@ def maker(phase: str, indicator: str, run_dir: Path = None):
     """
     if run_dir is None:
         run_dir = Path(__file__).parent.resolve()  # Use script location if not given
-    stage = get_stage(phase.capitalize())  # Get the Stage object for this phase
+    stage = get_stage(stages, phase.capitalize())  # Get the Stage object for this phase
     create_stage_yaml(run_dir, stage, indicator)

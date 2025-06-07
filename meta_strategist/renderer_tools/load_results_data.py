@@ -47,6 +47,6 @@ def load_results_data(run_name: str, stage: StageConfig) -> tuple[str, dict]:
             if "inputs" not in base_data:
                 base_data["inputs"] = {}
             base_data["inputs"][k] = {"default": v, "type": type(v).__name__}
-
+    print(base_data, base_data)
     return indicator_name, base_data
 

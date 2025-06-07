@@ -14,7 +14,10 @@ from .ea_runner import run_ea
 from .clean_test_cache import delete_mt5_test_cache
 from .create_dir_structure import create_dir_structure
 from .get_compiled_indicators import get_compiled_indicators
-from .init_logger import init_stage_logger
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class StageRunner:
@@ -25,8 +28,7 @@ class StageRunner:
     param recompile_ea: If True, force EA regeneration from template
     """
 
-    def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, whitelist: list,
-                 recompile_ea: bool = True):
+    def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, recompile_ea: bool = True):
         """ Initialise the optimiser pipeline.
 
         param project_config: Config object containing run parameters
@@ -35,21 +37,15 @@ class StageRunner:
         """
         self.project_config = project_config
         self.stage_config = stage_config
-        self.whitelist = whitelist
+        # self.whitelist = project_config.whitelist
         self.recompile_ea = recompile_ea
         self.paths = load_paths()
 
         # Set up output folder structure for this stage
         self.output_base = create_dir_structure(self.project_config.run_name, self.stage_config.name)
         self.ini_dir = self.output_base / "ini_files"
-        self.expert_dir = self.output_base / "experts"
+        self.ea_output_dir = self.output_base / "experts"
         self.results_dir = self.output_base / "results"
-
-        # Locate the EA template file for this stage_config
-        self.ea_template_path = self.paths["TEMPLATE_DIR"] / self.stage_config.ea_template
-
-        # Set up logging for this stage_config/run
-        self.logger = init_stage_logger(self.stage_config.name, self.output_base)
 
         # Clean the MT5 environment (delete cache)
         delete_mt5_test_cache()
@@ -57,24 +53,26 @@ class StageRunner:
         # Optionally (re)generate all EAs for this stage_config
         self.generate_experts()
 
+        self.run_stage_optimisations()
+
     def generate_experts(self):
         """ Generate EA .mq5 files from template if recompile_ea is enabled. """
         # Only generate if the flag is set
         if self.recompile_ea:
 
             # Log which stage_config is being processed
-            self.logger.info(f"Generating EAs for stage_config: {self.stage_config.name}")
+            logger.info(f"Generating EAs for stage_config: {self.stage_config.name}")
             run_name = self.project_config.run_name
 
             # Generate individual Expert Advisor:
-            GenerateEA(self.expert_dir, self.stage_config, run_name, self.whitelist).generate_all()
+            GenerateEA(self.project_config, self.stage_config, self.ea_output_dir).generate_all()
 
         else:
-            self.logger.info(f"Skipping EA generation for stage_config: {self.stage_config.name}")
+            logger.info(f"Skipping EA generation for stage_config: {self.stage_config.name}")
 
     def run_stage_optimisations(self):
         """ Run optimisation for all compiled indicators (EAs) in this stage_config. """
-        for indicator in get_compiled_indicators(self.expert_dir):
+        for indicator in get_compiled_indicators(self.ea_output_dir):
             self.optimise_indicator(indicator)
 
             # ALWAYS update the combined results table
@@ -93,14 +91,14 @@ class StageRunner:
         if self._has_is_results(indi_name):
 
             is_csv = self.results_dir / f"{indi_name}_IS.csv"
-            self.logger.info(f"Skipping in-sample optimisation for {indi_name}: found existing {is_csv}")
+            logger.info(f"Skipping in-sample optimisation for {indi_name}: found existing {is_csv}")
 
             try:
                 is_result = extract_optimization_result(self.results_dir, indi_name)
-                self.logger.info(f"Extracted existing in-sample result for {indi_name}: {is_result.parameters}")
+                logger.info(f"Extracted existing in-sample result for {indi_name}: {is_result.parameters}")
 
             except Exception as e:
-                self.logger.error(f"Failed to parse existing in-sample result for {indi_name}: {e}")
+                logger.error(f"Failed to parse existing in-sample result for {indi_name}: {e}")
                 is_result = None
         else:
             is_result = self.run_in_sample(indi_name)
@@ -110,7 +108,7 @@ class StageRunner:
 
             if self._has_oos_results(indi_name):
                 oos_csv = self.results_dir / f"{indi_name}_OOS.csv"
-                self.logger.info(f"Skipping out-of-sample optimisation for {indi_name}: found existing {oos_csv}")
+                logger.info(f"Skipping out-of-sample optimisation for {indi_name}: found existing {oos_csv}")
 
             else:
                 self.run_out_of_sample(indi_name, is_result)
@@ -121,12 +119,12 @@ class StageRunner:
         param indi_name: Base name of the EA/indicator
         return: OptimizationResult object or None if failed
         """
-        ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, project_config=self.project_config,
+        ini_path = create_ini(indi_name=indi_name, ea_output_dir=self.ea_output_dir, project_config=self.project_config,
                               ini_files_dir=self.ini_dir, in_sample=True, stage_config=self.stage_config,
                               optimized_parameters=None)
 
         if not ini_path:
-            self.logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
+            logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
             return None
 
         run_ea(ini_path)
@@ -134,11 +132,11 @@ class StageRunner:
 
         try:
             result = extract_optimization_result(self.results_dir, indi_name)
-            self.logger.info(f"Optimised parameters for {indi_name} (IS): {result.parameters}")
+            logger.info(f"Optimised parameters for {indi_name} (IS): {result.parameters}")
             return result
 
         except Exception as e:
-            self.logger.error(f"Failed to parse optimisation result for {indi_name} (IS): {e}")
+            logger.error(f"Failed to parse optimisation result for {indi_name} (IS): {e}")
             return None
 
     def run_out_of_sample(self, indi_name: str, optimisation_result: OptimizationResult):
@@ -147,17 +145,17 @@ class StageRunner:
         param indi_name: Base name of the EA/indicator
         param optimisation_result: OptimizationResult from IS phase
         """
-        ini_path = create_ini(indi_name=indi_name, expert_dir=self.expert_dir, project_config=self.project_config,
+        ini_path = create_ini(indi_name=indi_name, ea_output_dir=self.ea_output_dir, project_config=self.project_config,
                               ini_files_dir=self.ini_dir, in_sample=False, stage_config=self.stage_config,
                               optimized_parameters=optimisation_result.parameters)
 
         if not ini_path:
-            self.logger.warning(f"Skipping OOS for {indi_name}: missing YAML or EX5.")
+            logger.warning(f"Skipping OOS for {indi_name}: missing YAML or EX5.")
             return
 
         run_ea(ini_path)
         copy_mt5_report(ini_path, self.results_dir)
-        self.logger.info(f"Completed OOS test for {indi_name}")
+        logger.info(f"Completed OOS test for {indi_name}")
 
     def _has_is_results(self, indi_name: str) -> bool:
         """ Check if an in-sample results file already exists.

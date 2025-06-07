@@ -1,0 +1,22 @@
+#Average Directional Index
+mt5_adx:
+  custom: false
+  function: "iADX"
+  inputs:
+    InpPeriod:
+      default: 14
+      type: int
+      min: 2
+      max: 50
+      step: 1
+      optimize: true
+  buffers:
+    - name: Main
+      index: 0
+    - name: PlusDI
+      index: 1
+    - name: MinusDI
+      index: 2
+  base_conditions:
+    long: "PlusDI[0] > MinusDI[0]"
+    short: "PlusDI[0] < MinusDI[0]"

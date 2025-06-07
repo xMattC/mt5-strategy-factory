@@ -29,7 +29,7 @@ input group "-----------------------------------------"
 {{ line }}
 {% endfor %}
 
-string SymbolsArray[] = { {% for s in symbols_array %}"{{ s }}"{% if not loop.last %}, {% endif %}{% endfor %} };
+string SymbolsArray[] = { {% for s in whitelist %}"{{ s }}"{% if not loop.last %}, {% endif %}{% endfor %} };
 
 int trigger_handle[];   // Handles for trigger indicators
 int conf_handle[];      // Handles for conformation indicators
@@ -41,8 +41,16 @@ int OnInit(){
     ArrayResize(conf_handle, ArraySize(SymbolsArray));
 
     for(int i = 0; i < ArraySize(SymbolsArray); i++){
-        trigger_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
-        conf_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ conf_indicator_path }}"{% for input in conf_inputs %}, {{ input }}{% endfor %});
+    {% if trigger_custom %}
+        trigger_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_path }}"{% for input in trigger_inputs_vars %}, {{ input }}{% endfor %});
+    {% else %}
+        trigger_handle[i] = {{ trigger_function }}(SymbolsArray[i], PERIOD_CURRENT{% for input in trigger_inputs_vars %}, {{ input }}{% endfor %});
+    {% endif %}
+    {% if conf_custom %}
+        conf_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ conf_indicator_path }}"{% for input in conf_inputs_vars %}, {{ input }}{% endfor %});
+    {% else %}
+        conf_handle[i] = {{ conf_function }}(SymbolsArray[i], PERIOD_CURRENT{% for input in conf_inputs_vars %}, {{ input }}{% endfor %});
+    {% endif %}
     }
     return(INIT_SUCCEEDED);
 }
