@@ -37,7 +37,7 @@ class StageConfig:
         return f"<StageConfig {self.name}>"
 
 
-def get_stage(stages, name: str) -> StageConfig:
+def get_stage_config(stages, name: str) -> StageConfig:
     """Retrieve a StageConfig object from a list by its name.
 
     param stages: List of StageConfig objects (e.g., STAGES)
