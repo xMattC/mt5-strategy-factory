@@ -1,46 +1,51 @@
 run_name: example_run
-pipeline: trend_following
-whitelist_file: whitelist.yaml # CHART_SYMBOL_ONLY
-start_date: 2023.01.01
-end_date: 2024.01.01
-period: D1
-main_chart_symbol: EURUSD
-currency: USD
-deposit: 100000
-leverage: 100
-data_split: month
-risk: 2
-sl: 1.5
-tp: 1
+pipeline: trend_following # The name of the strategy pipeline to use (e.g., trend_following, mean_reversion)
+whitelist_file: whitelist.yaml  # Path to the whitelist file. Use either "whitelist.yaml" or "CART_SYMBOL_ONLY"
+start_date: 2023.01.01 # Optimisation/testing data start date (YYYY.MM.DD)
+end_date: 2024.01.01 # Optimisation/testing data end date (YYYY.MM.DD)
+period: D1 # Chart timeframe/period (e.g., D1 = daily, H1 = hourly)
+main_chart_symbol: EURUSD # Main chart symbol for this run (not necessarily traded)
+currency: USD # Base currency for trade account
+deposit: 100000 # Initial deposit for the account (in currency units)
+leverage: 100 # Account leverage (e.g., 100 = 1:100)
+data_split: month # How to split the data for in-sample/out-of-sample (e.g., week, month, year)
+risk: 2 # Default trade risk per position (as a percent of account, e.g., 2%)
+sl: 1.5 # Default stop loss value (in ATR or custom units; pipeline-specific)
+tp: 1 # Default take profit value (in ATR or custom units; pipeline-specific)
 
+#### Stage-specific optimisation settings ####
+# opt_criterion (Mt5 Optimisation criterion):
+#       0 - Balance Max,  1 - profit factor Max,  2 - Expected payoff max, 3 - Draw-down Min,  4 - recovery Factor Max,
+#       5 - Sharpe Ratio Max, 6 - Custom Max, 7 - Complex criterion Max
 opt_settings:
-
+  # Optimisation settings for the 'Trigger' stage:
   Trigger:
-    opt_criterion: 6
-    custom_criterion: 1
-    min_trade: 100
-    max_iterations: 100
-
+    opt_criterion: 6       # 6 = Custom Max
+    custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 1=WIN_PERCENT)
+    min_trade: 100         # Minimum trades required for a valid solution
+    max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
+  # Optimisation settings for the 'Conformation' stage:
   Conformation:
-    opt_criterion: 6
-    custom_criterion: 1
-    min_trade: 20
-    max_iterations: 100
-
+    opt_criterion: 6       # 6 = Custom Max
+    custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
+    min_trade: 100         # Minimum trades required for a valid solution
+    max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
+  # Optimisation settings for the 'Trendline' stage:
   Trendline:
-    opt_criterion: 5
-    custom_criterion: 99
-    min_trade: 0
-    max_iterations: 100
-
+    opt_criterion: 5       # 5 = Sharpe Ratio Max
+    custom_criterion: 99   # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
+    min_trade: 20          # Minimum trades required for a valid solution
+    max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
+  # Optimisation settings for the 'Volume' stage:
   Volume:
-    opt_criterion: 6
-    custom_criterion: 1
-    min_trade: 20
-    max_iterations: 100
-
+    opt_criterion: 6       # 6 = Custom Max
+    custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
+    min_trade: 100         # Minimum trades required for a valid solution
+    max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
+  # Optimisation settings for the 'Exit' stage:
   Exit:
-    opt_criterion: 6
-    custom_criterion: 1
-    min_trade: 30
-    max_iterations: 100
+    opt_criterion: 6       # 6 = Custom Max
+    custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
+    min_trade: 100         # Minimum trades required for a valid solution
+    max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
+
