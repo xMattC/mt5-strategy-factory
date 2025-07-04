@@ -1,0 +1,8 @@
+2025-06-03 10:15:21,237 [INFO] [init_stage_logger] Logging initialized for stage: Pre-Indi-Testing optimisation
+2025-06-03 10:15:21,237 [INFO] [_load_template] Loading EA template from: C:\Users\mkcor\AppData\Roaming\MetaQuotes\Terminal\49CDDEAA95A409ED22BD2287BB67CB9C\MQL5\Experts\meta-strategist-private\meta_strategist\templates\trigger.j2
+2025-06-03 10:15:21,249 [INFO] [__init__] HERE
+2025-06-03 10:15:21,262 [INFO] [compile_ea] Compiling: Terminal\49CDDEAA95A409ED22BD2287BB67CB9C\MQL5\Experts\meta-strategist-private\indicators\trigger\compiled\ASO.mq5
+2025-06-03 10:15:22,652 [INFO] [compile_ea] Compilation succeeded: ASO.ex5
+2025-06-03 10:15:22,652 [INFO] [_process_single] Compiled EA successfully: ASO.mq5
+2025-06-03 10:15:22,653 [INFO] [generate_one] Successfully generated and compiled EA for ASO.yaml
+2025-06-03 10:15:22,653 [INFO] [main] Done. Check the 'triggers/compiled/' directory for output.

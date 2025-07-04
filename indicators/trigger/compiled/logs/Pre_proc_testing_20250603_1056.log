@@ -1,0 +1,2 @@
+logging_conf.py:71: INFO: Logging initialized for stage: Pre_proc_testing
+compile_indicator.py:23: INFO: Done. Check the 'triggers/compiled/' directory for output.
