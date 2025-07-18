@@ -2,7 +2,7 @@ chande_momentum_oscillator:
   custom: true
   indicator_path: "MyIndicators/chande_momentum_oscillator.ex5"
 
-  inputs:
+  indicator_inputs:
     CMO_period:
       default: 9
       type: int

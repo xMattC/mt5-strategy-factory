@@ -1,0 +1,17 @@
+# On Balance Volume
+obv:
+  custom: false
+  function: "iOBV"
+
+  indicator_inputs:
+    InpVolumeType:
+      default: VOLUME_TICK
+      type: ENUM_APPLIED_VOLUME
+      optimize: false
+  buffers:
+    - name: OBV
+      index: 0
+
+  volume_conditions:
+    long: "OBV[0] > OBV[1]"
+    short: "OBV[0] < OBV[1]"

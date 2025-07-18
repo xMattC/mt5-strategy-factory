@@ -1,8 +1,8 @@
 #Average Directional Index
-mt5_adx:
+adx:
   custom: false
   function: "iADX"
-  inputs:
+  indicator_inputs:
     InpPeriod:
       default: 14
       type: int
@@ -11,12 +11,15 @@ mt5_adx:
       step: 1
       optimize: true
   buffers:
-    - name: Main
-      index: 0
     - name: PlusDI
       index: 1
     - name: MinusDI
       index: 2
-  base_conditions:
+
+  trigger_conditions:
+    long: "PlusDI[0] > MinusDI[0] && PlusDI[1] < MinusDI[1]"
+    short: "PlusDI[0] < MinusDI[0] && PlusDI[1] > MinusDI[1]"
+
+  conf_conditions:
     long: "PlusDI[0] > MinusDI[0]"
     short: "PlusDI[0] < MinusDI[0]"

@@ -1,96 +1,134 @@
-#include <MyLibs/Myfunctions.mqh>
-#include <MyLibs/OrderManagement.mqh>
-#include <MyLibs/MyEnums.mqh>
-#include <MyLibs/CustomMax.mqh>
-CustomMax cm;
-MyFunctions mf;
-OrderManagment om;
-//---
-input LOT_MODE  inp_lot_mode    = LOT_MODE_PCT_RISK;    // Lot Size Mode
-input double    inp_lot_var     = 2;                    // Lot Size Var
-input SL_MODE   inp_sl_mode     = SL_ATR_MULTIPLE;      // Stop-loss Mode
-input double    inp_sl_var      = 1.5;                    // Stop-loss Var
-input TP_MODE   inp_tp_mode     = TP_ATR_MULTIPLE;      // Take-profit Mode
-input double    inp_tp_var      = 1;                  // Take-Profit Var
-string lot_mode = EnumToString(inp_lot_mode);
-string sl_mode  = EnumToString(inp_sl_mode);
-string tp_mode  = EnumToString(inp_tp_mode);
-input CUSTOM_MAX_TYPE inp_custom_criteria = CM_WIN_PERCENT;
-input int inp_opt_min_trades = 0; // 0/off
-input MODE_SPLIT_DATA inp_data_split_method = NO_SPLIT;
+#include <MyLibs/BacktestUtils/CustomMax.mqh>
+#include <MyLibs/BacktestUtils/TestDataSplit.mqh>
+#include <MyLibs/Orders/OrderTracker.mqh>
+#include <MyLibs/Orders/EntryOrders.mqh>
+#include <MyLibs/Orders/ExitOrders.mqh>
+#include <MyLibs/Utils/Enums.mqh>
+#include <MyLibs/Utils/MarketDataUtils.mqh>
+#include <MyLibs/Utils/ResourceManager.mqh>
+//--- classes
+CustomMax c_max;
+OrderTracker order_tracker;
+EntryOrders entry_orders;
+MarketDataUtils m_utils;
+ResourceManager resource_manager;
+TestDataSplit data_split;
+//--- Inputs
+input LOT_MODE inp_lot_mode = LOT_MODE_PCT_RISK;     
+input double inp_lot_var = 2;                        
+input SL_MODE inp_sl_mode = SL_ATR_MULTIPLE;       
+input double inp_sl_var = 1.5;                    
+input TP_MODE inp_tp_mode = TP_ATR_MULTIPLE;   
+input double inp_tp_var = 1;                    
+string lot_mode = EnumToString(inp_lot_mode);    
+string sl_mode = EnumToString(inp_sl_mode);   
+string tp_mode = EnumToString(inp_tp_mode);  
+input CUSTOM_MAX_TYPE inp_custom_criteria = CM_WIN_PERCENT; 
+input int inp_opt_min_trades = 0;                           
+input MODE_SPLIT_DATA inp_data_split_method = NO_SPLIT;  
 input int inp_force_opt = 1;
-input group "-----------------------------------------"
 
-{% for enum in enum_definitions %}
-{{ enum }}
-{% endfor %}
+{#- Trigger indicator_inputs     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -#}
 
-{% for line in trigger_input_lines %}
-{{ line }}
-{% endfor %}
+//+------------------------------------------------------------------+
+//--- Indicator inputs
+{% for line in trigger_input_lines if line.strip() -%}
+{{ line.strip() }}
+{% endfor -%}
+//--- Logic inputs
 
+{#- Trigger logic_inputs        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -#}
+
+{%- if trigger_logic_inputs_vars %}
+{%- for var in trigger_logic_inputs_vars %}
+input int {{ var }} = {{ trigger_logic_inputs_defaults[loop.index0] }};
+{%- endfor %}
+{%- endif %}
+
+{#- End Jinja block             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #}
+//+------------------------------------------------------------------+
 string SymbolsArray[] = { {% for s in symbols_array %}"{{ s }}"{% if not loop.last %}, {% endif %}{% endfor %} };
-
-int indicator_handle[];  // Handle array for indicators
+//+------------------------------------------------------------------+
+int trig_handle[];
+int magic_number = 1000;
 
 int OnInit(){
-    EventSetTimer(60);
+    ArrayResize(trig_handle, ArraySize(SymbolsArray));
+    for(int i = 0; i < ArraySize(SymbolsArray); i++) {
 
-    ArrayResize(indicator_handle, ArraySize(SymbolsArray));
+    {#- Trigger             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -#}
 
-    for(int i = 0; i < ArraySize(SymbolsArray); i++){
-    {% if trigger_custom %}
-        indicator_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_indicator_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
-    {% else %}
-        indicator_handle[i] = {{ trigger_function }}(SymbolsArray[i], PERIOD_CURRENT{% for input in trigger_inputs %}, {{ input }}{% endfor %});
-    {% endif %}
+        {%- if trigger_custom %}
+        trig_handle[i] = iCustom(SymbolsArray[i], PERIOD_CURRENT, "{{ trigger_path }}"{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+        {%- else %}
+        trig_handle[i] = {{ trigger_function }}(SymbolsArray[i], PERIOD_CURRENT{% for input in trigger_inputs %}, {{ input }}{% endfor %});
+        {%- endif %}
+
+    {#- End Jinja block             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #}
+        resource_manager.register_handle(trig_handle[i]);
     }
+
+    EventSetTimer(60);
     return(INIT_SUCCEEDED);
 }
 
-void OnDeinit(const int reason){}
+void OnDeinit(const int reason) {
+    EventKillTimer();
+    resource_manager.release_all_handles();
+}
 
-void OnTimer(){
-    if(!mf.in_test_period(inp_data_split_method)){return;}
-    
-    if(!mf.is_new_bar(_Symbol, PERIOD_CURRENT, "00:05")){return;}
-    
-    for(int i = 0; i < ArraySize(SymbolsArray); i++){
-        strategy(SymbolsArray[i], indicator_handle[i]);
+double OnTester() {
+    return c_max.calculate_custom_criteria(inp_custom_criteria, inp_opt_min_trades);
+}
+
+void OnTimer() {
+    for (int i = 0; i < ArraySize(SymbolsArray); i++) {
+        string symbol = SymbolsArray[i];
+        run_trade_logic(symbol, trig_handle[i]);
     }
 }
 
-double OnTester(){
-    return cm.calculate_custom_criteria(inp_custom_criteria, inp_opt_min_trades);
-}
+void run_trade_logic(string symbol, int trig_hand) {
 
-void strategy(string symbol, int trigger_handle){
+    if (!m_utils.is_new_bar(symbol, PERIOD_CURRENT, "00:05")) return;
+
+    // --- trigger signal
     bool trigger_long, trigger_short;
+    trigger(trig_hand, trigger_long, trigger_short);
 
-    // --- Call modular trigger signal logic
-    trigger(trigger_handle, trigger_long, trigger_short);
+    bool entry_long = trigger_long;
+    bool entry_short = trigger_short;
+    bool exit_long = false;
+    bool exit_short = false;
 
-    bool long_in  = trigger_long;
-    bool short_in = trigger_short;
-    bool long_out = 0;
-    bool short_out = 0;
-
-    //--- Manage orders
-    om.close_buy_orders(symbol, long_out, 0, PERIOD_CURRENT, 42);
-    om.close_sell_orders(symbol, short_out, 0, PERIOD_CURRENT, 42);
-    om.open_buy_orders(symbol, long_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
-    om.open_sell_orders(symbol, short_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, 42);
+    manage_orders(symbol, entry_long, entry_short, exit_long, exit_short);
 }
 
-// --- Trigger logic function (add more signal functions as needed)
-void trigger(int indi_handle, bool &trigger_long, bool &trigger_short){
+void manage_orders(string symbol, bool long_in, bool short_in, bool exit_long, bool exit_short) {
+
+    // --- Only open new positions if in test window ---
+    if (!data_split.in_test_period(inp_data_split_method)) return;
+
+    // --- Only open new positions if there are no open positions for symbol (regardless of side) ---
+    if (order_tracker.count_open_positions(symbol, 0, magic_number) > 0) return;
+
+    // TP entries
+    entry_orders.open_buy_orders(symbol, long_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, magic_number);
+    entry_orders.open_sell_orders(symbol, short_in, PERIOD_CURRENT, sl_mode, inp_sl_var, tp_mode, inp_tp_var, lot_mode, inp_lot_var, magic_number);
+}
+
+void trigger(int handle, bool& long_sig, bool& short_sig) {
+
+    long_sig = false; short_sig = false;
+    {# Start - Load trigger Buffers         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -#}
 
     {% for buf in trigger_buffers %}
     double {{ buf.name }}[];
     ArraySetAsSeries({{ buf.name }}, true);
-    CopyBuffer(indi_handle, {{ buf.index }}, 1, 10, {{ buf.name }});
-
+    CopyBuffer(handle, {{ buf.index }}, 1, 10, {{ buf.name }});
     {% endfor %}
-    trigger_long  = ({{ trigger_long_conditions }});
-    trigger_short = ({{ trigger_short_conditions }});
+
+    {#- End - Load trigger Buffers          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #}
+    long_sig  = ({{ trigger_long_conditions }});
+    short_sig = ({{ trigger_short_conditions }});
 }

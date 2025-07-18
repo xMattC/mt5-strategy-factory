@@ -1,43 +1,23 @@
-ASO:
+Bears_Bulls_Impuls:
   custom: true
-  indicator_path: "MyIndicators/ASO.ex5"
+  indicator_path: "MyIndicators/Bears_Bulls_Impuls.ex5"
 
-  inputs:
+  indicator_inputs:
     InpPeriod:
-      default: 9
+      default: 13
       type: int
       min: 1
       max: 200
       step: 1
       optimize: true
 
-    InpPeriodSm:
-      default: 1
-      type: int
-      min: 1
-      max: 10
-      step: 1
-      optimize: true
-
-    InpMode:
-      default: MODE_RSI
-      type: ENUM_MODE
-      optimize: false
-
-    InpMethod:
-      default: MODE_SMA
-      type: ENUM_MA_METHOD
-      optimize: false
-
     InpAppliedPrice:
       default: PRICE_CLOSE
       type: ENUM_APPLIED_PRICE
       optimize: false
 
-  enums:
-    ENUM_MODE:
-      - MODE_RSI
-      - MODE_MACD
+#  enums:
+    # ENUM_APPLIED_PRICE members should be included here if you want them listed
 
   buffers:
     - name: Bulls

@@ -62,6 +62,21 @@ def process_all_yaml_files_in_dir(indi_dir):
 
 
 if __name__ == "__main__":
+    # Main execution entry point for EA generation.
+    #
+    # Description:
+    # - Initialises logging in compact_full mode for structured output.
+    # - Processes all YAML configuration files from the "mt5_built_in_indicators"
+    #   directory to generate corresponding Expert Advisors (EAs).
+    # - Alternative processing paths are provided via commented lines to enable
+    #   specific subsets of files or different strategy categories (e.g.,
+    #   trend-following triggers, volume filters, etc.).
+    #
+    # Logic:
+    # - Logging is configured first for debug visibility.
+    # - You can either uncomment a specific `file_list` or directory-based
+    #   processing line depending on what subset of EAs you wish to generate.
+    # - The final list of generated EAs is printed to the console.
     initialise_logging("compact_full")
 
     # file_list = [
@@ -72,9 +87,17 @@ if __name__ == "__main__":
     #     # "mt5_Stochastic.yaml",
     #     # "mt5_Volumes.yaml",
     # ]
-    # generated_eas = process_yaml_file_list("mt5_built_in_indicators", file_list)
-    # logger.info(f"\nProcessed files: {generated_eas}")
 
-    # For processing all YAML files:
     generated_eas = process_all_yaml_files_in_dir("mt5_built_in_indicators")
+    # generated_eas = process_yaml_file_list("trend_following/trigger_conf_exit", file_list)
+
+    # generated_eas = process_all_yaml_files_in_dir("trend_following/trigger_conf_exit")
+    # generated_eas = process_yaml_file_list("trend_following/trigger_conf_exit", file_list)
+
+    # generated_eas = process_all_yaml_files_in_dir("trend_following/trendline")
+    # generated_eas = process_yaml_file_list("trend_following/trendline", file_list)
+
+    # generated_eas = process_all_yaml_files_in_dir("trend_following/volume")
+    # generated_eas = process_yaml_file_list("trend_following/volume", file_list)
+
     print(f"\nAll processed files: {generated_eas}")

@@ -25,16 +25,14 @@ def render_pre_proc_test(project_config: ProjectConfig, stage_config: StageConfi
     rendered_ea = stage_config.ea_template.render(
         enum_definitions=build_enum_definitions(indi_data),  # Generate MQL5 enum definitions from YAML
         symbols_array=project_config.whitelist,  # Pass whitelist for symbol iteration in EA
-
-        # Trigger settings (to be optimised):
-        trigger_indicator_name=indi_name,  # The name of the indicator being optimised
-        trigger_input_lines=build_input_lines(indi_data),  # MQL5 input variable declarations
-        trigger_custom=indi_data.get("custom"),  # States if indi is mt5 inbuilt or custom
-        trigger_function=indi_data.get("function"),  # Only used for mt5 built in indicators
-        trigger_indicator_path=indi_data.get("indicator_path"),  # Path to indicator .mq5
-        trigger_inputs=[k for k in indi_data.get("inputs", {})],  # List of input variable names for indicator
-        trigger_buffers=indi_data.get("buffers", []),  # List of output buffer indices or names
-        trigger_long_conditions=indi_data.get("base_conditions", {}).get("long", "false"),  # Buy logic
-        trigger_short_conditions=indi_data.get("base_conditions", {}).get("short", "false"),  # Sell logic
+        indicator_name=indi_name,  # The name of the indicator being optimised
+        input_lines=build_input_lines(indi_data),  # MQL5 input variable declarations
+        custom=indi_data.get("custom"),  # States if indi is mt5 inbuilt or custom
+        function=indi_data.get("function"),  # Only used for mt5 built in indicators
+        indicator_path=indi_data.get("indicator_path"),  # Path to indicator .mq5
+        inputs=[k for k in indi_data.get("inputs", {})],  # List of input variable names for indicator
+        buffers=indi_data.get("buffers", []),  # List of output buffer indices or names
+        long_conditions=indi_data.get("base_conditions", {}).get("long", "false"),  # Buy logic
+        short_conditions=indi_data.get("base_conditions", {}).get("short", "false"),  # Sell logic
     )
     return rendered_ea

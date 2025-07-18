@@ -7,7 +7,7 @@ def build_input_lines(data: dict) -> list[str]:
     """
     input_lines = []
     # For each input, create a proper MQL5 declaration line
-    for var_name, props in data.get("inputs", {}).items():
+    for var_name, props in data.get("indicator_inputs", {}).items():
         val = props["default"]
         typ = props["type"]
 

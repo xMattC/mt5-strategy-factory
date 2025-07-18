@@ -2,7 +2,7 @@ AROON:
   custom: true
   indicator_path: "MyIndicators/AROON.ex5"
 
-  inputs:
+  indicator_inputs:
     InpPeriod:
       default: 25
       type: int
@@ -30,6 +30,12 @@ AROON:
     - name: BufferDN
       index: 1
 
-  base_conditions:
-    long: "BufferUP[0] > BufferDN[0] && BufferUP[1] < BufferDN[1]"
+  threshold_values:
+
+  trigger_conditions:
+    long: "BufferUP[0] > InpOverbought && BufferUP[1] < BufferDN[1]"
     short: "BufferUP[0] < BufferDN[0] && BufferUP[1] > BufferDN[1]"
+
+  conf_conditions:
+    long: "BufferUP[0] > InpOverbought"
+    short: "BufferUP[0] < BufferDN[0]"
