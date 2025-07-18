@@ -1,0 +1,24 @@
+# Money Flow Index
+mfi:
+  custom: false
+  function: "iMFI"
+
+  indicator_inputs:
+    InpPeriod:
+      default: 14
+      type: int
+      min: 2
+      max: 50
+      step: 1
+      optimize: true
+    InpVolumeType:
+      default: VOLUME_TICK
+      type: int
+      optimize: false
+  buffers:
+    - name: MFI
+      index: 0
+
+  volume_conditions:
+    long: "MFI[0] > 50"
+    short: "MFI[0] < 50"

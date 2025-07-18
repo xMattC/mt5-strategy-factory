@@ -6,11 +6,14 @@ logger = logging.getLogger(__name__)
 
 
 def extract_inputs_from_input_yaml(yaml_path: Path, expected_key: str) -> dict:
-    """Extracts and validates the 'inputs' section from a YAML indicator file.
+    """Extract and merge 'indicator_inputs' and 'logic_inputs' from a YAML indicator file.
 
-    param yaml_path: Path to the .yaml file describing the indicator
-    param expected_key: Expected top-level key (indicator name) in the YAML
-    return: Dictionary of input parameter definitions
+    Parameters:
+    - yaml_path: Path to the .yaml file describing the indicator
+    - expected_key: Expected top-level key (indicator name) in the YAML
+
+    Returns:
+    - Dictionary of combined input parameter definitions
     """
     if not yaml_path.exists():
         raise FileNotFoundError(f"YAML file not found: {yaml_path}")
@@ -22,8 +25,17 @@ def extract_inputs_from_input_yaml(yaml_path: Path, expected_key: str) -> dict:
     if top_key.lower() != expected_key.lower():
         logger.warning(f"Top-level key '{top_key}' does not match expected name '{expected_key}'")
 
-    inputs = data[top_key].get("inputs", {})
-    if not isinstance(inputs, dict):
-        raise ValueError(f"'inputs' section in {yaml_path.name} must be a dictionary")
+    indi_data = data[top_key]
 
-    return inputs
+    indicator_inputs = indi_data.get("indicator_inputs") or {}
+    logic_inputs = indi_data.get("logic_inputs") or {}
+
+    if not isinstance(indicator_inputs, dict):
+        raise ValueError(f"'indicator_inputs' in {yaml_path.name} must be a dictionary")
+    if not isinstance(logic_inputs, dict):
+        raise ValueError(f"'logic_inputs' in {yaml_path.name} must be a dictionary")
+
+    # Merge both dicts into a single parameter definition
+    merged_inputs = {**indicator_inputs, **logic_inputs}
+    return merged_inputs
+

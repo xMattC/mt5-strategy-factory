@@ -2,7 +2,7 @@ Coral:
   custom: true
   indicator_path: "MyIndicators/Coral.ex5"
 
-  inputs:
+  indicator_inputs:
     InpCoeff:
       default: 0.063492063492
       type: double

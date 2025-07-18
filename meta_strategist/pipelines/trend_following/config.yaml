@@ -18,31 +18,30 @@ tp: 1 # Default take profit value (in ATR or custom units; pipeline-specific)
 #       0 - Balance Max,  1 - profit factor Max,  2 - Expected payoff max, 3 - Draw-down Min,  4 - recovery Factor Max,
 #       5 - Sharpe Ratio Max, 6 - Custom Max, 7 - Complex criterion Max
 opt_settings:
-  # Optimisation settings for the 'Trigger' stage:
   Trigger:
     opt_criterion: 6       # 6 = Custom Max
     custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 1=WIN_PERCENT)
     min_trade: 100         # Minimum trades required for a valid solution
     max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
-  # Optimisation settings for the 'Conformation' stage:
+
   Conformation:
     opt_criterion: 6       # 6 = Custom Max
     custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
     min_trade: 100         # Minimum trades required for a valid solution
     max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
-  # Optimisation settings for the 'Trendline' stage:
+
   Trendline:
     opt_criterion: 5       # 5 = Sharpe Ratio Max
     custom_criterion: 99   # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
     min_trade: 20          # Minimum trades required for a valid solution
     max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
-  # Optimisation settings for the 'Volume' stage:
+
   Volume:
     opt_criterion: 6       # 6 = Custom Max
     custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)
     min_trade: 100         # Minimum trades required for a valid solution
     max_iterations: 100    # Maximum optimisation params per indicator/ indicator param.
-  # Optimisation settings for the 'Exit' stage:
+
   Exit:
     opt_criterion: 6       # 6 = Custom Max
     custom_criterion: 1    # Only used if opt_criterion = 6. (0=WIN_LOSS_RATIO, 2=WIN_PERCENT)

@@ -45,8 +45,9 @@ def extract_minimal_defaults(indicator_yaml: Path) -> tuple[str, dict]:
         indi_data = yaml.safe_load(f)
     indicator_name = next(iter(indi_data))
     indi_section = indi_data[indicator_name]
-    inputs = indi_section.get("inputs", {})
+    inputs = indi_section.get("indicator_inputs", {})
     minimal = {k: v["default"] for k, v in inputs.items() if "default" in v}
+
     return indicator_name, minimal
 
 
@@ -65,6 +66,7 @@ def create_stage_yaml(run_dir: Path, stage: StageConfig, indicator: str, out_fil
 
     # Find the YAML file for the requested indicator
     indicator_yaml = find_indicator_yaml(indicators_dir, indicator)
+
     # Extract minimal input defaults
     indicator_name, minimal = extract_minimal_defaults(indicator_yaml)
 

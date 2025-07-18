@@ -1,0 +1,17 @@
+#  Accumulation/Distribution
+accumulation_dist:
+  custom: false
+  function: "iAD"
+
+  indicator_inputs:
+    InpVolumeType:
+      default: VOLUME_TICK
+      type: ENUM_APPLIED_VOLUME
+      optimize: false
+  buffers:
+    - name: AD
+      index: 0
+
+  volume_conditions:
+    long: "AD[0] > AD[1]"
+    short: "AD[0] < AD[1]"

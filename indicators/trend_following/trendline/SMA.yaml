@@ -1,0 +1,36 @@
+SMA:
+  custom: false
+  function: "iMA"
+
+  indicator_inputs:
+    InpPeriod:
+      default: 150
+      type: int
+      min: 5
+      max: 300
+      step: 1
+      optimize: true
+
+    InpShift:
+      default: 0
+      type: int
+      optimize: false
+
+    InpMAType:
+      default: MODE_SMA
+      type: ENUM_MA_METHOD
+      optimize: false
+
+    InpAppliedPrice:
+      default: PRICE_CLOSE
+      type: int
+      optimize: false
+
+  trendline_buffer_index:
+      index: 0
+
+  test_trend:
+    long: "close[0] > trend_line[0] && close[1] < trend_line[0]"
+    short: "close[0] < trend_line[0] && close[0] > trend_line[0]"
+
+

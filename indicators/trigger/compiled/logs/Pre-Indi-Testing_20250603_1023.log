@@ -1,2 +1,0 @@
-logging_conf.py:71: INFO: Logging initialized for stage: Pre-Indi-Testing optimisation
-compile_indicator.py:24: INFO: Done. Check the 'triggers/compiled/' directory for output.

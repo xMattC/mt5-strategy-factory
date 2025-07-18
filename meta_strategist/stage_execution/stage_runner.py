@@ -114,29 +114,42 @@ class StageRunner:
                 self.run_out_of_sample(indi_name, is_result)
 
     def run_in_sample(self, indi_name: str) -> OptimizationResult | None:
-        """ Run the in-sample (IS) optimisation pass.
+        """Run the in-sample (IS) optimisation pass.
 
         param indi_name: Base name of the EA/indicator
         return: OptimizationResult object or None if failed
         """
-        ini_path = create_ini(indi_name=indi_name, ea_output_dir=self.ea_output_dir, project_config=self.project_config,
-                              ini_files_dir=self.ini_dir, in_sample=True, stage_config=self.stage_config,
-                              optimized_parameters=None)
+        logger.info(f"=== Starting in-sample optimisation for: {indi_name} ===")
+
+        ini_path = create_ini(
+            indi_name=indi_name,
+            ea_output_dir=self.ea_output_dir,
+            project_config=self.project_config,
+            ini_files_dir=self.ini_dir,
+            in_sample=True,
+            stage_config=self.stage_config,
+            optimized_parameters=None
+        )
 
         if not ini_path:
-            logger.warning(f"Skipping {indi_name}: missing YAML or EX5.")
+            logger.warning(f"[run_in_sample] Skipping {indi_name}: missing YAML or EX5.")
             return None
 
+        logger.info(f"[run_in_sample] INI file created: {ini_path}")
+        logger.debug(f"[run_in_sample] Running MT5 EA for: {indi_name}")
+
         run_ea(ini_path)
+        logger.debug(f"[run_in_sample] Copying MT5 report to: {self.results_dir}")
+
         copy_mt5_report(ini_path, self.results_dir)
 
         try:
             result = extract_optimization_result(self.results_dir, indi_name)
-            logger.info(f"Optimised parameters for {indi_name} (IS): {result.parameters}")
+            logger.info(f"[run_in_sample] Optimised parameters for {indi_name} (IS): {result.parameters}")
             return result
 
         except Exception as e:
-            logger.error(f"Failed to parse optimisation result for {indi_name} (IS): {e}")
+            logger.error(f"[run_in_sample] Failed to parse optimisation result for {indi_name} (IS): {e}")
             return None
 
     def run_out_of_sample(self, indi_name: str, optimisation_result: OptimizationResult):
