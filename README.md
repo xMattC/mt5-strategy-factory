@@ -104,9 +104,9 @@ Place them in `indicators/`. Each file defines inputs, buffer mappings, and opti
 ### 2. Run a Pipeline
 
 ```python
-from meta_strategist.optimisation_pipeline import OptimizationPipeline
-from meta_strategist.ini_generator import IniConfig
-from meta_strategist.stages import get_stage
+from strategy_factory.optimisation_pipeline import OptimizationPipeline
+from strategy_factory.ini_generator import IniConfig
+from strategy_factory.stages import get_stage
 
 config = IniConfig(
     run_name="Apollo",

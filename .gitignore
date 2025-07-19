@@ -6,3 +6,4 @@ __pycache__/
 /outputs/
 /indicators/mt5_built_in_indicators/
 /docs/
+/.pytest_cache/
