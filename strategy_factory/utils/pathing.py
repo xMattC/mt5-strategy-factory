@@ -37,8 +37,8 @@ def load_paths() -> dict:
     mt5_test_cache = mt5_root / "Tester" / "cache"
     mt5_experts_dir = mt5_root / "MQL5" / "Experts"
     indicator_dir = pro_root / "indicators"
-    output_dir = pro_root / "outputs"
-    pipelines_dir = pro_root / "meta_strategist" / "pipelines"
+    output_dir = pro_root / "~ outputs"
+    pipelines_dir = pro_root / "strategy_factory" / "pipelines"
 
     return {
         "MT5_ROOT": mt5_root,

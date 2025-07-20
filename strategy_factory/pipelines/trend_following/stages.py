@@ -1,7 +1,7 @@
 from pathlib import Path
 from strategy_factory.stage_execution.stage_config import StageConfig
 
-pipline_dir = "meta_strategist.pipelines.trend_following"
+pipline_dir = "strategy_factory.pipelines.trend_following"
 template_dir = Path(__file__).resolve().parent / "templates"
 
 STAGES = [
