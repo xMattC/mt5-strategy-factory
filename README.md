@@ -5,7 +5,7 @@
 **MetaTrader 5 (MT5)** is a multi-asset trading platform widely used for developing and executing automated trading 
 strategies. [Learn more](https://www.metatrader5.com/en)
 
-**MT5 Strategy Factory** is a powerful, production-grade Python framework for automating the complete lifecycle of 
+**MT5 Strategy Factory** is a production-grade quality Python framework for automating the complete lifecycle of 
 strategy development in MetaTrader 5 (MT5). It enables modular strategy construction, batch optimisation, and performance 
 evaluation — all driven by YAML indicator files and executed through a highly customisable, stage-based pipeline.
 
