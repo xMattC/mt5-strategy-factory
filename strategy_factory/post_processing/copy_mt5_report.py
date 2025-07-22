@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def copy_mt5_report(ini_path: Path, dest_dir: Path):
-    """ Copies the MT5-generated report (XML) to the results directory,
-    generates a CSV version of it, and deletes the copied XML.
+    """ Copies the MT5-generated report (XML) to the results directory, generates a CSV version of it, and deletes
+    the copied XML.
 
     param ini_path: Path to the .ini file used for the MT5 run
     param dest_dir: Destination directory for reports

@@ -12,16 +12,9 @@ METRIC_COLUMNS = {
 }
 
 
-def extract_top_parameters(
-        results_dir: Path,
-        top_n: int = 5,
-        sort_by: str = "Res_OOS",
-        csv_file: str = "1_top_parameter_sets.csv",
-        yaml_file: str = "1_top_parameter_sets.yaml"
-):
-    """
-    Extract best IS parameters for the top-N indicators based on the combined results CSV.
-
+def extract_top_parameters(results_dir: Path, top_n: int = 5, sort_by: str = "Res_OOS",
+                           csv_file: str = "1_top_parameter_sets.csv", yaml_file: str = "1_top_parameter_sets.yaml"):
+    """Extract best IS parameters for the top-N indicators based on the combined results CSV.
     Writes both a flat CSV (for humans) and structured YAML (for automation).
 
     param results_dir: Directory containing combined results and IS CSVs

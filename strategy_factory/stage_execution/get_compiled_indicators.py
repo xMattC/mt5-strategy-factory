@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_compiled_indicators(expert_dir: Path) -> list[str]:
-    """Scan a directory for compiled EAs and report missing .ex5 files.
+    """ Scan a directory for compiled EAs and report missing .ex5 files.
 
     param expert_dir: Directory containing .mq5/.ex5 files
     return: List of names of compiled indicators (present as both .mq5 and .ex5)
