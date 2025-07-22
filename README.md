@@ -41,7 +41,30 @@ re-tested out-of-sample (OOS) to evaluate generalisation.
 - MetaTrader 5 (installed and licensed locally)
 - Access to your MT5 `Experts/` folder
 
-## Installation
+
+## Aditional Dependency: MyLibs MQL5 Utility Library
+
+This strategy framework depends on a companion MQL5 utility library containing reusable classes for:
+
+- Trade execution and management
+- Risk control and position sizing
+- Signal state tracking and indicator handling
+- Time-based filters and session controls
+
+To use this framework successfully, you **must install the `MyLibs` library** into your MetaTrader 5 terminal.
+
+
+1. Download or clone the required library:
+   ( [mt5-quant-lib](https://github.com/xMattC/mt5-quant-lib) )
+
+2. Place the `MyLibs` folder in your MetaTrader 5 `Include/` directory:
+
+```plaintext
+C:/Users/<YourUsername>/AppData/Roaming/MetaQuotes/Terminal/<YourInstanceID>/MQL5/Include/MyLibs/
+```
+
+
+## MT5 Strategy Factory Installation
 
 #### Step 1: Clone the Repository
 
@@ -121,8 +144,8 @@ The MT5 Strategy Factory is designed to run via a single entry point: `main.py`.
 This script orchestrates the execution of each logical strategy stage in order:
 
 ```python
-StageRunner(...)               # Optimises the stage
-create_stage_result_yaml(...) # Creates placeholder for indicator handoff
+StageRunner(...)                # Optimises the stage
+create_stage_result_yaml(...)   # Creates placeholder for indicator handoff
 ```
 
 After each stage, the system halts until a user manually chooses the best-performing indicator to forward to the next stage.
@@ -262,11 +285,11 @@ Outputs/
 
 ## Roadmap
 
-- ✅ Trend-following pipeline complete
-- 🔜 Breakout and mean-reversion pipelines
-- 🔜 Indicator crossover detection
-- 🔜 Parallelisation and distributed testing
-- 🔜 Integrated visual reporting dashboard
+- Trend-following pipeline complete
+- Breakout, mean-reversion and scalping pipelines
+- Walk-forward testing framework
+- Monte Carlo testing for backtest results
+- Integrated visual reporting dashboard
 
 ### Contributing
 Welcome contributions of all kinds — from new pipeline architectures and indicator modules to enhancements in the YAML 
