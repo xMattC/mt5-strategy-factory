@@ -103,4 +103,5 @@ class GenerateEA:
         """
         if not getattr(self.stage_config, "indi_dir", None):
             raise ValueError(f"Stage {self.stage_config.name} must define indi_dir.")
+
         return self.paths["INDICATOR_DIR"] / self.stage_config.indi_dir
