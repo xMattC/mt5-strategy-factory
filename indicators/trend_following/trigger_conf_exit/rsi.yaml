@@ -6,8 +6,8 @@ rsi:
     InpPeriod:
       default: 14
       type: int
-      min: 2
-      max: 50
+      min: 1
+      max: 200
       step: 1
       optimize: true
     applied_price:
@@ -19,19 +19,19 @@ rsi:
     - name: RSI
       index: 0
 
-  logic_inputs:
-    inp_rsi_mid_threshold:
-      default: 50
-      type: int
-      min: 40
-      max: 60
-      step: 1
-      optimize: true
+#  logic_inputs:
+#    inp_rsi_mid_threshold:
+#      default: 50
+#      type: int
+#      min: 40
+#      max: 60
+#      step: 1
+#      optimize: true
 
   trigger_conditions:
-    long: "RSI[0] > inp_rsi_mid_threshold && RSI[1] < inp_rsi_mid_threshold"
-    short: "RSI[0] < inp_rsi_mid_threshold && RSI[1] > inp_rsi_mid_threshold"
+    long: "RSI[0] > 50 && RSI[1] < 50"
+    short: "RSI[0] < 50 && RSI[1] > 50"
 
   conf_conditions:
-    long: "RSI[0] > inp_rsi_mid_threshold"
-    short: "RSI[0] < inp_rsi_mid_threshold"
+    long: "RSI[0] > 50"
+    short: "RSI[0] < 50"

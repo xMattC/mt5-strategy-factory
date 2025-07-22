@@ -1,0 +1,30 @@
+# Parabolic Star
+sar:
+  custom: false
+  function: "iSAR"
+  indicator_inputs:
+    InpStep:
+      default: 0.02
+      type: double
+      min: 0.001
+      max: 0.1
+      step: 0.001
+      optimize: true
+    InpMaximum:
+      default: 0.2
+      type: double
+      min: 0.01
+      max: 1.0
+      step: 0.01
+      optimize: true
+  buffers:
+    - name: SAR
+      index: 0
+
+  trigger_conditions:
+    long: "close[0] > SAR[0] && close[1] < SAR[1]"
+    short: "close[0] < SAR[0] && close[1] > SAR[1]"
+
+  conf_conditions:
+    long: "close[0] > SAR[0]"
+    short: "close[0] < SAR[0]"

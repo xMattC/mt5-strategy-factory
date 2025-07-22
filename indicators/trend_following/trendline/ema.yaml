@@ -1,4 +1,4 @@
-SMA:
+EMA:
   custom: false
   function: "iMA"
 
@@ -17,7 +17,7 @@ SMA:
       optimize: false
 
     InpMAType:
-      default: MODE_SMA
+      default: MODE_EMA
       type: ENUM_MA_METHOD
       optimize: false
 
