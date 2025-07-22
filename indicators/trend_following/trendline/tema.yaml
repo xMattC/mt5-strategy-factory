@@ -9,18 +9,18 @@ tema:
       min: 2
       max: 50
       step: 1
-      optimize: true
+      optimise: true
     InpShift:
       default: 0
       type: int
       min: 0
       max: 10
       step: 1
-      optimize: false
+      optimise: false
     InpAppliedPrice:
       default: PRICE_CLOSE
       type: int
-      optimize: false
+      optimise: false
   buffers:
     - name: TEMA
       index: 0

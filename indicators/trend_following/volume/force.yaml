@@ -7,18 +7,18 @@ force:
     InpPeriod:
       default: 13
       type: int
-      min: 2
-      max: 50
+      min: 1
+      max: 200
       step: 1
-      optimize: true
+      optimise: true
     InpMAType:
       default: MODE_EMA
       type: ENUM_MA_METHOD
-      optimize: false
+      optimise: false
     InpVolumeType:
       default: VOLUME_TICK
       type: int
-      optimize: false
+      optimise: false
   buffers:
     - name: Force
       index: 0

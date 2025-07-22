@@ -9,11 +9,11 @@ rsi:
       min: 1
       max: 200
       step: 1
-      optimize: true
+      optimise: true
     applied_price:
       default: PRICE_CLOSE
       type: int
-      optimize: false
+      optimise: false
 
   buffers:
     - name: RSI
@@ -26,7 +26,7 @@ rsi:
 #      min: 40
 #      max: 60
 #      step: 1
-#      optimize: true
+#      optimise: true
 
   trigger_conditions:
     long: "RSI[0] > 50 && RSI[1] < 50"
