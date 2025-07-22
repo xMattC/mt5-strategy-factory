@@ -1,70 +1,59 @@
 from pathlib import Path
 
-from strategy_factory.stage_execution import StageRunner, get_stage_config
-from strategy_factory.post_processing.stage_indicator_result_file_maker import create_stage_results_yaml
-from strategy_factory.utils import (initialise_logging,
-                                    load_config_from_yaml,
-                                    check_and_validate_config)
-
-# Pipeline-specific import: each pipeline (e.g., trend_following, mean-reversion e.t.c) has a unique STAGES list
 from strategy_factory.pipelines.trend_following.stages import STAGES
+from strategy_factory.post_processing.make_stage_result_file import create_stage_result_yaml
+from strategy_factory.stage_execution import StageRunner, get_stage_config
+from strategy_factory.utils import initialise_logging, load_config_from_yaml, check_and_validate_config
 
-
-def make_stage_result_file(phase, indicator):
-    """Creates a result file for a given phase and indicator.
-
-    param phase: The optimisation pipeline phase/stage name (e.g., "Trigger", "Volume")
-    param indicator: The indicator name or ID to associate with this phase
-    """
-    # Resolve the current script directory as the base path for result generation
-    run_dir = Path(__file__).parent.resolve()
-
-    # Use the 'stage_indicator_result_file_maker' utility to create the stage result file for the given indicator and phase
-    create_stage_results_yaml(STAGES, run_dir=run_dir, phase=phase, indicator=indicator)
+ROOT_DIR = Path(__file__).parent.resolve()
 
 
 def main():
-    """Entry point for executing a full MT5 optimisation pipeline.
+    """ Entry point for executing the full MT5 optimisation pipeline.
 
-    Loads and validates the configuration file for the current run, then sequentially executes all predefined
-    optimisation stages.
+    This script loads and validates the configuration file for the current run, then sequentially executes all
+    predefined optimisation stages.
 
-    Assumes the config.yaml and whitelist.yaml files are located alongside this script.
+    After each optimisation stage, the user must inspect the results and choose which indicator to pass on to the next
+    stage by replacing the placeholder "indicator_tbd" in the result YAML file using `create_stage_result_yaml`.
+
+    This process generates a file named `the_<stage_name>` within the stage's results directory. Overwriting this file
+    is disabled. If the user changes their mind about the chosen indicator, they must manually delete the file and rerun
+    create_stage_result_yaml.
+
+    Assumes `config.yaml` and `whitelist.yaml` are located alongside this script.
     """
-    # Set up logging with the 'compact_full' profile.
     initialise_logging("compact_full")
 
-    # Load pipeline configuration from YAML file in the same directory as this script
-    config_path = Path(__file__).parent / "config.yaml"
+    # --- LOAD PIPELINE CONFIGURATION FILE ---
+    config_path = ROOT_DIR / "config.yaml"
     config = load_config_from_yaml(config_path)
-
-    # Validate the loaded configuration; raises on errors or missing fields
     check_and_validate_config(config)
 
     # --- TRIGGER STAGE EXECUTION ---
-    stage_1 = get_stage_config(STAGES, "Trigger")
-    StageRunner(project_config=config, stage_config=stage_1)
-    # make_stage_result_file("Trigger", "tbd")
+    stage = get_stage_config(STAGES, "Trigger")
+    StageRunner(project_config=config, stage_config=stage, recompile_ea=True)
+    create_stage_result_yaml("indicator_tbd", "Trigger", STAGES, ROOT_DIR)
 
     # --- CONFORMATION STAGE EXECUTION ---
-    # stage_2 = get_stage(STAGES, "Conformation")
-    # StageRunner(project_config=config, stage_config=stage_2, recompile_ea=True)
-    # make_stage_result_file("Conformation", "tbd")
+    stage = get_stage_config(STAGES, "Conformation")
+    StageRunner(project_config=config, stage_config=stage, recompile_ea=True)
+    create_stage_result_yaml("indicator_tbd", "Conformation", STAGES, ROOT_DIR)
 
     # --- TRENDLINE STAGE EXECUTION ---
-    # stage_5 = get_stage("Trendline")
-    # Optimiser(config=config, stage=stage_5).run_stage_optimisations()
-    # make_stage_result_file("Trendline", "tbd")
+    stage = get_stage_config(STAGES, "Trendline")
+    StageRunner(project_config=config, stage_config=stage, recompile_ea=True)
+    create_stage_result_yaml("indicator_tbd", "Trendline", STAGES, ROOT_DIR)
 
     # --- VOLUME STAGE EXECUTION ---
-    # stage_3 = get_stage("Volume")
-    # Optimiser(config=config, stage=stage_3).run_stage_optimisations()
-    # make_stage_result_file("Volume", "tbd")
+    stage = get_stage_config(STAGES, "Volume")
+    StageRunner(project_config=config, stage_config=stage, recompile_ea=True)
+    create_stage_result_yaml("indicator_tbd", "Volume", STAGES, ROOT_DIR)
 
     # --- EXIT STAGE EXECUTION ---
-    # stage_4 = get_stage("Exit")
-    # Optimiser(config=config, stage=stage_4).run_stage_optimisations()
-    # make_stage_result_file("Exit", "tbd")
+    stage = get_stage_config(STAGES, "Exit")
+    StageRunner(project_config=config, stage_config=stage, recompile_ea=True)
+    create_stage_result_yaml("indicator_tbd", "Exit", STAGES, ROOT_DIR)
 
 
 if __name__ == "__main__":

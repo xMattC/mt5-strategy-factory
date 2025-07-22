@@ -113,7 +113,8 @@ Position sizing is calculated based on risk per trade:
   No trades are taken unless every condition is satisfied. This removes emotional influence and creates consistent execution.
 
 - **One Trade per Pair Rule:**  
-  To limit exposure and avoid correlation risk, only one open position is allowed per currency pair at any time.
+  To limit exposure and avoid correlation risk, only one open position is allowed per currency pair at any time. 
+  (i.e, trading USD/GBP and USD/EUR at same time would not be allowed)
 
 - **Consistent Risk Management:**  
   All trades adhere to a fixed risk-per-trade model (usually 1%). Risk does not increase based on “confidence” in a setup.
