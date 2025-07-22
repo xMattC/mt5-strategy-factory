@@ -1,8 +1,8 @@
 run_name: example_run
 pipeline: trend_following # The name of the strategy pipeline to use (e.g., trend_following, mean_reversion)
 whitelist_file: whitelist.yaml  # Path to the whitelist file. Use either "whitelist.yaml" or "CART_SYMBOL_ONLY"
-start_date: 2023.01.01 # Optimisation/testing data start date (YYYY.MM.DD)
-end_date: 2024.01.01 # Optimisation/testing data end date (YYYY.MM.DD)
+start_date: 2016.01.01 # Optimisation/testing data start date (YYYY.MM.DD)
+end_date: 2020.01.01 # Optimisation/testing data end date (YYYY.MM.DD)
 period: D1 # Chart timeframe/period (e.g., D1 = daily, H1 = hourly)
 main_chart_symbol: EURUSD # Main chart symbol for this run (not necessarily traded)
 currency: USD # Base currency for trade account

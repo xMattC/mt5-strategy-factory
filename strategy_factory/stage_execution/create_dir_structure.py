@@ -14,8 +14,7 @@ def create_dir_structure(run_name: str, indicator_type: str) -> Path:
     return: Path to the run's indicator_type subdirectory
     """
     paths = load_paths()
-    base_path = paths["PRO_ROOT"]
-    run_dir = base_path / "outputs" / run_name
+    run_dir = paths["OUTPUT_DIR"] / run_name
     indi_path = run_dir / indicator_type
 
     (indi_path / "experts").mkdir(parents=True, exist_ok=True)

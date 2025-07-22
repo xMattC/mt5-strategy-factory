@@ -37,7 +37,6 @@ class StageRunner:
         """
         self.project_config = project_config
         self.stage_config = stage_config
-        # self.whitelist = project_config.whitelist
         self.recompile_ea = recompile_ea
         self.paths = load_paths()
 
