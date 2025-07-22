@@ -28,16 +28,6 @@ The currently implemented system is a **trend-following pipeline** that:
 Each stage is independently scored using your chosen metric (e.g., Profit Factor), tested in-sample (IS), and then 
 re-tested out-of-sample (OOS) to evaluate generalisation.
 
-##  Key Features
-
-- **Modular Strategy Assembly**
-- **Template-Based Code Generation**
-- **Automated CLI Execution**
-- **Custom INI Generator**
-- **SAX-Optimised XML Parser**
-- **Clean Output Architecture**
-- **Extensible and Maintainable**
-
 ## Use Cases
 
 - Quantitative developers building, testing, and refining modular strategies
