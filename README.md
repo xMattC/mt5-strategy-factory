@@ -43,7 +43,7 @@ re-tested out-of-sample (OOS) to evaluate generalisation.
 
 ## Installation
 
-### Step 1: Clone the Repository
+#### Step 1: Clone the Repository
 
 Clone the repository to your local machine:
 
@@ -52,7 +52,7 @@ git clone https://github.com/xMattC/mt5-strategy-factory.git
 cd mt5-strategy-factory
 ```
 
-### Step 2: Set Up a Virtual Environment
+#### Step 2: Set Up a Virtual Environment
 
 Create a virtual environment to manage dependencies e.g:
 
@@ -71,7 +71,7 @@ Activate the virtual environment:
   source .env/bin/activate
   ```
 
-### Step 3: Install Dependencies
+#### Step 3: Install Dependencies
 
 Install the required dependencies:
 
