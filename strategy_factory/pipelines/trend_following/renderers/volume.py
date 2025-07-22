@@ -1,10 +1,11 @@
 from strategy_factory.stage_execution.stage_config import StageConfig
 from strategy_factory.utils import ProjectConfig
 
-from strategy_factory.renderer_tools import build_input_lines, build_enum_definitions
+from strategy_factory.renderer_tools import build_input_lines
 from strategy_factory.renderer_tools import load_results_data
 from strategy_factory.stage_execution.stage_config import get_stage_config
 from strategy_factory.utils import load_all_pipeline_stages
+
 
 def render_volume(project_config: ProjectConfig, stage_config: StageConfig, indi_name: str, indi_data: dict) -> str:
     """Render function for the volume stage.
@@ -23,6 +24,8 @@ def render_volume(project_config: ProjectConfig, stage_config: StageConfig, indi
     volume_logic_inputs = indi_data.get("logic_inputs") or {}
     volume_logic_inputs_vars = list(volume_logic_inputs.keys())
     volume_logic_inputs_defaults = [volume_logic_inputs[k]["default"] for k in volume_logic_inputs_vars]
+    volume_input_lines = build_input_lines(indi_data)
+    volume_buffers = indi_data.get("buffers") or []
 
     # Load other stages
     trendline_stage = get_stage_config(stages, "Trendline")
@@ -47,13 +50,14 @@ def render_volume(project_config: ProjectConfig, stage_config: StageConfig, indi
         whitelist=project_config.whitelist,
 
         # Volume indicator
+        volume_indicator_input_lines=volume_input_lines,
         volume_logic_inputs_vars=volume_logic_inputs_vars,
         volume_logic_inputs_defaults=volume_logic_inputs_defaults,
         volume_custom=indi_data.get("custom"),
         volume_function=indi_data.get("function"),
         volume_indicator_path=indi_data.get("indicator_path"),
         volume_inputs_vars=[v["default"] for v in indi_data["indicator_inputs"].values()],
-        volume_buffers=indi_data.get("buffers", []),
+        volume_buffers=volume_buffers,
         volume_long_conditions=indi_data.get("volume_conditions", {}).get("long"),
         volume_short_conditions=indi_data.get("volume_conditions", {}).get("short"),
 

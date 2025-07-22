@@ -34,12 +34,10 @@ input CUSTOM_MAX_TYPE inp_custom_criteria = CM_WIN_PERCENT;
 input int inp_opt_min_trades = 0;
 input MODE_SPLIT_DATA inp_data_split_method = NO_SPLIT;
 input int inp_force_opt = 1;
-
-{#- Exit indicator_inputs     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -#}
-
+{#- Exit indicator_inputs     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #}
 //+------------------------------------------------------------------+
 //--- Indicator inputs
-{% for line in exit_indicator_input_lines if line.strip() -%}
+{% for line in volume_indicator_input_lines if line.strip() -%}
 {{ line.strip() }}
 {% endfor -%}
 //--- Logic inputs
