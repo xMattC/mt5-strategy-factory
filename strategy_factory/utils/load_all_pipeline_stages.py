@@ -9,7 +9,7 @@ def load_all_pipeline_stages(pipeline_name: str):
     raises RuntimeError: If the pipeline or STAGES cannot be found/imported
     """
     try:
-        stages_module = importlib.import_module(f"meta_strategist.pipelines.{pipeline_name}.stages")
+        stages_module = importlib.import_module(f"strategy_factory.pipelines.{pipeline_name}.stages")
         return stages_module.STAGES
 
     except ImportError as e:
