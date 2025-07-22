@@ -1,7 +1,12 @@
 from pathlib import Path
-import yaml
-from strategy_factory.stage_execution.stage_config import StageConfig, get_stage_config
 import numpy as np
+import pandas as pd
+import yaml
+import logging
+
+from strategy_factory.stage_execution.stage_config import StageConfig, get_stage_config
+
+logger = logging.getLogger(__name__)
 
 
 def get_output_yaml_path(run_dir: Path, phase: str) -> Path:
@@ -52,10 +57,6 @@ def extract_minimal_defaults(indicator_yaml: Path) -> tuple[str, dict]:
     return indicator_name, minimal
 
 
-import pandas as pd
-from pathlib import Path
-
-
 def extract_indicator_optimised_results(run_dir: Path, stage, indicator: str):
     """ Extract the optimised result row for a specific indicator from the combined results CSV.
 
@@ -94,17 +95,12 @@ def extract_indicator_optimised_results(run_dir: Path, stage, indicator: str):
 
 
 def merge_optimised_params(defaults: dict, optimised: dict) -> dict:
-    """
-    Merge defaults with optimised values, keeping optimised where provided.
-    - Only use optimised keys that exist in defaults.
-    - Convert any NumPy numeric types to native Python types.
+    """ Merge defaults with optimised values, keeping optimised where provided.
 
-    Parameters:
-    - defaults: dict of default parameter values
-    - optimised: dict of optimised values (e.g. from CSV)
+    param defaults: dict of default parameter values
+    param optimised: dict of optimised values (e.g. from CSV)
 
-    Returns:
-    - Merged dict with optimised values where available
+    return: Merged dict with optimised values where available
     """
     merged = {}
 
@@ -152,13 +148,13 @@ def create_stage_yaml(run_dir: Path, stage: StageConfig, indicator: str):
 
     # Prevent overwrite unless the user deletes the old file
     if out_path.exists():
-        print(f"YAML file already exists: {out_path}\nPlease delete it if you need to remake.")
+        logger.info(f"YAML file already exists: {out_path}\nPlease delete it if you need to remake.")
         return
 
     # Write the minimal YAML (only defaults for inputs) to the output file
     with open(out_path, "w") as f:
         yaml.dump({indicator_name: indi_final_values}, f, sort_keys=False, indent=2)
-    print(f"Stage YAML created: {out_path}")
+    logger.info(f"Stage YAML created: {out_path}")
 
 
 def create_stage_result_yaml(indicator: str, phase: str, stages, run_dir: Path):

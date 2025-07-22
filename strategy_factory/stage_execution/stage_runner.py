@@ -1,8 +1,8 @@
 from strategy_factory.gen_expert_advisor.generate_ea import GenerateEA
 from strategy_factory.gen_initilisation_file import create_ini
 from strategy_factory.post_processing import (
-    extract_optimization_result,
-    OptimizationResult,
+    extract_optimisation_result,
+    OptimisationResult,
     update_combined_results,
     extract_top_parameters,
     copy_mt5_report
@@ -75,8 +75,7 @@ class StageRunner:
             self.optimise_indicator(indicator)
 
             # ALWAYS update the combined results table
-            update_combined_results(results_dir=self.results_dir, stage_name=self.stage_config.name,
-                                    print_summary=False)
+            update_combined_results(results_dir=self.results_dir, stage_name=self.stage_config.name, print_summary=False)
 
         # Finally, extract top-N performing parameter sets
         extract_top_parameters(results_dir=self.results_dir, top_n=5, sort_by="Res_OOS")
@@ -93,7 +92,7 @@ class StageRunner:
             logger.info(f"Skipping in-sample optimisation for {indi_name}: found existing {is_csv}")
 
             try:
-                is_result = extract_optimization_result(self.results_dir, indi_name)
+                is_result = extract_optimisation_result(self.results_dir, indi_name)
                 logger.info(f"Extracted existing in-sample result for {indi_name}: {is_result.parameters}")
 
             except Exception as e:
@@ -112,11 +111,11 @@ class StageRunner:
             else:
                 self.run_out_of_sample(indi_name, is_result)
 
-    def run_in_sample(self, indi_name: str) -> OptimizationResult | None:
+    def run_in_sample(self, indi_name: str) -> OptimisationResult | None:
         """Run the in-sample (IS) optimisation pass.
 
         param indi_name: Base name of the EA/indicator
-        return: OptimizationResult object or None if failed
+        return: OptimisationResult object or None if failed
         """
         logger.info(f"=== Starting in-sample optimisation for: {indi_name} ===")
 
@@ -127,7 +126,7 @@ class StageRunner:
             ini_files_dir=self.ini_dir,
             in_sample=True,
             stage_config=self.stage_config,
-            optimized_parameters=None
+            optimised_params=None
         )
 
         if not ini_path:
@@ -143,7 +142,7 @@ class StageRunner:
         copy_mt5_report(ini_path, self.results_dir)
 
         try:
-            result = extract_optimization_result(self.results_dir, indi_name)
+            result = extract_optimisation_result(self.results_dir, indi_name)
             logger.info(f"[run_in_sample] Optimised parameters for {indi_name} (IS): {result.parameters}")
             return result
 
@@ -151,15 +150,15 @@ class StageRunner:
             logger.error(f"[run_in_sample] Failed to parse optimisation result for {indi_name} (IS): {e}")
             return None
 
-    def run_out_of_sample(self, indi_name: str, optimisation_result: OptimizationResult):
+    def run_out_of_sample(self, indi_name: str, optimisation_result: OptimisationResult):
         """ Run the out-of-sample (OOS) optimisation pass.
 
         param indi_name: Base name of the EA/indicator
-        param optimisation_result: OptimizationResult from IS phase
+        param optimisation_result: OptimisationResult from IS phase
         """
         ini_path = create_ini(indi_name=indi_name, ea_output_dir=self.ea_output_dir, project_config=self.project_config,
                               ini_files_dir=self.ini_dir, in_sample=False, stage_config=self.stage_config,
-                              optimized_parameters=optimisation_result.parameters)
+                              optimised_params=optimisation_result.parameters)
 
         if not ini_path:
             logger.warning(f"Skipping OOS for {indi_name}: missing YAML or EX5.")
