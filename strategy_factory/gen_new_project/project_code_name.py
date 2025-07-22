@@ -2,6 +2,7 @@ import random
 import string
 import logging
 from pathlib import Path
+import os
 
 import yaml
 
@@ -50,6 +51,7 @@ def generate_next_project_codename(pantheon_filter: str = None) -> str:
     """Interactive generation of the next available project codename."""
     paths = load_paths()
     outputs_dir = paths["OUTPUT_DIR"]
+    os.makedirs(outputs_dir, exist_ok=True)
 
     # Gather all existing project directory names
     existing_dirs = [f.name for f in outputs_dir.iterdir() if f.is_dir()]

@@ -20,6 +20,7 @@ class OptSettings:
     custom_criterion: int
     min_trade: int
     max_iterations: int
+    max_iterations_per_param: bool = False
 
 
 @dataclass
