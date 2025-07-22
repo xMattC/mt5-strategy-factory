@@ -1,0 +1,5 @@
+sma:
+  InpPeriod: 285.0
+  InpShift: 0
+  InpMAType: MODE_SMA
+  InpAppliedPrice: PRICE_CLOSE
