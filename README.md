@@ -43,16 +43,46 @@ re-tested out-of-sample (OOS) to evaluate generalisation.
 
 ## Installation
 
+### Step 1: Clone the Repository
+
+Clone the repository to your local machine:
+
 ```bash
 git clone https://github.com/xMattC/mt5-strategy-factory.git
 cd mt5-strategy-factory
+```
+
+### Step 2: Set Up a Virtual Environment
+
+Create a virtual environment to manage dependencies e.g:
+
+```bash
+python -m venv .env
+```
+
+Activate the virtual environment:
+
+- On Windows:
+  ```bash
+  .env\Scripts\activate
+  ```
+- On macOS/Linux:
+  ```bash
+  source .env/bin/activate
+  ```
+
+### Step 3: Install Dependencies
+
+Install the required dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-Clone this repo directly into your MT5 Experts folder:
+Make sure to clone this repo directly into your MT5 Experts folder:
 
 ```
-C:\Users\<YOU>\AppData\Roaming\MetaQuotes\Terminal\<INSTANCE_ID>\MQL5\Experts\
+C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts
 ```
 
 ## Configuration
