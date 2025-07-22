@@ -1,0 +1,27 @@
+#  Commodity Channel Index
+cci:
+  custom: false
+  function: "iCCI"
+  indicator_inputs:
+    InpPeriod:
+      default: 14
+      type: int
+      min: 2
+      max: 200
+      step: 1
+      optimize: true
+    InpAppliedPrice:
+      default: PRICE_TYPICAL
+      type: int
+      optimize: false
+  buffers:
+    - name: CCI
+      index: 0
+
+  trigger_conditions:
+    long: "CCI[0] > 0 && CCI[0] < 0"
+    short: "CCI[0] < 0 && CCI[0] > 0"
+
+  conf_conditions:
+    long: "CCI[0] > 0"
+    short: "CCI[0] < 0"
