@@ -15,7 +15,8 @@ lwma:
     InpShift:
       default: 0
       type: int
-      optimize: false
+      optimise: false
+
     InpMAType:
       default: MODE_LWMA
       type: ENUM_MA_METHOD
