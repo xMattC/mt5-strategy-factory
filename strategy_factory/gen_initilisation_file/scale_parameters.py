@@ -7,7 +7,7 @@ def scale_parameters(param_dict: dict, max_total_iterations: int, per_param: boo
                      allow_step_reduction: bool = False):
     """ Scale input parameter ranges to keep total combinations under a max limit.
 
-    param param_dict: Dict of {param_name: {default, min, max, step, optimize, type}}
+    param param_dict: Dict of {param_name: {default, min, max, step, optimise, type}}
     param max_total_iterations: Max combinations (total or per parameter, depending on per_param)
     param per_param: If True, applies the limit to each param individually, else to the full grid
     param even_spacing: If True, always space parameter values evenly (like linspace); else, use legal steps as much as possible
@@ -18,7 +18,7 @@ def scale_parameters(param_dict: dict, max_total_iterations: int, per_param: boo
 
     optimisable = []
     for name, param in param_dict.items():
-        if not param.get("optimize", True):
+        if not param.get("optimise", True):
             continue
         start = float(param.get("min", param["default"]))
         end = float(param.get("max", param["default"]))
@@ -62,14 +62,14 @@ def scale_parameters(param_dict: dict, max_total_iterations: int, per_param: boo
 
     result = []
     for name, param in param_dict.items():
-        if param.get("optimize", True):
+        if param.get("optimise", True):
             match = next(p for p in optimisable if p["name"] == name)
             param = {
                 "default": param["default"],
                 "min": match["start"],
                 "max": match["end"],
                 "step": match["step"],
-                "optimize": True,
+                "optimise": True,
                 "type": match["type"]
             }
         result.append((name, param))
@@ -99,9 +99,9 @@ def print_param_grid(param):
 
 if __name__ == "__main__":
     ini_lines = {
-        "InpPeriod": {"default": 9, "min": 1, "max": 50, "step": 1, "optimize": True, "type": "int"},
-        "InpPeriodSm": {"default": 1, "min": 1, "max": 10, "step": 1, "optimize": True, "type": "float"},
-        "inp_force_opt": {"default": 1, "min": 1, "max": 2, "step": 1, "optimize": True, "type": "int"}
+        "InpPeriod": {"default": 9, "min": 1, "max": 50, "step": 1, "optimise": True, "type": "int"},
+        "InpPeriodSm": {"default": 1, "min": 1, "max": 10, "step": 1, "optimise": True, "type": "float"},
+        "inp_force_opt": {"default": 1, "min": 1, "max": 2, "step": 1, "optimise": True, "type": "int"}
     }
 
     print("=== Per param, at most 5 values, even spacing, respecting type ===")

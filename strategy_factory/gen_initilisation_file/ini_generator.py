@@ -5,7 +5,6 @@ from typing import Dict, Optional
 
 from strategy_factory.utils import load_paths, ProjectConfig
 from strategy_factory.stage_execution.stage_config import StageConfig
-
 from .extract_inputs import extract_inputs_from_input_yaml
 from .scale_parameters import scale_parameters
 
@@ -13,11 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfig, ini_files_dir: Path,
-               in_sample: bool, stage_config: StageConfig, optimized_parameters: Optional[Dict[str, str]] = None):
-    """ Generate a .ini file for a given indicator if the corresponding .yaml and .ex5 files exist.
-
-    This function validates that both the .yaml config and compiled .ex5 file are present,
-    loads the input settings, and writes a complete MetaTrader-compatible .ini file.
+               in_sample: bool, stage_config: StageConfig, optimised_params: Optional[Dict[str, str]] = None):
+    """
+    Generate a .ini file for a given indicator if the corresponding .yaml and .ex5 files exist.
 
     param indi_name: Name of the indicator.
     param ea_output_dir: Directory where the .ex5 files are stored.
@@ -25,7 +22,7 @@ def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfi
     param ini_files_dir: Directory where the .ini file should be saved.
     param in_sample: True if generating for in-sample testing, else False.
     param stage_config: Stage-specific configuration object.
-    param optimized_parameters: Optional dictionary of parameter overrides.
+    param optimised_params: Optional dictionary of parameter overrides.
     return: Path to the generated .ini file, or None if prerequisites are missing.
     """
     paths = load_paths()
@@ -46,14 +43,16 @@ def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfi
         logger.warning(f"Failed to load inputs from YAML: {e}")
         return None
 
-    ini_file_path = _write_ini_file(project_config, ex5_path, ini_files_dir, inputs, in_sample, stage_config, optimized_parameters)
+    ini_file_path = _write_ini_file(project_config, ex5_path, ini_files_dir, inputs, in_sample, stage_config,
+                                    optimised_params)
     return ini_file_path
 
 
 def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: Path, inputs: dict,
                     in_sample: bool, stage_config: StageConfig,
-                    optimized_parameters: Optional[Dict[str, str]]) -> Path:
-    """  Write a .ini file for MetaTrader 5 backtesting/optimisation.
+                    optimised_params: Optional[Dict[str, str]]) -> Path:
+    """
+    Write a .ini file for MetaTrader 5 backtesting/optimisation.
 
     param project_config: Project configuration object.
     param expert_path: Path to the compiled .ex5 file.
@@ -61,7 +60,7 @@ def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: P
     param inputs: Input parameter dictionary loaded from YAML.
     param in_sample: True if generating for in-sample testing.
     param stage_config: Stage-specific configuration object.
-    param optimized_parameters: Optional dictionary of parameter overrides.
+    param optimised_params: Optional dictionary of parameter overrides.
     return: Path to the written .ini file.
     """
     cfg = configparser.ConfigParser()
@@ -74,7 +73,7 @@ def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: P
     expert_rel_path = get_rel_expert_path(expert_path, load_paths()["MT5_EXPERT_DIR"])
 
     cfg["Tester"] = _build_tester_section(project_config, expert_rel_path, report_name, stage_config)
-    cfg["TesterInputs"] = _build_tester_inputs(project_config, inputs, in_sample, optimized_parameters, stage_config)
+    cfg["TesterInputs"] = _build_tester_inputs(project_config, inputs, in_sample, optimised_params, stage_config)
 
     ini_file_path = ini_dir / f"{indi_name}_{sample_type}.ini"
     ini_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -88,7 +87,8 @@ def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: P
 
 def _build_tester_section(project_config: ProjectConfig, expert_path: str,
                           report_name: str, stage_config: StageConfig) -> dict:
-    """ Construct the [Tester] section for the .ini file.
+    """
+    Construct the [Tester] section for the .ini file.
 
     param project_config: Project configuration object.
     param expert_path: Relative path to the expert .ex5 file.
@@ -121,19 +121,25 @@ def _build_tester_section(project_config: ProjectConfig, expert_path: str,
 
 
 def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample: bool,
-                         optimized_parameters: Optional[Dict[str, str]],
+                         optimised_params: Optional[Dict[str, str]],
                          stage_config: StageConfig) -> dict:
-    """ Construct the [TesterInputs] section for the .ini file.
+    """
+    Construct the [TesterInputs] section for the .ini file.
+
+    Combines static inputs (e.g., SL/TP, risk, criteria) and dynamic strategy parameters,
+    including parameter scaling and optional override handling.
 
     param project_config: Project configuration object.
     param inputs: Dictionary of inputs loaded from YAML.
     param in_sample: True if in-sample, else False.
-    param optimized_parameters: Optional dictionary of parameter overrides.
+    param optimised_params: Optional dictionary of parameter overrides.
     param stage_config: Stage-specific configuration object.
     return: Dictionary for the [TesterInputs] section.
     """
-    _, criteria, min_trade, max_iterations, max_per_param = _get_stage_config_criteria(project_config, stage_config.name)
+    _, criteria, min_trade, max_its, max_per_param = _get_stage_config_criteria(project_config, stage_config.name)
 
+    # ---------------------------------------------------------------------
+    # STATIC TESTER INPUTS
     tester_inputs = {
         "inp_lot_mode": "2||0||0||2||N",
         "inp_lot_var": f"{project_config.risk}||2.0||0.2||20||N",
@@ -143,21 +149,38 @@ def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample:
         "inp_tp_var": f"{project_config.tp}||1.5||0.15||15||N",
         "inp_custom_criteria": f"{criteria}||0||0||1||N",
         "inp_opt_min_trades": f"{min_trade}||0||0||1||N",
-        "inp_force_opt": "1||1||1||2||N" if in_sample else "1||1||1||2||Y",
         "inp_data_split_method": _get_split_code(project_config.data_split, in_sample),
     }
 
-    scaled_params = scale_parameters(inputs, max_iterations, max_per_param)
+    # ---------------------------------------------------------------------
+    # FORCE OPTIMISATION FLAG
+    # - If *none* of the input parameters have optimise=True, we force optimisation.
+    # - If out-of-sample (OOS), we must also force optimisation (Y) regardless of input flags.
+    # - Otherwise, in-sample with at least one opt param; no need to force optimisation.
 
+    force_optimisation = not any(param.get("optimise", True) for param in inputs.values())
+
+    if force_optimisation or not in_sample:
+        tester_inputs["inp_force_opt"] = "1||1||1||2||Y"
+    else:
+        tester_inputs["inp_force_opt"] = "1||1||1||2||N"
+
+    # ---------------------------------------------------------------------
+    # DYNAMIC PARAMETERS (FROM YAML / OVERRIDES)
+    scaled_params = scale_parameters(inputs, max_its, max_per_param)
     for name, param in scaled_params:
-        if optimized_parameters and name.lower() in optimized_parameters:
-            value = optimized_parameters[name.lower()]
+        name_lc = name.lower()
+
+        if optimised_params and name_lc in optimised_params:
+            value = optimised_params[name_lc]
             tester_inputs[name] = f"{value}||0||0||1||N"
-        elif param.get("optimize", True) and in_sample:
+
+        elif param.get("optimise", True) and in_sample:
             min_val = param.get("min", param["default"])
             max_val = param.get("max", param["default"])
             step = param.get("step", 1)
             tester_inputs[name] = f"{param['default']}||{min_val}||{step}||{max_val}||Y"
+
         else:
             tester_inputs[name] = f"{param['default']}||0||0||1||N"
 
@@ -165,11 +188,12 @@ def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample:
 
 
 def _get_split_code(split_type: str, in_sample: bool) -> str:
-    """ Return data split code depending on split type and test phase.
+    """
+    Return encoded string for inp_data_split_method.
 
-    param split_type: Either "year", "month", or other.
-    param in_sample: Whether in-sample or out-of-sample.
-    return: Encoded string for `inp_data_split_method`.
+    param split_type: 'year', 'month', or 'none'.
+    param in_sample: Whether the run is in-sample or OOS.
+    return: MT5-formatted input string.
     """
     if split_type == "year":
         split_code = "2" if in_sample else "1"
@@ -182,12 +206,12 @@ def _get_split_code(split_type: str, in_sample: bool) -> str:
 
 
 def _get_stage_config_criteria(project_config, stage_config_name):
-    """ Return the optimisation criteria settings for a given stage.
+    """
+    Get optimisation config values for a given stage.
 
-    param project_config: Project configuration object.
-    param stage_config_name: Name of the current optimisation stage.
-    return: Tuple (opt_criterion, custom_criterion, min_trade, max_iterations, max_iterations_per_param).
-    raises: TypeError if opt_settings is not a dict, KeyError if the stage is not found.
+    param project_config: Project config with .opt_settings.
+    param stage_config_name: Name of current optimisation stage.
+    return: Tuple (opt_criterion, custom_criterion, min_trades, max_iterations, max_per_param).
     """
     opt_settings = project_config.opt_settings
 
@@ -202,10 +226,11 @@ def _get_stage_config_criteria(project_config, stage_config_name):
 
 
 def get_rel_expert_path(expert_path: Path, mt5_experts_dir: Path) -> str:
-    """ Return the path of the expert file relative to the MT5 expert directory.
+    """
+    Return expert path relative to MT5 Expert directory.
 
-    param expert_path: Absolute path to the .ex5 expert file.
-    param mt5_experts_dir: Root path of the MT5 Experts folder.
-    return: Relative path as a string.
+    param expert_path: Full .ex5 path.
+    param mt5_experts_dir: Root folder for MT5 Experts.
+    return: Relative path string for ini [Tester] section.
     """
     return str(expert_path.relative_to(mt5_experts_dir))
