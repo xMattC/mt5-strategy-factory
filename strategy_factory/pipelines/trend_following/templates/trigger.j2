@@ -28,8 +28,7 @@ input int inp_opt_min_trades = 0;
 input MODE_SPLIT_DATA inp_data_split_method = NO_SPLIT;  
 input int inp_force_opt = 1;
 
-{#- Trigger indicator_inputs     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -#}
-
+{#--- Indicator Inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #}
 //+------------------------------------------------------------------+
 //--- Indicator inputs
 {% for line in trigger_input_lines if line.strip() -%}

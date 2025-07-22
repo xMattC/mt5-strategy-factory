@@ -1,6 +1,6 @@
 import logging
 
-from strategy_factory.renderer_tools import build_input_lines, build_enum_definitions
+from strategy_factory.renderer_tools import build_input_lines
 from strategy_factory.stage_execution.stage_config import StageConfig
 from strategy_factory.utils import ProjectConfig
 
