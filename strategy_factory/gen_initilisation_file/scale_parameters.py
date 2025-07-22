@@ -3,12 +3,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def scale_parameters(
-        param_dict: dict,
-        max_total_iterations: int,
-        per_param: bool = False,
-        even_spacing: bool = True,
-        allow_step_reduction: bool = False):
+def scale_parameters(param_dict: dict, max_total_iterations: int, per_param: bool = False, even_spacing: bool = True,
+                     allow_step_reduction: bool = False):
     """ Scale input parameter ranges to keep total combinations under a max limit.
 
     param param_dict: Dict of {param_name: {default, min, max, step, optimize, type}}
@@ -80,7 +76,6 @@ def scale_parameters(
     return result
 
 
-# --- Helper: print grid values for each parameter ---
 def print_param_grid(param):
     min_v = param["min"]
     max_v = param["max"]
@@ -102,7 +97,6 @@ def print_param_grid(param):
     print(f"    Values: {values}")
 
 
-# --- Example usage ---
 if __name__ == "__main__":
     ini_lines = {
         "InpPeriod": {"default": 9, "min": 1, "max": 50, "step": 1, "optimize": True, "type": "int"},
