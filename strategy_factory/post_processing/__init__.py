@@ -1,4 +1,4 @@
-from .extract_optimization_result import OptimizationResult, extract_optimization_result
+from .extract_optimisation_result import OptimisationResult, extract_optimisation_result
 from .result_summary import update_combined_results
 from .extract_top_parameters import extract_top_parameters
 from .copy_mt5_report import copy_mt5_report
