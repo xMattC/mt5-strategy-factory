@@ -97,7 +97,7 @@ mt5_meta_editor_exe: "C:/Program Files/YourBroker MetaTrader 5/metaeditor64.exe"
 strategy_factory_root: "C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts/mt5-strategy-factory"
 ```
 
-## MT5 Strategy Factory – Execution Guide
+# MT5 Strategy Factory – Execution Guide
 
 This guide describes the complete strategy execution flow in **MT5 Strategy Factory**, including how to use `main.py`, configure your strategy, and run the full trend-following pipeline using `run.py`.
 
