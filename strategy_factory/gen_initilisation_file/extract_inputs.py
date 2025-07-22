@@ -6,14 +6,22 @@ logger = logging.getLogger(__name__)
 
 
 def extract_inputs_from_input_yaml(yaml_path: Path, expected_key: str) -> dict:
-    """Extract and merge 'indicator_inputs' and 'logic_inputs' from a YAML indicator file.
+    """ Extract and merge 'indicator_inputs' and 'logic_inputs' from a YAML indicator file.
 
-    Parameters:
-    - yaml_path: Path to the .yaml file describing the indicator
-    - expected_key: Expected top-level key (indicator name) in the YAML
+    This function ensures the expected top-level key is present, validates structure,
+    and returns a combined dictionary of input parameters for the indicator.
 
-    Returns:
-    - Dictionary of combined input parameter definitions
+    Example YAML structure:
+        MyIndicator:
+          indicator_inputs:
+            period: {default: 14}
+          logic_inputs:
+            signal_strength: {default: 3}
+
+    param yaml_path: Path to the .yaml file describing the indicator.
+    param expected_key: Expected top-level key (indicator name) in the YAML.
+    return: Dictionary of combined input parameter definitions.
+    raises: FileNotFoundError if the file doesn't exist, ValueError if the structure is invalid.
     """
     if not yaml_path.exists():
         raise FileNotFoundError(f"YAML file not found: {yaml_path}")

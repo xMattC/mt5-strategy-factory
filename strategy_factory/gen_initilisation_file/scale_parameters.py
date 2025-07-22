@@ -3,8 +3,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def scale_parameters(param_dict: dict, max_total_iterations: int, per_param: bool = False, even_spacing: bool = True):
-    """Scale input parameter ranges to keep total combinations under a max limit.
+def scale_parameters(
+        param_dict: dict,
+        max_total_iterations: int,
+        per_param: bool = False,
+        even_spacing: bool = True,
+        allow_step_reduction: bool = False):
+    """ Scale input parameter ranges to keep total combinations under a max limit.
 
     param param_dict: Dict of {param_name: {default, min, max, step, optimize, type}}
     param max_total_iterations: Max combinations (total or per parameter, depending on per_param)
@@ -37,37 +42,28 @@ def scale_parameters(param_dict: dict, max_total_iterations: int, per_param: boo
         )
 
     if per_param:
-        # Limit each parameter's count independently
         for p in optimisable:
-
-            if p["count"] > max_total_iterations:
-                N = int(max_total_iterations)
+            if p["count"] > max_total_iterations or allow_step_reduction:
+                N = min(p["count"], int(max_total_iterations)) if not allow_step_reduction else int(
+                    max_total_iterations)
                 span = p["end"] - p["start"]
 
                 if even_spacing:
-                    # Space N values evenly between min and max
                     raw_step = span / (N - 1) if N > 1 else span
                     p["step"] = max(1, int(round(raw_step))) if p["type"] == "int" else raw_step
-
                 else:
-                    # Increase step size (multiple of original step for ints)
-                    raw_step = (span) / (N - 1) if N > 1 else span
-                    # Snap to the nearest integer for ints, keep as float for floats
+                    raw_step = span / (N - 1) if N > 1 else span
                     p["step"] = max(1, int(round(raw_step))) if p["type"] == "int" else raw_step
     else:
-        # Limit the total number of combinations (Cartesian product)
         total = reduce(mul, (p["count"] for p in optimisable), 1)
-
-        if total > max_total_iterations:
+        if total > max_total_iterations or allow_step_reduction:
             scale_factor = (total / max_total_iterations) ** (1 / len(optimisable))
-
             for p in optimisable:
-                new_count = p["count"] / scale_factor
+                new_count = p["count"] / scale_factor if scale_factor != 0 else 1
                 span = p["end"] - p["start"]
                 raw_step = span / new_count if new_count > 1 else span
                 p["step"] = max(1, int(round(raw_step))) if p["type"] == "int" else raw_step
 
-    # Build the final parameter dict with new steps
     result = []
     for name, param in param_dict.items():
         if param.get("optimize", True):

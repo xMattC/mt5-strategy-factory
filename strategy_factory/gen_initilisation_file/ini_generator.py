@@ -13,8 +13,21 @@ logger = logging.getLogger(__name__)
 
 
 def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfig, ini_files_dir: Path,
-               in_sample: bool, stage_config: StageConfig, optimized_parameters: Optional[Dict[str, str]] = None, ):
-    """Generate a .ini file for a given indicator if corresponding .yaml and .ex5 files exist."""
+               in_sample: bool, stage_config: StageConfig, optimized_parameters: Optional[Dict[str, str]] = None):
+    """ Generate a .ini file for a given indicator if the corresponding .yaml and .ex5 files exist.
+
+    This function validates that both the .yaml config and compiled .ex5 file are present,
+    loads the input settings, and writes a complete MetaTrader-compatible .ini file.
+
+    param indi_name: Name of the indicator.
+    param ea_output_dir: Directory where the .ex5 files are stored.
+    param project_config: Project configuration object.
+    param ini_files_dir: Directory where the .ini file should be saved.
+    param in_sample: True if generating for in-sample testing, else False.
+    param stage_config: Stage-specific configuration object.
+    param optimized_parameters: Optional dictionary of parameter overrides.
+    return: Path to the generated .ini file, or None if prerequisites are missing.
+    """
     paths = load_paths()
     yaml_path = paths["INDICATOR_DIR"] / stage_config.indi_dir / f"{indi_name}.yaml"
     ex5_path = ea_output_dir / f"{indi_name}.ex5"
@@ -29,19 +42,28 @@ def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfi
 
     try:
         inputs = extract_inputs_from_input_yaml(yaml_path, indi_name)
-
     except Exception as e:
         logger.warning(f"Failed to load inputs from YAML: {e}")
         return None
 
     ini_file_path = _write_ini_file(project_config, ex5_path, ini_files_dir, inputs, in_sample, stage_config, optimized_parameters)
-
     return ini_file_path
 
 
-def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: Path, inputs: dict, in_sample: bool, stage_config: StageConfig,
+def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: Path, inputs: dict,
+                    in_sample: bool, stage_config: StageConfig,
                     optimized_parameters: Optional[Dict[str, str]]) -> Path:
-    """Write a .ini file for MetaTrader 5 backtesting/optimisation."""
+    """  Write a .ini file for MetaTrader 5 backtesting/optimisation.
+
+    param project_config: Project configuration object.
+    param expert_path: Path to the compiled .ex5 file.
+    param ini_dir: Directory where the .ini file should be saved.
+    param inputs: Input parameter dictionary loaded from YAML.
+    param in_sample: True if generating for in-sample testing.
+    param stage_config: Stage-specific configuration object.
+    param optimized_parameters: Optional dictionary of parameter overrides.
+    return: Path to the written .ini file.
+    """
     cfg = configparser.ConfigParser()
     cfg.optionxform = str
 
@@ -64,9 +86,17 @@ def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: P
     return ini_file_path
 
 
-def _build_tester_section(project_config: ProjectConfig, expert_path: str, report_name: str, stage_config: StageConfig) -> dict:
-    """Construct the [Tester] section for the .ini file."""
-    opt_criterion, criteria, min_trade, max_iterations = _get_stage_config_criteria(project_config, stage_config.name)
+def _build_tester_section(project_config: ProjectConfig, expert_path: str,
+                          report_name: str, stage_config: StageConfig) -> dict:
+    """ Construct the [Tester] section for the .ini file.
+
+    param project_config: Project configuration object.
+    param expert_path: Relative path to the expert .ex5 file.
+    param report_name: Name to be used for the optimisation report.
+    param stage_config: Stage-specific configuration object.
+    return: Dictionary for the [Tester] section.
+    """
+    opt_criterion, _, _, _, _ = _get_stage_config_criteria(project_config, stage_config.name)
 
     return {
         "Expert": expert_path,
@@ -91,18 +121,19 @@ def _build_tester_section(project_config: ProjectConfig, expert_path: str, repor
 
 
 def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample: bool,
-                         optimized_parameters: Optional[Dict[str, str]], stage_config: StageConfig) -> dict:
-    """Construct the [TesterInputs] section for the .ini file.
+                         optimized_parameters: Optional[Dict[str, str]],
+                         stage_config: StageConfig) -> dict:
+    """ Construct the [TesterInputs] section for the .ini file.
 
-    param project_config: Configuration object with stage_config-specific custom_criteria dict
-    param inputs: Not used here but kept for compatibility
-    param in_sample: True if in-sample, else out-of-sample
-    param optimized_parameters: Not used here but kept for compatibility
-    param stage_config: String representing current optimisation stage_config, e.g. "C1", "Exit"
-    return: Dictionary of tester input lines for .ini
+    param project_config: Project configuration object.
+    param inputs: Dictionary of inputs loaded from YAML.
+    param in_sample: True if in-sample, else False.
+    param optimized_parameters: Optional dictionary of parameter overrides.
+    param stage_config: Stage-specific configuration object.
+    return: Dictionary for the [TesterInputs] section.
     """
-    # Get the stage_config-specific custom_criteria, fall back to 0 if not found
-    opt_criterion, criteria, min_trade, max_iterations = _get_stage_config_criteria(project_config, stage_config.name)
+    _, criteria, min_trade, max_iterations, max_per_param = _get_stage_config_criteria(project_config, stage_config.name)
+
     tester_inputs = {
         "inp_lot_mode": "2||0||0||2||N",
         "inp_lot_var": f"{project_config.risk}||2.0||0.2||20||N",
@@ -116,7 +147,7 @@ def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample:
         "inp_data_split_method": _get_split_code(project_config.data_split, in_sample),
     }
 
-    scaled_params = scale_parameters(inputs, max_total_iterations=max_iterations)
+    scaled_params = scale_parameters(inputs, max_iterations, max_per_param)
 
     for name, param in scaled_params:
         if optimized_parameters and name.lower() in optimized_parameters:
@@ -134,7 +165,12 @@ def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample:
 
 
 def _get_split_code(split_type: str, in_sample: bool) -> str:
-    """Return data split code depending on split type and test phase."""
+    """ Return data split code depending on split type and test phase.
+
+    param split_type: Either "year", "month", or other.
+    param in_sample: Whether in-sample or out-of-sample.
+    return: Encoded string for `inp_data_split_method`.
+    """
     if split_type == "year":
         split_code = "2" if in_sample else "1"
     elif split_type == "month":
@@ -146,20 +182,30 @@ def _get_split_code(split_type: str, in_sample: bool) -> str:
 
 
 def _get_stage_config_criteria(project_config, stage_config_name):
+    """ Return the optimisation criteria settings for a given stage.
+
+    param project_config: Project configuration object.
+    param stage_config_name: Name of the current optimisation stage.
+    return: Tuple (opt_criterion, custom_criterion, min_trade, max_iterations, max_iterations_per_param).
+    raises: TypeError if opt_settings is not a dict, KeyError if the stage is not found.
     """
-    Return (criteria, min_trade) tuple for the given stage_config.
-    Raises KeyError if the stage_config is not present.
-    """
-    crit = project_config.opt_settings
-    if not isinstance(crit, dict):
-        raise TypeError("custom_criteria must be a dict of CriterionSettings.")
-    try:
-        criterion = crit[stage_config_name]
-        return criterion.opt_criterion, criterion.custom_criterion, criterion.min_trade, criterion.max_iterations
-    except KeyError:
-        raise KeyError(f"custom_criteria not defined for stage_config '{stage_config_name}'")
+    opt_settings = project_config.opt_settings
+
+    if not isinstance(opt_settings, dict):
+        raise TypeError("project_config.opt_settings must be a dict of CriterionSettings.")
+
+    if stage_config_name not in opt_settings:
+        raise KeyError(f"opt_settings not defined for stage_config '{stage_config_name}'")
+
+    s = opt_settings[stage_config_name]
+    return s.opt_criterion, s.custom_criterion, s.min_trade, s.max_iterations, s.max_iterations_per_param
 
 
 def get_rel_expert_path(expert_path: Path, mt5_experts_dir: Path) -> str:
-    """Return relative path of expert from MT5 expert directory."""
+    """ Return the path of the expert file relative to the MT5 expert directory.
+
+    param expert_path: Absolute path to the .ex5 expert file.
+    param mt5_experts_dir: Root path of the MT5 Experts folder.
+    return: Relative path as a string.
+    """
     return str(expert_path.relative_to(mt5_experts_dir))
