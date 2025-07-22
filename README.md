@@ -1,3 +1,5 @@
+![Strategy Factory Banner](img.png)
+
 # Meta Strategist - MetaTrader 5 Strategy Optimization Pipeline
 
 This project is a Python-based framework for automating the strategy development lifecycle in MetaTrader 5 (MT5). It handles EA generation, compilation, configuration, batch testing, optimisation, and result evaluation — all in a structured, repeatable, and extensible way.
