@@ -17,7 +17,7 @@ def write_make_stage_yaml_script(run_dir: Path):
         return
 
     content = (
-        "from meta_strategist.utils import maker\n"
+        "from strategy_factory.utils import maker\n"
         "from pathlib import Path\n\n"
         "if __name__ == \"__main__\":\n"
         "    run_dir = Path(__file__).parent.resolve()\n"
