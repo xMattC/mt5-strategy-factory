@@ -1,0 +1,47 @@
+# Stochastic Oscillator
+stochastic:
+  custom: false
+  function: "iStochastic"
+  indicator_inputs:
+    InpKPeriod:
+      default: 5
+      type: int
+      min: 1
+      max: 200
+      step: 1
+      optimize: true
+    InpDPeriod:
+      default: 3
+      type: int
+      min: 1
+      max: 200
+      step: 1
+      optimize: true
+    InpSlowing:
+      default: 3
+      type: int
+      min: 1
+      max: 20
+      step: 1
+      optimize: false
+    InpMAType:
+      default: MODE_SMA
+      type: int
+      optimize: false
+    InpAppliedPrice:
+      default: PRICE_CLOSE
+      type: int
+      optimize: false
+  buffers:
+    - name: K
+      index: 0
+    - name: D
+      index: 1
+
+  trigger_conditions:
+    long: "K[0] > D[0] && K[1] < D[1]"
+    short: "K[0] < D[0] && K[1] > D[1]"
+
+  conf_conditions:
+    long: "K[0] > D[0]"
+    short: "K[0] < D[0]"

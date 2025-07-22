@@ -1,0 +1,29 @@
+# Triple Exponential Moving Average
+tema:
+  custom: false
+  function: "iTEMA"
+  indicator_inputs:
+    InpPeriod:
+      default: 14
+      type: int
+      min: 2
+      max: 50
+      step: 1
+      optimize: true
+    InpShift:
+      default: 0
+      type: int
+      min: 0
+      max: 10
+      step: 1
+      optimize: false
+    InpAppliedPrice:
+      default: PRICE_CLOSE
+      type: int
+      optimize: false
+  buffers:
+    - name: TEMA
+      index: 0
+  base_conditions:
+    long: "TEMA[0] > TEMA[1]"
+    short: "TEMA[0] < TEMA[1]"

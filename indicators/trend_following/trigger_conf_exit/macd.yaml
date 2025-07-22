@@ -1,0 +1,43 @@
+# Moving Averages Convergence-Divergence
+macd:
+  custom: false
+  function: "iMACD"
+  indicator_inputs:
+    InpFastEMA:
+      default: 12
+      type: int
+      min: 1
+      max: 200
+      step: 1
+      optimize: true
+    InpSlowEMA:
+      default: 26
+      type: int
+      min: 1
+      max: 300
+      step: 1
+      optimize: true
+    InpSignalSMA:
+      default: 9
+      type: int
+      min: 1
+      max: 300
+      step: 1
+      optimize: true
+    InpAppliedPrice:
+      default: PRICE_CLOSE
+      type: int
+      optimize: false
+  buffers:
+    - name: MACD
+      index: 0
+    - name: Signal
+      index: 1
+
+  trigger_conditions:
+    long: "MACD[0] > Signal[0] && MACD[1] < Signal[1]"
+    short: "MACD[0] < Signal[0] && MACD[1] > Signal[1]"
+
+  conf_conditions:
+    long: "MACD[0] > Signal[0]"
+    short: "MACD[0] < Signal[0]"
