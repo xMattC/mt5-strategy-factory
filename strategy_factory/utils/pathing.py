@@ -27,7 +27,7 @@ _private_paths = _load_private_paths()
 mt5_root = Path(_private_paths["mt5_root"])
 mt5_terminal_exe = Path(_private_paths["mt5_terminal_exe"])
 mt5_meta_editor_exe = Path(_private_paths["mt5_meta_editor_exe"])
-pro_root = Path(_private_paths["meta_strat_root"])
+pro_root = Path(_private_paths["strategy_factory_root"])
 
 
 def load_paths() -> dict:
