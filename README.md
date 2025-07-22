@@ -292,6 +292,6 @@ Outputs/
 - Integrated visual reporting dashboard
 
 ### Contributing
-Welcome contributions/ ideas of all kinds —  Feel free to fork the project and submit a pull request, or open an issue to start a discussion.
+Contributions and ideas of all kinds are welcome! Feel free to fork the project and submit a pull request, or open an issue to start a discussion.
 
-Note: Active development is currently maintained in a private repository. If you're interested in collaborating more closely, please reach out.
+Note: This repository serves as a proof of concept. Active development is maintained in a private repository. If you're interested in collaborating more closely, please don’t hesitate to reach out.
