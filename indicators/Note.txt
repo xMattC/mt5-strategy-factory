@@ -1,0 +1,3 @@
+Note: While a few example indicators are included to demonstrate structure and usage, it is the user’s
+responsibility to source additional indicators and define their corresponding YAML files in order to fully build out
+and customise their strategy.
