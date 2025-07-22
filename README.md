@@ -33,7 +33,6 @@ re-tested out-of-sample (OOS) to evaluate generalisation.
 - Quantitative developers building, testing, and refining modular strategies
 - Algo researchers evaluating signal performance across time
 - System traders seeking reproducible, automated backtesting workflows
-- Fintech teams deploying walk-forward optimisations in high-frequency environments
 
 ## Requirements
 
