@@ -10,11 +10,11 @@ mfi:
       min: 2
       max: 50
       step: 1
-      optimize: true
+      optimise: true
     InpVolumeType:
       default: VOLUME_TICK
       type: int
-      optimize: false
+      optimise: false
   buffers:
     - name: MFI
       index: 0

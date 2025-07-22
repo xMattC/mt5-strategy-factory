@@ -9,11 +9,11 @@ cci:
       min: 2
       max: 200
       step: 1
-      optimize: true
+      optimise: true
     InpAppliedPrice:
       default: PRICE_TYPICAL
       type: int
-      optimize: false
+      optimise: false
   buffers:
     - name: CCI
       index: 0

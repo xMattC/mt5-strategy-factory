@@ -9,7 +9,7 @@ adx:
       min: 1
       max: 200
       step: 1
-      optimize: true
+      optimise: true
   buffers:
     - name: PlusDI
       index: 1

@@ -7,7 +7,7 @@ accumulation_dist:
     InpVolumeType:
       default: VOLUME_TICK
       type: ENUM_APPLIED_VOLUME
-      optimize: false
+      optimise: false
   buffers:
     - name: AD
       index: 0

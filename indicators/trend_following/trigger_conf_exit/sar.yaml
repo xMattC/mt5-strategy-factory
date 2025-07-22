@@ -9,14 +9,14 @@ sar:
       min: 0.001
       max: 0.1
       step: 0.001
-      optimize: true
+      optimise: true
     InpMaximum:
       default: 0.2
       type: double
       min: 0.01
       max: 1.0
       step: 0.01
-      optimize: true
+      optimise: true
   buffers:
     - name: SAR
       index: 0

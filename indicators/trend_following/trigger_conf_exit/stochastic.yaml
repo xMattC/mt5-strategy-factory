@@ -9,29 +9,29 @@ stochastic:
       min: 1
       max: 200
       step: 1
-      optimize: true
+      optimise: true
     InpDPeriod:
       default: 3
       type: int
       min: 1
       max: 200
       step: 1
-      optimize: true
+      optimise: true
     InpSlowing:
       default: 3
       type: int
       min: 1
       max: 20
       step: 1
-      optimize: false
+      optimise: false
     InpMAType:
       default: MODE_SMA
       type: int
-      optimize: false
+      optimise: false
     InpAppliedPrice:
       default: PRICE_CLOSE
       type: int
-      optimize: false
+      optimise: false
   buffers:
     - name: K
       index: 0
