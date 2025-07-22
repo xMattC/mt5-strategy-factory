@@ -24,7 +24,7 @@ def run_ea(ini_file: Path):
         return
 
     if is_mt5_running(mt5_terminal):
-        logger.error("MetaTrader 5 terminal is already running! Please close it before running automation.")
+        logger.error("MetaTrader 5 terminal is already running! Please close it before starting the automated pipeline.")
         sys.exit(1)  # Exit with error code
 
     try:
@@ -39,7 +39,8 @@ def run_ea(ini_file: Path):
 
 
 def is_mt5_running(mt5_path: str) -> bool:
-    """Return True if a MetaTrader 5 terminal is running matching the given executable path."""
+    """Return True if a MetaTrader 5 terminal is running and matches the given executable path.
+    """
     for proc in psutil.process_iter(['pid', 'name', 'exe']):
         try:
             if proc.info['exe'] and Path(proc.info['exe']) == Path(mt5_path):

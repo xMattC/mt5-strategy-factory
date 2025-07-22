@@ -60,13 +60,11 @@ def extract_minimal_defaults(indicator_yaml: Path) -> tuple[str, dict]:
 def extract_indicator_optimised_results(run_dir: Path, stage, indicator: str):
     """ Extract the optimised result row for a specific indicator from the combined results CSV.
 
-    Parameters:
-    - run_dir : Path to the run directory.
-    - stage : StageConfig object with a .name attribute (e.g., 'confirmation').
-    - indicator : Name of the indicator (e.g., 'macd').
+    param run_dir : Path to the run directory.
+    param stage : StageConfig object with a .name attribute (e.g., 'confirmation').
+    param indicator : Name of the indicator (e.g., 'macd').
 
-    Returns:
-    - dict of result values for the indicator, or None if not found.
+    return: dict of result values for the indicator, or None if not found.
     """
     results_file = run_dir / str(stage.name) / "results" / f"{indicator}_IS.csv"
 

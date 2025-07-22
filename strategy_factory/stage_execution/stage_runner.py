@@ -117,7 +117,7 @@ class StageRunner:
         param indi_name: Base name of the EA/indicator
         return: OptimisationResult object or None if failed
         """
-        logger.info(f"=== Starting in-sample optimisation for: {indi_name} ===")
+        logger.info(f"============== Starting in-sample optimisation for: {indi_name}   ==============")
 
         ini_path = create_ini(
             indi_name=indi_name,
@@ -156,6 +156,8 @@ class StageRunner:
         param indi_name: Base name of the EA/indicator
         param optimisation_result: OptimisationResult from IS phase
         """
+        logger.info(f"============== Starting out-of-sample Backtest for: {indi_name}  ==============")
+
         ini_path = create_ini(indi_name=indi_name, ea_output_dir=self.ea_output_dir, project_config=self.project_config,
                               ini_files_dir=self.ini_dir, in_sample=False, stage_config=self.stage_config,
                               optimised_params=optimisation_result.parameters)

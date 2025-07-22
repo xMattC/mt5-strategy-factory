@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class OptSettings:
-    """Settings for a single custom criterion."""
     opt_criterion: int
     custom_criterion: int
     min_trade: int
@@ -44,8 +43,7 @@ class ProjectConfig:
 
 
 def load_config_from_yaml(config_path: Path) -> ProjectConfig:
-    """
-    Load a YAML config file and return a Config dataclass instance. Loads whitelist from a separate file specified in
+    """ Load a YAML config file and return a Config dataclass instance. Loads whitelist from a separate file specified in
     config, or sets to [Symbol()] if whitelist_file is 'CHART_SYMBOL_ONLY'.
 
     Exits with an error if the whitelist file does not exist,
@@ -98,17 +96,9 @@ def check_and_validate_config(config: ProjectConfig):
         exit(1)
 
 
-# TODO update validate config
+# TODO update to a more comprehensive validation.
 def validate_config(config: dict):
     """ Validate the structure and values of the run configuration.
-
-    param config: Dict form of the configuration (e.g., asdict(Config))
-    raises: ValueError if any validation fails
-
-    Checks for:
-        - All required fields present
-        - Date format correctness
-        - Numeric and enum field correctness
     """
 
     # List all keys that must be present for the config to be valid
@@ -154,16 +144,5 @@ def validate_config(config: dict):
         raise ValueError(
             "data_split must be one of: none, year, month"
         )
-
-    # --- Custom criteria (optional): Check dict or int, and allowed values if desired ---
-    # Accept either an int or a dict of ints for custom_criteria
-    # custom_criteria = config["custom_criteria"]
-    # if isinstance(custom_criteria, dict):
-    #     for stage, val in custom_criteria.items():
-    #         if not isinstance(val, int):
-    #             raise ValueError(f"custom_criteria for stage '{stage}' must be an integer (got {val})")
-    # else:
-    #     if not isinstance(custom_criteria, int):
-    #         raise ValueError(f"custom_criteria must be an integer (got {custom_criteria})")
 
     logger.info("Configuration validated successfully.")
