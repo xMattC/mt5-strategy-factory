@@ -40,6 +40,7 @@ def extract_inputs_from_input_yaml(yaml_path: Path, expected_key: str) -> dict:
 
     if not isinstance(indicator_inputs, dict):
         raise ValueError(f"'indicator_inputs' in {yaml_path.name} must be a dictionary")
+
     if not isinstance(logic_inputs, dict):
         raise ValueError(f"'logic_inputs' in {yaml_path.name} must be a dictionary")
 
