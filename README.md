@@ -292,8 +292,5 @@ Outputs/
 - Integrated visual reporting dashboard
 
 ### Contributing
-Welcome contributions of all kinds — from new pipeline architectures and indicator modules to enhancements in the YAML 
-configuration or templating system.  Feel free to fork the project and submit a pull request, or open an issue to start a discussion.
-
-Note: Active development is currently maintained in a private repository.
-If you're interested in collaborating more closely, please reach out.
+Welcome contributions/ ideas of all kinds —  Feel free to fork the project and submit a pull request, or open an issue to start a discussion.
+Note: Active development is currently maintained in a private repository. If you're interested in collaborating more closely, please reach out.
