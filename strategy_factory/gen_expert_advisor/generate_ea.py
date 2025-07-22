@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 class GenerateEA:
     def __init__(self, project_config: ProjectConfig, stage_config: StageConfig, ea_output_dir: Path):
-        """
-        Initialise the EA generator for a given project and stage configuration.
+        """ Initialise the EA generator for a given project and stage configuration.
 
         param project_config: Project-level configuration object.
         param stage_config: Stage-specific configuration object.
@@ -26,8 +25,7 @@ class GenerateEA:
         self.ea_output_dir.mkdir(parents=True, exist_ok=True)
 
     def generate_all(self) -> None:
-        """
-        Generate and compile EAs for all indicator YAML files in the stage's indicator directory.
+        """ Generate and compile EAs for all indicator YAML files in the stage's indicator directory.
 
         This method scans the indicator directory defined in the stage configuration and processes
         each `.yaml` file it finds.
@@ -43,8 +41,7 @@ class GenerateEA:
             self.generate_one(yaml_file)
 
     def generate_one(self, yaml_path: Path) -> None:
-        """
-        Generate and compile an EA for a single YAML configuration file.
+        """ Generate and compile an EA for a single YAML configuration file.
 
         This function checks the existence of the input YAML file, generates an MQ5 file,
         and attempts to compile it into an EX5 file. If any stage fails, it logs an error

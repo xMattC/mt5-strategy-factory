@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfig, ini_files_dir: Path,
                in_sample: bool, stage_config: StageConfig, optimised_params: Optional[Dict[str, str]] = None):
-    """
-    Generate a .ini file for a given indicator if the corresponding .yaml and .ex5 files exist.
+    """ Generate a .ini file for a given indicator if the corresponding .yaml and .ex5 files exist.
 
     param indi_name: Name of the indicator.
     param ea_output_dir: Directory where the .ex5 files are stored.
@@ -51,8 +50,7 @@ def create_ini(indi_name: str, ea_output_dir: Path, project_config: ProjectConfi
 def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: Path, inputs: dict,
                     in_sample: bool, stage_config: StageConfig,
                     optimised_params: Optional[Dict[str, str]]) -> Path:
-    """
-    Write a .ini file for MetaTrader 5 backtesting/optimisation.
+    """ Write a .ini file for MetaTrader 5 backtesting/optimisation.
 
     param project_config: Project configuration object.
     param expert_path: Path to the compiled .ex5 file.
@@ -87,8 +85,7 @@ def _write_ini_file(project_config: ProjectConfig, expert_path: Path, ini_dir: P
 
 def _build_tester_section(project_config: ProjectConfig, expert_path: str,
                           report_name: str, stage_config: StageConfig) -> dict:
-    """
-    Construct the [Tester] section for the .ini file.
+    """ Construct the [Tester] section for the .ini file.
 
     param project_config: Project configuration object.
     param expert_path: Relative path to the expert .ex5 file.
@@ -123,8 +120,7 @@ def _build_tester_section(project_config: ProjectConfig, expert_path: str,
 def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample: bool,
                          optimised_params: Optional[Dict[str, str]],
                          stage_config: StageConfig) -> dict:
-    """
-    Construct the [TesterInputs] section for the .ini file.
+    """ Construct the [TesterInputs] section for the .ini file.
 
     Combines static inputs (e.g., SL/TP, risk, criteria) and dynamic strategy parameters,
     including parameter scaling and optional override handling.
@@ -188,8 +184,7 @@ def _build_tester_inputs(project_config: ProjectConfig, inputs: dict, in_sample:
 
 
 def _get_split_code(split_type: str, in_sample: bool) -> str:
-    """
-    Return encoded string for inp_data_split_method.
+    """ Return encoded string for inp_data_split_method.
 
     param split_type: 'year', 'month', or 'none'.
     param in_sample: Whether the run is in-sample or OOS.
@@ -206,8 +201,7 @@ def _get_split_code(split_type: str, in_sample: bool) -> str:
 
 
 def _get_stage_config_criteria(project_config, stage_config_name):
-    """
-    Get optimisation config values for a given stage.
+    """ Get optimisation config values for a given stage.
 
     param project_config: Project config with .opt_settings.
     param stage_config_name: Name of current optimisation stage.
@@ -226,8 +220,7 @@ def _get_stage_config_criteria(project_config, stage_config_name):
 
 
 def get_rel_expert_path(expert_path: Path, mt5_experts_dir: Path) -> str:
-    """
-    Return expert path relative to MT5 Expert directory.
+    """ Return expert path relative to MT5 Expert directory.
 
     param expert_path: Full .ex5 path.
     param mt5_experts_dir: Root folder for MT5 Experts.
