@@ -1,5 +1,0 @@
-Indicator,InpPeriod,InpFastEMA,InpSlowEMA,InpSignalSMA
-rsi,200.0,,,
-cci,200.0,,,
-macd,,1.0,76.0,61.0
-adx,200.0,,,

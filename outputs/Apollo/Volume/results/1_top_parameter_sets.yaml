@@ -1,8 +1,0 @@
-mfi:
-  InpPeriod: 49.0
-obv:
-  inp_force_opt: 2.0
-force:
-  InpPeriod: 181.0
-accumulation_dist:
-  inp_force_opt: 2.0
