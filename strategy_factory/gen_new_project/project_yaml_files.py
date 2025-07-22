@@ -7,8 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def write_make_stage_yaml_script(run_dir: Path):
-    """
-    Drop a default make_stage_yaml.py script into run_dir.
+    """ Drop a default make_stage_yaml.py script into run_dir.
     Do nothing if file already exists.
     """
     script_path = run_dir / "make_stage_yaml.py"
@@ -31,8 +30,7 @@ def write_make_stage_yaml_script(run_dir: Path):
 
 
 def write_whitelist_yaml(project_dir: Path, symbols=None, overwrite=False):
-    """
-    Create a whitelist.yaml file in the specified project directory.
+    """ Create a whitelist.yaml file in the specified project directory.
 
     param project_dir: Path to the project directory where whitelist.yaml will be created
     param symbols: List of symbols to include in the whitelist. Defaults to a sample list if None.
