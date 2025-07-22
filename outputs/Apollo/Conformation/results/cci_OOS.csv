@@ -1,0 +1,3 @@
+Pass,Result,Profit,Expected Payoff,Profit Factor,Recovery Factor,Sharpe Ratio,Custom,Equity DD %,Trades,inp_force_opt
+1,60.42,-5620.08,-29.271250,0.963288,-0.184920,-0.181403,60.416666666666664,27.0128,192,2
+0,60.42,-5620.08,-29.271250,0.963288,-0.184920,-0.181403,60.416666666666664,27.0128,192,1

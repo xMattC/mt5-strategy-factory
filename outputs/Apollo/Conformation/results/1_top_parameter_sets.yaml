@@ -1,0 +1,10 @@
+rsi:
+  InpPeriod: 200.0
+cci:
+  InpPeriod: 200.0
+macd:
+  InpFastEMA: 1.0
+  InpSlowEMA: 76.0
+  InpSignalSMA: 61.0
+adx:
+  InpPeriod: 200.0

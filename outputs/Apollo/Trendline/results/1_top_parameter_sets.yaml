@@ -1,0 +1,6 @@
+lwma:
+  InpPeriod: 283.0
+sma:
+  InpPeriod: 285.0
+ema:
+  InpPeriod: 282.0
