@@ -1,6 +1,6 @@
 # MT5 Strategy Factory
  
-![Strategy Factory Banner](docs/imgage.png)
+![Strategy Factory Banner](docs/image.png)
 
 **MetaTrader 5 (MT5)** is a multi-asset trading platform widely used for developing and executing automated trading 
 strategies. [Learn more](https://www.metatrader5.com/en)
