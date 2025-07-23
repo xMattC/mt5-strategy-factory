@@ -6,7 +6,7 @@
 strategies. [Learn more](https://www.metatrader5.com/en)
 
 **MT5 Strategy Factory** is a production-grade quality Python framework for automating the complete lifecycle of 
-strategy development in MetaTrader 5 (MT5). It enables modular strategy construction, batch optimisation, and performance 
+strategy development in MT5. It enables modular strategy construction, batch optimisation, and performance 
 evaluation — all driven by YAML indicator files and executed through a highly customisable, stage-based pipeline.
 
 Whether you're a quantitative trader, algo developer, or strategy engineer, this framework lets you rapidly prototype, 
