@@ -28,7 +28,7 @@ The currently implemented system is a **trend-following pipeline** that:
 Each stage is independently scored using your chosen metric (e.g., Profit Factor), tested in-sample (IS), and then 
 re-tested out-of-sample (OOS) to evaluate generalisation.
 
-More details on the implemented trend-following system can be found here: [Trendfollowin - System](https://github.com/xMattC/mt5-strategy-factory/blob/main/docs/Trendfollowing%20-%20%20system%20concept.md)
+More details on the implemented trend-following system can be found here: [Trendfollowing - System](https://github.com/xMattC/mt5-strategy-factory/blob/main/docs/Trendfollowing%20-%20%20system%20concept.md)
 
 ## Use Cases
 
