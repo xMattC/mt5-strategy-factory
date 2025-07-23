@@ -7,10 +7,9 @@ strategies. [Learn more](https://www.metatrader5.com/en)
 
 ## Overview
 
-**MT5 Strategy Factory** is a modular framework for building full-featured Expert Advisors (EAs) from configurable trading logic components.  
-It enables systematic strategy development by combining automation, indicator modularity, and robust evaluation tools.  
-The framework compiles EAs directly via **MetaEditor** and executes large-scale batch optimisations using the **MetaTrader 5 
-Strategy Tester CLI**, streamlining the entire research and development workflow.
+**MT5 Strategy Factory** is a modular framework for building full-featured Expert Advisors (EAs) from configurable trading logic components. It enables systematic 
+strategy development by combining automation, indicator modularity, and robust evaluation tools. The framework compiles EAs directly via **MetaEditor** and executes 
+large-scale batch optimisations using the **MetaTrader 5 Strategy Tester CLI**, streamlining the entire research and development workflow.
 
 Whether you're a quantitative trader, algorithmic developer, or strategy engineer, this framework enables you to rapidly prototype,  
 test, and refine trading strategies in a structured, repeatable, and scalable way.
