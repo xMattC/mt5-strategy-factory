@@ -11,12 +11,11 @@ strategies. [Learn more](https://www.metatrader5.com/en)
 strategy development by combining automation, indicator modularity, and robust evaluation tools. The framework compiles EAs directly via **MetaEditor** and executes 
 large-scale batch optimisations using the **MetaTrader 5 Strategy Tester CLI**, streamlining the entire research and development workflow.
 
-Whether you're a quantitative trader, algorithmic developer, or strategy engineer, this framework enables you to rapidly prototype,  
-test, and refine trading strategies in a structured, repeatable, and scalable way.
+Whether you're a quantitative trader, algorithmic developer, or strategy engineer, this framework enables you to rapidly prototype, test, and refine trading strategies in a structured, repeatable, and scalable way.
 
-The system is built around the concept of **strategy pipelines** — multi-stage processes that assemble, optimise, and validate EAs from modular parts. The currently 
-implemented pipeline is a **trend-following system**, but the architecture is fully extensible: advanced users can define and implement **custom pipelines** 
-tailored to other trading styles, such as mean reversion, breakout, or scalping strategies.
+The system is built around the concept of **strategy pipelines** — multi-stage processes that assemble, optimise, and validate EAs from modular parts. The currently
+implemented pipeline is a **trend-following system**, but the architecture is fully extensible: advanced users can define and implement **custom pipelines** tailored 
+to other trading styles, such as mean reversion, breakout, or scalping strategies.
 
 This flexibility makes MT5 Strategy Factory a robust foundation for automated trading research, development, and deployment across a wide range of market hypotheses.
 
