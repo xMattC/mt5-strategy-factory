@@ -34,8 +34,9 @@ Iteratively optimises Volume filters, using the best-performing combinations fro
 **Exit** Stage:
 Finally, evaluates and optimises Exit rules, completing the system with all previously selected components.
 
-Each stage is independently scored using your chosen metric (e.g., Profit Factor), tested in-sample (IS), and then 
-re-tested out-of-sample (OOS) to evaluate generalisation.
+Each stage is independently scored using a user-defined performance metric (e.g., Profit Factor). Indicators are first optimised on in-sample (IS) data, 
+then re-tested on out-of-sample (OOS) data to detect and avoid curve fitting. Users should prioritise indicators that demonstrate consistent OOS 
+performance — strong in-sample results alone often indicate curve-fitted behaviour, which undermines reliable algorithmic development.
 
 More details on the implemented trend-following system can be found here: [Trendfollowing - System](https://github.com/xMattC/mt5-strategy-factory/blob/main/docs/Trendfollowing%20-%20%20system%20concept.md)
 
