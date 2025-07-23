@@ -23,22 +23,22 @@ This flexibility makes MT5 Strategy Factory a robust foundation for automated tr
 
 The currently implemented system follows a **trend-following architecture**, structured as a multi-stage pipeline. At each stage, a specific category of indicators is evaluated and optimised. These stages build upon one another to form a cohesive, high-performance trading system:
 
-### Trigger Stage
+#### Trigger Stage
 This initial stage focuses on identifying the core signal generator of the strategy — the **Trigger**. A pool of candidate indicators is tested and optimised individually, using in-sample (IS) data. The goal is to isolate indicators capable of consistently generating entry signals under the defined market conditions.
 
-### Confirmation Stage
+#### Confirmation Stage
 Once a Trigger has been selected, the **Confirmation** stage evaluates indicators that filter or validate the Trigger signals. These indicators are tested in combination with the chosen Trigger to ensure complementary behaviour. Only those that improve robustness and reduce false signals are advanced.
 
-### Trendline Stage
+#### Trendline Stage
 Here, the pipeline evaluates **Trendline**-based filters or conditions, which aim to confirm broader market structure. These are optimised in conjunction with both the Trigger and Confirmation indicators, assessing their contribution to overall strategy alignment with trending conditions.
 
-### Volume Stage
+#### Volume Stage
 Volume filters are introduced to avoid poor-quality signals during low-liquidity periods or to emphasise signals occurring during significant market participation. This stage uses the cumulative logic from previous phases and tests **Volume** indicators for added precision and robustness.
 
-### Exit Stage
+#### Exit Stage
 The final stage determines how trades are exited. This includes evaluating and optimising **Exit** logic such as fixed stops, trailing stops, ATR-based exits, or indicator-driven closures. Exit rules are tested in the context of the entire trading stack built up in the previous stages.
 
-### Decision Points and Evaluation
+#### Decision Points and Evaluation
 
 After **each stage**, the user is responsible for reviewing performance metrics and selecting which indicator (or configuration) to carry forward. 
 This allows for human oversight and strategic decision-making between stages, ensuring only the most promising components are retained.
@@ -57,7 +57,7 @@ effective in-sample but fail in real-world conditions.
 Indicators that fail to show consistent OOS performance are discarded, regardless of their in-sample results. This ensures that the resulting system 
 is not only optimised, but also resilient and deployable in live trading conditions.
 
-### Final Outcome
+#### Final Outcome
 
 The end result is a fully constructed, tested, and deployable Expert Advisor — built from individually selected, data-validated 
 components — with minimal manual intervention and a strong emphasis on generalisation and robustness.
