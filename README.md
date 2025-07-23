@@ -14,16 +14,25 @@ test, and refine trading strategies in a structured, repeatable, and scalable wa
 
 ## What It Does
 
-MT5 Strategy Factory assembles full Expert Advisors (EAs) from modular indicator definitions using YAML, compiles them 
-via MetaEditor, and batch-tests them using MT5’s Strategy Tester CLI.
+MT5 Strategy Factory builds complete Expert Advisors (EAs) from modular indicator components. It automates EA compilation via MetaEditor 
+and runs batch optimisations using the MetaTrader 5 Strategy Tester CLI.
 
-The currently implemented system is a **trend-following pipeline** that:
+The currently implemented system is a trend-following pipeline that progressively builds and optimises an Expert Advisor (EA) through the following stages:
 
-1. Optimises all indicators for the **Trigger**
-2. Then builds and evaluates the **Confirmation**
-3. Adds a **Trendline structure** filter
-4. Then applies a **Volume condition**
-5. Finally integrates and tests the **Exit logic**
+**Trigger** Stage
+Optimises a pool of indicators to select the most effective Trigger.
+
+**Confirmation** Stage
+Incorporates the optimised Trigger into the EA, then optimises and evaluates Confirmation indicators in combination.
+
+**Trendline** Stage
+Optimises Trendline indicators alongside the previously selected Trigger and Confirmation indicators.
+
+**Volume** Stage
+Iteratively optimises Volume filters, using the best-performing combinations from prior stages.
+
+**Exit** Stage
+Finally, evaluates and optimises Exit rules, completing the system with all previously selected components.
 
 Each stage is independently scored using your chosen metric (e.g., Profit Factor), tested in-sample (IS), and then 
 re-tested out-of-sample (OOS) to evaluate generalisation.
@@ -124,8 +133,6 @@ strategy_factory_root: "C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YO
 # MT5 Strategy Factory – Execution Guide
 
 This guide describes the complete strategy execution flow in **MT5 Strategy Factory**, including how to use `main.py`, configure your strategy, and run the full trend-following pipeline using `run.py`.
-
-
 
 The MT5 Strategy Factory is designed to run via a single entry point: `main.py`. This script bootstraps your strategy project, scaffolds the required files, and prepares everything needed to begin optimisation.
 
