@@ -5,38 +5,66 @@
 **MetaTrader 5 (MT5)** is a multi-asset trading platform widely used for developing and executing automated trading 
 strategies. [Learn more](https://www.metatrader5.com/en)
 
-**MT5 Strategy Factory** is a production-grade quality Python framework for automating the complete lifecycle of 
-strategy development in MT5. It enables modular strategy construction, batch optimisation, and performance 
-evaluation — all driven by YAML indicator files and executed through a highly customisable, stage-based pipeline.
+## Overview
 
-Whether you're a quantitative trader, algo developer, or strategy engineer, this framework lets you rapidly prototype, 
+**MT5 Strategy Factory** is a modular framework for building full-featured Expert Advisors (EAs) from configurable trading logic components.  
+It enables systematic strategy development by combining automation, indicator modularity, and robust evaluation tools.  
+The framework compiles EAs directly via **MetaEditor** and executes large-scale batch optimisations using the **MetaTrader 5 Strategy Tester CLI**,  
+streamlining the entire research and development workflow.
+
+Whether you're a quantitative trader, algorithmic developer, or strategy engineer, this framework enables you to rapidly prototype,  
 test, and refine trading strategies in a structured, repeatable, and scalable way.
 
-## What It Does
+The system is built around the concept of **strategy pipelines** — multi-stage processes that assemble, optimise, and validate EAs from modular parts.  
+The currently implemented pipeline is a **trend-following system**, but the architecture is fully extensible:  
+advanced users can define and implement **custom pipelines** tailored to other trading styles, such as mean reversion, breakout, or scalping strategies.
 
-MT5 Strategy Factory builds complete Expert Advisors (EAs) from modular indicator components. It automates EA compilation via MetaEditor 
-and runs batch optimisations using the MetaTrader 5 Strategy Tester CLI.
+This flexibility makes MT5 Strategy Factory a robust foundation for automated trading research, development, and deployment across a wide range of market hypotheses.
 
-The currently implemented system is a trend-following pipeline that progressively builds and optimises an Expert Advisor (EA) through the following stages:
+## Trend-Following Pipeline
 
-**Trigger** Stage:
-Optimises a pool of indicators to select the most effective Trigger.
+The currently implemented system follows a **trend-following architecture**, structured as a multi-stage pipeline. At each stage, a specific category of indicators is evaluated and optimised. These stages build upon one another to form a cohesive, high-performance trading system:
 
-**Confirmation** Stage:
-Incorporates the optimised Trigger into the EA, then optimises and evaluates Confirmation indicators in combination.
+### Trigger Stage
+This initial stage focuses on identifying the core signal generator of the strategy — the **Trigger**. A pool of candidate indicators is tested and optimised individually, using in-sample (IS) data. The goal is to isolate indicators capable of consistently generating entry signals under the defined market conditions.
 
-**Trendline** Stage:
-Optimises Trendline indicators alongside the previously selected Trigger and Confirmation indicators.
+### Confirmation Stage
+Once a Trigger has been selected, the **Confirmation** stage evaluates indicators that filter or validate the Trigger signals. These indicators are tested in combination with the chosen Trigger to ensure complementary behaviour. Only those that improve robustness and reduce false signals are advanced.
 
-**Volume** Stage:
-Iteratively optimises Volume filters, using the best-performing combinations from prior stages.
+### Trendline Stage
+Here, the pipeline evaluates **Trendline**-based filters or conditions, which aim to confirm broader market structure. These are optimised in conjunction with both the Trigger and Confirmation indicators, assessing their contribution to overall strategy alignment with trending conditions.
 
-**Exit** Stage:
-Finally, evaluates and optimises Exit rules, completing the system with all previously selected components.
+### Volume Stage
+Volume filters are introduced to avoid poor-quality signals during low-liquidity periods or to emphasise signals occurring during significant market participation. This stage uses the cumulative logic from previous phases and tests **Volume** indicators for added precision and robustness.
 
-Each stage is independently scored using a user-defined performance metric (e.g., Profit Factor). Indicators are first optimised on in-sample (IS) data, 
-then re-tested on out-of-sample (OOS) data to detect and avoid curve fitting. Users should prioritise indicators that demonstrate consistent OOS 
-performance — strong in-sample results alone often indicate curve-fitted behaviour, which undermines reliable algorithmic development.
+### Exit Stage
+The final stage determines how trades are exited. This includes evaluating and optimising **Exit** logic such as fixed stops, trailing stops, ATR-based exits, or indicator-driven closures. Exit rules are tested in the context of the entire trading stack built up in the previous stages.
+
+### Decision Points and Evaluation
+
+After **each stage**, the user is responsible for reviewing performance metrics and selecting which indicator (or configuration) to carry forward. 
+This allows for human oversight and strategic decision-making between stages, ensuring only the most promising components are retained.
+
+Each stage is scored independently using a **user-defined performance metric**, such as:
+
+- Profit Factor  
+- Sharpe Ratio  
+- Expected Payoff  
+- Custom-defined scoring functions
+
+Optimisations are performed on **in-sample (IS)** data to tune parameters, followed by **out-of-sample (OOS)** testing to validate generalisability. 
+This two-phase process is critical for detecting and avoiding **curve fitting** — a common pitfall in algorithmic development where strategies appear 
+effective in-sample but fail in real-world conditions.
+
+Indicators that fail to show consistent OOS performance are discarded, regardless of their in-sample results. This ensures that the resulting system 
+is not only optimised, but also resilient and deployable in live trading conditions.
+
+---
+
+### Final Outcome
+
+The end result is a fully constructed, tested, and deployable Expert Advisor — built from individually selected, data-validated 
+components — with minimal manual intervention and a strong emphasis on generalisation and robustness.
 
 More details on the implemented trend-following system can be found here: [Trendfollowing - System](https://github.com/xMattC/mt5-strategy-factory/blob/main/docs/Trendfollowing%20-%20%20system%20concept.md)
 
