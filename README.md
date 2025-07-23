@@ -19,19 +19,19 @@ and runs batch optimisations using the MetaTrader 5 Strategy Tester CLI.
 
 The currently implemented system is a trend-following pipeline that progressively builds and optimises an Expert Advisor (EA) through the following stages:
 
-**Trigger** Stage
+**Trigger** Stage:
 Optimises a pool of indicators to select the most effective Trigger.
 
-**Confirmation** Stage
+**Confirmation** Stage:
 Incorporates the optimised Trigger into the EA, then optimises and evaluates Confirmation indicators in combination.
 
-**Trendline** Stage
+**Trendline** Stage:
 Optimises Trendline indicators alongside the previously selected Trigger and Confirmation indicators.
 
-**Volume** Stage
+**Volume** Stage:
 Iteratively optimises Volume filters, using the best-performing combinations from prior stages.
 
-**Exit** Stage
+**Exit** Stage:
 Finally, evaluates and optimises Exit rules, completing the system with all previously selected components.
 
 Each stage is independently scored using your chosen metric (e.g., Profit Factor), tested in-sample (IS), and then 
