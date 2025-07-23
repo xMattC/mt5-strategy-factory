@@ -59,8 +59,6 @@ effective in-sample but fail in real-world conditions.
 Indicators that fail to show consistent OOS performance are discarded, regardless of their in-sample results. This ensures that the resulting system 
 is not only optimised, but also resilient and deployable in live trading conditions.
 
----
-
 ### Final Outcome
 
 The end result is a fully constructed, tested, and deployable Expert Advisor — built from individually selected, data-validated 
