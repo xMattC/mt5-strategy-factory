@@ -120,7 +120,7 @@ python -m venv .env
 
 Activate the virtual environment:
 
-- On Windows (MT5 is windows only!):
+- On Windows (MT5 is Windows only):
   ```bash
   .env\Scripts\activate
   ```
