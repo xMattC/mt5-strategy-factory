@@ -120,13 +120,9 @@ python -m venv .env
 
 Activate the virtual environment:
 
-- On Windows:
+- On Windows (MT5 is windows only!):
   ```bash
   .env\Scripts\activate
-  ```
-- On macOS/Linux:
-  ```bash
-  source .env/bin/activate
   ```
 
 #### Step 3: Install Dependencies
