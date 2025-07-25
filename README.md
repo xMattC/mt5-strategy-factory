@@ -76,32 +76,14 @@ More details on the implemented trend-following system can be found here: [Trend
 - MetaTrader 5 (installed and licensed locally)
 - Access to your MT5 `Experts/` folder
 
-
-## Aditional Dependency: MyLibs MQL5 Utility Library
-
-This strategy framework depends on a companion MQL5 utility library containing reusable classes for:
-
-- Trade execution and management
-- Risk control and position sizing
-- Signal state tracking and indicator handling
-- Time-based filters and session controls
-
-To use this framework successfully, you **must install the `MyLibs` library** into your MetaTrader 5 terminal.
-
-
-1. Download or clone the required library:
-   ( [mt5-quant-lib](https://github.com/xMattC/mt5-quant-lib) )
-
-2. Place the `MyLibs` folder in your MetaTrader 5 `Include/` directory:
-
-```plaintext
-C:/Users/<YourUsername>/AppData/Roaming/MetaQuotes/Terminal/<YourInstanceID>/MQL5/Include/MyLibs/
-```
-
-
 ## MT5 Strategy Factory Installation
 
 #### Step 1: Clone the Repository
+Make sure to clone this repo directly into your MT5 Experts folder:
+
+```
+C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts
+```
 
 Clone the repository to your local machine:
 
@@ -133,10 +115,25 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
-Make sure to clone this repo directly into your MT5 Experts folder:
+## Aditional Dependency: MyLibs MQL5 Utility Library
 
-```
-C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts
+This strategy framework depends on a companion MQL5 utility library containing reusable classes for:
+
+- Trade execution and management
+- Risk control and position sizing
+- Signal state tracking and indicator handling
+- Time-based filters and session controls
+
+To use this framework successfully, you **must install the `MyLibs` library** into your MetaTrader 5 terminal.
+
+
+1. Download or clone the required library:
+   ( [mt5-quant-lib](https://github.com/xMattC/mt5-quant-lib) )
+
+2. Place the `MyLibs` folder in your MetaTrader 5 `Include/` directory:
+
+```plaintext
+C:/Users/<YourUsername>/AppData/Roaming/MetaQuotes/Terminal/<YourInstanceID>/MQL5/Include/MyLibs/
 ```
 
 ## Configuration
