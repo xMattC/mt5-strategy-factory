@@ -57,10 +57,12 @@ This trading system is a fully rule-based, algorithmic approach to trend-followi
 **Logic:** Closes the trade if a trend reversal or exhaustion is signalled.
 
 **Examples:**
-- ATR Trailing Stop
-- QQE
-- Opposite Trigger signal
-
+- Opposite Trigger signals eg:
+- SSL Channel
+- CCI
+- DMI/ADX Cross
+- MACD Histogram
+- Custom oscillators
 ---
 
 ## Entry Conditions
