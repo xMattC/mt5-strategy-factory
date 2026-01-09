@@ -1,8 +1,8 @@
-# 📄 MQL5 Syntax Cheat Sheet
+# MQL5 Syntax Cheat Sheet
 
 ---
 
-## 🔧 Operators
+## Operators
 
 | Operator | Meaning                      | Example                      |
 |----------|------------------------------|------------------------------|
@@ -24,7 +24,7 @@
 
 ---
 
-## 🔁 Control Structures
+## Control Structures
 
 ### If / Else
 ```mql5
@@ -60,7 +60,7 @@ switch (x) {
 
 ---
 
-## 🧩 Data Types
+## Data Types
 
 | Type       | Description              | Example                      |
 |------------|--------------------------|------------------------------|
@@ -73,7 +73,7 @@ switch (x) {
 
 ---
 
-## 📈 Price and Indicator Functions
+## Price and Indicator Functions
 
 | Function                      | Description                       |
 |-------------------------------|------------------------------------|
@@ -86,7 +86,7 @@ switch (x) {
 
 ---
 
-## 🧰 Utility Functions
+## Utility Functions
 
 | Function                     | Purpose                             |
 |------------------------------|--------------------------------------|
@@ -97,7 +97,7 @@ switch (x) {
 
 ---
 
-## 📦 Arrays
+## Arrays
 
 | Function           | Description                     |
 |--------------------|---------------------------------|
@@ -107,7 +107,7 @@ switch (x) {
 
 ---
 
-## 🎨 Colors
+## Colors
 
 | Color Constant     | Example            |
 |--------------------|--------------------|
@@ -118,7 +118,7 @@ switch (x) {
 
 ---
 
-## 🔄 Order Constants
+## Order Constants
 
 | Constant    | Meaning           |
 |-------------|-------------------|
@@ -129,7 +129,7 @@ switch (x) {
 
 ---
 
-## ✅ Example: MA Cross Strategy
+## Example: MA Cross Strategy
 
 ```mql5
 double ma = iMA(_Symbol, PERIOD_CURRENT, 14, 0, MODE_SMA, PRICE_CLOSE, 1);
