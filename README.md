@@ -242,7 +242,6 @@ pip install -r requirements.txt
 | [execution-guide.md](docs/execution-guide.md) | End-to-end execution workflow and project lifecycle |
 | [mt5-integration.md](docs/mt5-integration.md) | MT5 integration layer, INI generation, and CLI automation |
 | [pipeline-workflow.md](docs/pipeline-workflow.md) | Progressive strategy construction and stage processing |
-| [testing.md](docs/testing.md) | Testing approach, current coverage, and future plans |
 
 ---
 
