@@ -29,13 +29,13 @@ This project was built to demonstrate:
 
 - Configuration-driven application design
 - Modular pipeline architecture
-- Workflow orchestration
-- Dynamic branch generation
+- Workflow orchestration and automation
 - YAML validation and parsing
-- Manifest and lineage tracking
+- Automated code generation
+- External process orchestration
+- Batch optimisation workflows
 - Structured output generation
 - Research workflow automation
-- Large-scale processing pipelines
 - Separation of concerns and reusable components
 
 ---
@@ -55,14 +55,15 @@ This project was built to demonstrate:
 ## 🔑 Key Features
 
 - Multi-stage optimisation pipelines
-- Dynamic branch generation
-- Candidate lineage tracking
-- Manifest-driven workflow state management
-- Automatic YAML generation and validation
-- Structured output generation
-- Modular stage processing
-- Automated compilation and execution workflows
-- In-sample / out-of-sample evaluation support
+- YAML-driven strategy and indicator configuration
+- Automatic Expert Advisor (EA) generation
+- Automated MT5 compilation and execution workflows
+- Batch optimisation and evaluation
+- In-sample / out-of-sample testing support
+- Parameter extraction and result scoring
+- Stage-gated candidate progression
+- Structured outputs and result tracking
+- Modular processing stages
 
 ---
 
@@ -81,10 +82,9 @@ Key practices include:
 - Structured outputs for reproducibility
 
 ---
-
 ## 📈 Architecture
 
-A key focus of this project was designing a modular pipeline architecture that allows independent processing stages while maintaining full traceability between generated results.
+A key focus of this project was designing a staged processing pipeline capable of progressively constructing and evaluating systems while maintaining repeatable workflows.
 
 <p align="center">
 <img src="docs/images/architecture.png" width="800">
@@ -93,11 +93,11 @@ A key focus of this project was designing a modular pipeline architecture that a
 This architecture provides:
 
 - Independent stage execution
-- Candidate lineage tracking
-- Reproducible workflows
-- Modular configuration systems
-- Structured outputs
-- Scalable processing
+- Reusable processing stages
+- Configuration-driven behaviour
+- Automated execution workflows
+- Structured result outputs
+- Repeatable optimisation pipelines
 
 Full architecture documentation:
 
@@ -107,7 +107,7 @@ Full architecture documentation:
 
 ## 🔄 Processing Workflow
 
-The currently implemented pipeline progressively builds complete systems using staged processing.
+The currently implemented pipeline progressively builds complete systems using staged optimisation and evaluation.
 
 Example workflow:
 
@@ -122,21 +122,35 @@ Volume
     ↓
 Exit
     ↓
-Results
-    ↓
-Resolved Configuration
+Final System
+```
+
+Each stage:
+
+- Loads YAML indicator definitions
+- Generates Expert Advisor source code
+- Compiles source into executable MT5 files
+- Creates strategy tester configurations
+- Executes optimisation workflows
+- Parses and scores results
+- Produces structured outputs
+- Passes selected components to downstream stages
 ```
 ---
 
 ## 📂 Example Output Structure
 
 ```text
-outputs/
+Outputs/
 └── Example_Run/
     ├── Trigger/
-    │   └── branch_0001/
-    │       ├── results.yaml
-    │       └── .resolved.yaml
+    │   ├── experts/
+    │   ├── ini_files/
+    │   ├── results/
+    │   │   ├── best_summary.csv
+    │   │   ├── scored_results.csv
+    │   │   └── the_trigger.yaml
+    │   └── logs/
     │
     ├── Confirmation/
     ├── Trendline/
