@@ -154,23 +154,6 @@ Full architecture details:
 
 The currently implemented pipeline progressively builds complete systems using staged optimisation and evaluation.
 
-Example workflow:
-
-```mermaid
-flowchart LR
-
-A["Trigger"]
-B["Confirmation"]
-C["Trendline"]
-D["Volume"]
-E["Exit"]
-
-A --> B
-B --> C
-C --> D
-D --> E
-```
-
 Each stage:
 
 - Loads YAML indicator definitions
@@ -206,33 +189,6 @@ Outputs/
 
 ---
 
-## ⚙️ Running Locally
-Prerequisites
-
-Before running:
-
-- Python 3.8+, MetaTrader 5, Git
-- [MyLibs dependency](https://github.com/xMattC/mt5-quant-lib)
-
-```Bash
-# Clone repository:
-
-git clone https://github.com/xMattC/mt5-strategy-factory.git
-cd mt5-strategy-factory
-
-# Create virtual environment:
-python -m venv .venv
-
-# Windows
-.venv\Scripts\activate
-
-# Linux / macOS
-source .venv/bin/activate
-
-# Install requirements:
-pip install -r requirements.txt
-
-```
 ## 📚 Additional Documentation
 
 | Document | Description |
@@ -265,6 +221,52 @@ Future development plans include expanded testing, improved reporting, and great
 - Additional processing pipelines
 - Dashboard and reporting system
 - Improved configuration tooling
+
+
+## ⚙️ Installation
+
+### Prerequisites
+
+- Python 3.8+
+- MetaTrader 5
+- Git
+- [MT5 Quant Lib dependency](https://github.com/xMattC/mt5-quant-lib)
+
+### Clone Project
+
+```bash
+# This project must be cloned directly into your MetaTrader 5 `Experts` directory,
+# `Terminal_ID` is generated automatically by MetaTrader 5 and differs between installations.
+C:/Users/<YourUser>/AppData/Roaming/MetaQuotes/Terminal/<Terminal_ID>/MQL5/Experts/
+
+# Clone repository:
+git clone https://github.com/xMattC/mt5-strategy-factory.git
+cd mt5-strategy-factory
+
+# Create Virtual Environment
+python -m venv .venv
+
+# Activate environment
+.venv\Scripts\activate
+
+# Install Dependencies
+pip install -r requirements.txt
+```
+
+### Install MT5 Quant Lib
+
+``` Bash
+# The dependency libuary must be installed into the MT5 `Include` directory.
+C:/Users/<YourUser>/AppData/Roaming/MetaQuotes/Terminal/<Terminal_ID>/MQL5/Include/
+
+# clone suporting libuary
+git clone https://github.com/xMattC/mt5-quant-lib.git MyLibs
+```
+
+### Run
+
+[execution-guide.md](execution-guide.md)
+
 
 ## ⚠ Disclaimer
 
