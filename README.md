@@ -8,7 +8,7 @@
 ![Testing](https://img.shields.io/badge/Testing-pytest-0A9EDC)
 ![MT5](https://img.shields.io/badge/MT5-Research_Framework-green)
 
-# MT5 Strategy Factory
+# MT5 Research Framework
 
 A Python-based framework for automated generation, transformation and evaluation of modular strategy configurations.
 
