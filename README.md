@@ -26,20 +26,45 @@ In this project, MT5 acts as the execution environment for optimisation and eval
 
 ---
 
+## 🧠 What This Project Builds
+
+MT5 Strategy Factory generates MetaTrader 5 Expert Advisors (EAs) from YAML-defined trend-following components.
+
+The framework progressively builds an Expert Advisor by independently evaluating and selecting:
+
+- **Trigger** — the primary signal used to identify potential trade entries.
+- **Confirmation** — a secondary signal used to reduce false positives.
+- **Trendline** — a trend-direction component used to align trades with broader market movement.
+- **Volume** — a market-quality filter used to avoid weak or unsuitable conditions.
+- **Exit** — rules controlling how trades are closed.
+
+Each stage:
+
+- Generates EA source code
+- Compiles MQ5 → EX5
+- Generates MT5 tester configurations
+- Executes optimisation/backtesting
+- Parses and scores results
+- Produces structured outputs
+
+The project focuses primarily on workflow orchestration, automation, code generation, and configuration-driven processing.
+
+---
+
 ## 🎯 Engineering Focus
 
 This project was built to demonstrate:
 
 - Configuration-driven application design
 - Modular pipeline architecture
-- Workflow orchestration and automation
+- Workflow orchestration
+- Template-based code generation
 - YAML validation and parsing
-- Automated code generation
-- External process orchestration
+- External process automation
 - Batch optimisation workflows
+- Result processing pipelines
 - Structured output generation
-- Research workflow automation
-- Separation of concerns and reusable components
+- Separation of concerns
 
 ---
 
@@ -58,15 +83,14 @@ This project was built to demonstrate:
 ## 🔑 Key Features
 
 - Multi-stage optimisation pipelines
-- YAML-driven strategy and indicator configuration
-- Automatic Expert Advisor (EA) generation
-- Automated MT5 compilation and execution workflows
-- Batch optimisation and evaluation
-- In-sample / out-of-sample testing support
-- Parameter extraction and result scoring
+- YAML-driven strategy configuration
+- Automatic Expert Advisor generation
+- Automated MT5 compilation and execution
+- In-sample / out-of-sample evaluation
+- Result parsing and candidate scoring
 - Stage-gated candidate progression
-- Structured outputs and result tracking
-- Modular processing stages
+- Structured CSV/YAML outputs
+- Modular workflow stages
 
 ---
 
@@ -85,39 +109,41 @@ Key practices include:
 - Structured outputs for reproducibility
 
 ---
-## 📈 Architecture
-
-A key focus of this project was designing a staged processing pipeline capable of progressively constructing and evaluating systems while maintaining repeatable workflows.
+## 📈 System Architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
 
-A["YAML Config"] --> B["Python Automation"]
+A["Inputs
+(config.yaml + indicators)"]
 
-subgraph B2["MT5 Strategy Factory"]
+B["Generate
+Expert Advisors"]
 
-B --> C["EA Generation"]
-C --> D["MT5 Execution"]
-D --> E["Result Processing"]
+C["Optimise
+& Backtest"]
 
-end
+D["Parse
+Results"]
 
-E --> F["Review + Selection"]
-F --> G["Progressive Strategy Construction"]
+E["Select
+Best Candidate"]
+
+F["Build
+Final System"]
+
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
 ```
 
-This architecture provides:
+The framework uses a staged pipeline that progressively constructs complete systems through independent optimisation and evaluation.
 
-- Independent stage execution
-- Reusable processing stages
-- Configuration-driven behaviour
-- Automated execution workflows
-- Structured result outputs
-- Repeatable optimisation pipelines
+Full architecture details:
 
-Full architecture documentation:
-
-[Architecture Document](docs/architecture.md)
+[Architecture Documentation](docs/architecture.md)
 
 ---
 
@@ -127,18 +153,21 @@ The currently implemented pipeline progressively builds complete systems using s
 
 Example workflow:
 
-```text
-Trigger
-    ↓
-Confirmation
-    ↓
-Trendline
-    ↓
-Volume
-    ↓
-Exit
-    ↓
-Final System
+```mermaid
+flowchart LR
+
+A["Trigger"]
+B["Confirmation"]
+C["Trendline"]
+D["Volume"]
+E["Exit"]
+F["Final System"]
+
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
 ```
 
 Each stage:
@@ -193,8 +222,11 @@ cd mt5-strategy-factory
 # Create virtual environment:
 python -m venv .venv
 
-# Activate:
+# Windows
 .venv\Scripts\activate
+
+# Linux / macOS
+source .venv/bin/activate
 
 # Install requirements:
 pip install -r requirements.txt
@@ -213,12 +245,16 @@ pip install -r requirements.txt
 
 ---
 
-## ⚠️ Current Limitations
-- Test coverage currently focuses on critical components and core workflows
-- Integration testing remains limited
-- Full execution currently requires a local MT5 installation
-- Workflow execution is research-oriented rather than cloud-native
-- Distributed processing is not implemented
+## ⚠ Current Limitations
+Current limitations include:
+
+- Limited automated test coverage
+- Manual candidate selection between stages
+- Local MetaTrader 5 dependency
+- Windows-focused execution environment
+- Single-machine execution workflow
+
+Future development plans include expanded testing, improved reporting, and greater automation.
 
 ---
 
