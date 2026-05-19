@@ -45,43 +45,102 @@ Different indicators and optimisation workflows should be supported through reus
 
 # High-Level System Architecture
 
+A key focus of this project was designing a staged processing pipeline capable of progressively constructing and evaluating systems while maintaining repeatable workflows.
 ```mermaid
 flowchart TD
 
-    A["User Configuration<br>(config.yaml)"]
+subgraph INPUT["Inputs"]
+A["config.yaml"]
+B["whitelist.yaml"]
+C["Indicator YAMLs"]
+end
 
-    B["Config Loading<br>& Validation"]
 
-    C["Pipeline Runner"]
+subgraph CORE["Python Framework"]
 
-    D["Stage Runner"]
+D["Config
+Validation"]
 
-    E["EA Generation"]
+E["Pipeline
+Runner"]
 
-    F["INI Generation"]
+F["Stage
+Runner"]
 
-    G["MT5 Execution"]
+G["EA
+Generation"]
 
-    H["Result Processing"]
+H["INI
+Generation"]
 
-    I["Stage Outputs<br>CSV + YAML"]
+end
 
-    J["User Selection"]
 
-    A --> B
-    B --> C
-    C --> D
+subgraph EXEC["MT5 Execution"]
 
-    D --> E
-    D --> F
-    D --> G
+I["Compile
+MQ5 → EX5"]
 
-    E --> H
-    F --> H
-    G --> H
+J["Optimisation
++ Backtesting"]
 
-    H --> I
-    I --> J
+end
+
+
+subgraph RESULTS["Result Processing"]
+
+K["Parse
+Results"]
+
+L["IS/OOS
+Scoring"]
+
+M["CSV + YAML
+Outputs"]
+
+end
+
+
+subgraph USER["User Review"]
+
+N["Review
+Results"]
+
+O["Select
+Candidate"]
+
+end
+
+
+subgraph FINAL["Progressive System Construction"]
+
+P["Updated
+Strategy System"]
+
+end
+
+
+A --> D
+B --> D
+C --> G
+
+D --> E
+E --> F
+F --> G
+F --> H
+
+G --> I
+H --> J
+I --> J
+
+J --> K
+K --> L
+L --> M
+
+M --> N
+N --> O
+O --> P
+O -.-> E
 ```
 
 ---
