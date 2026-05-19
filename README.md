@@ -1,357 +1,205 @@
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
+![YAML](https://img.shields.io/badge/YAML-Configuration_CB171E?logo=yaml)
+![Testing](https://img.shields.io/badge/Testing-pytest-0A9EDC)
+![Architecture](https://img.shields.io/badge/Architecture-Modular-success)
+![CI](https://img.shields.io/badge/Workflow-Automation-orange)
+![MT5](https://img.shields.io/badge/MT5-Research_Framework-green)
+
 # MT5 Strategy Factory
 
-Python automation framework for systematic MT5 strategy research.
+A Python-based framework for automated generation, transformation and evaluation of modular strategy configurations.
 
-MT5 Strategy Factory generates Expert Advisors (EAs), renders MT5 configuration files, compiles source code through MetaEditor, runs batch optimisations via the MT5 Strategy Tester CLI, and post-processes the results into structured outputs for staged review.
+The project focuses on workflow orchestration, configuration-driven architecture, automated processing pipelines, and research automation through reusable software components.
 
-This project is best thought of as an **experiment pipeline for trading strategy development**, not just an EA codebase.
-
----
-
-**MetaTrader 5 (MT5)** is a multi-asset trading platform widely used for developing and executing automated trading 
-strategies. [Learn more](https://www.metatrader5.com/en)
-
-**MT5 Strategy Factory** is a production-grade quality Python framework for automating the complete lifecycle of 
-strategy development in MT5. It enables modular strategy construction, batch optimisation, and performance 
-evaluation — all driven by YAML indicator files and executed through a highly customisable, stage-based pipeline.
-
-Whether you're a quantitative trader, algo developer, or strategy engineer, this framework lets you rapidly prototype, 
-test, and refine trading strategies in a structured, repeatable, and scalable way.
-
-To use this framework successfully, you **must install the `MyLibs` library** into your MetaTrader 5 terminal.
-
-
-1. Download or clone the required library:
-   ( [mt5-quant-lib](https://github.com/xMattC/mt5-quant-lib) )
-
-2. Place the `MyLibs` folder in your MetaTrader 5 `Include/` directory:
-
-```plaintext
-C:/Users/<YourUsername>/AppData/Roaming/MetaQuotes/Terminal/<YourInstanceID>/MQL5/Include/MyLibs/
-```
-
-
-## Strategy Engine Installation
-
-#### Step 1: Clone the Repository
-
-Clone the repository to your local machine:
-
-```bash
-git clone https://https://github.com/xMattC/Strategy-Engine.git
-cd Strategy-Engine
-```
-
-#### Step 2: Set Up a Virtual Environment
-
-Create a virtual environment to manage dependencies e.g:
-
-```bash
-python -m venv .env
-```
-
-Activate the virtual environment:
-
-- On Windows:
-  ```bash
-  .env\Scripts\activate
-  ```
-- On macOS/Linux:
-  ```bash
-  source .env/bin/activate
-  ```
-
-#### Step 3: Install Dependencies
-
-Install the required dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Make sure to clone this repo directly into your MT5 Experts folder:
-
-```
-C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts
-```
-
-## Configuration
-Update the paths in ../mt5-strategy-factory/config/local_paths.yaml:
-```yaml
-mt5_root: "C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID"
-
-mt5_terminal_exe: "C:/Program Files/YourBroker MetaTrader 5/terminal64.exe"
-
-mt5_meta_editor_exe: "C:/Program Files/YourBroker MetaTrader 5/metaeditor64.exe"
-
-strategy_factory_root: "C:/Users/YourUser/AppData/Roaming/MetaQuotes/Terminal/YOUR_TERMINAL_ID/MQL5/Experts/mt5-strategy-factory"
-```
-
-## Strategy Engine Execution
-
-The MT5 Strategy Factory is designed to run via a single entry point: `main.py`. This script bootstraps your strategy project, scaffolds the required files, and prepares everything needed to begin optimisation.
-
-### What Happens When You Run `main.py`
-
-1. A **project codename** is suggested using a generator.
-2. If the user accepts (`Y`), a new project directory is created with:
-   - `config.yaml` – strategy configuration
-   - `whitelist.yaml` – list of tradable instruments
-   - `run.py` – ready-to-execute pipeline script
-3. The user can customise the generated config before running `run.py`.
-
-## Roadmap
-
-- Trend-following pipeline complete
-- Breakout, mean-reversion and scalping pipelines
-- Walk-forward testing framework
-- Monte Carlo testing for backtest results
-- Integrated visual reporting dashboard
-
-- 
-## What this project does
-
-MT5 Strategy Factory automates the repetitive parts of quantitative strategy research in MetaTrader 5:
-
-* scaffolds a new strategy research project
-* renders EA source code from templates and configuration
-* renders MT5 `.ini` files for optimisation and backtesting
-* compiles EAs through MetaEditor
-* runs large batches of optimisation jobs through the MT5 Strategy Tester CLI
-* processes optimisation outputs into structured results
-* supports multi-stage strategy construction where each stage builds on the previous one
-
-The current implemented workflow is a **trend-following strategy pipeline**, but the framework is designed so that other pipeline types can be added later.
+While the domain is quantitative strategy research, the primary engineering focus is on building scalable and maintainable software systems.
 
 ---
 
-## Why this exists
+## 🔍 Domain Context
 
-Manual MT5 strategy development is slow and error-prone when testing many combinations of:
+MetaTrader 5 (MT5) is a multi-asset trading platform widely used for developing and executing automated trading strategies. [Learn more](https://www.metatrader5.com/en)
 
-* indicator logic
-* parameter ranges
-* entry/exit rules
-* filters
-* in-sample / out-of-sample windows
-
-This framework turns that work into a repeatable pipeline:
-
-1. generate candidate strategy artefacts
-2. execute tests in batch
-3. collect outputs
-4. evaluate results stage by stage
-5. carry the best configurations forward
+In this project, MT5 acts as the execution environment for optimisation and evaluation workflows, while the primary software focus is on orchestration, configuration management, and research automation.
 
 ---
 
-## Core idea
+## 🎯 Engineering Focus
 
-A strategy is built as a **pipeline of stages**.
+This project was built to demonstrate:
 
-Each stage evaluates a specific class of trading logic:
-
-* trigger
-* confirmation
-* trendline
-* volume
-* exit
-
-Each stage:
-
-1. generates EA/config artefacts
-2. runs optimisation
-3. produces structured results
-4. passes best candidates forward
+- Configuration-driven application design
+- Modular pipeline architecture
+- Workflow orchestration
+- Dynamic branch generation
+- YAML validation and parsing
+- Manifest and lineage tracking
+- Structured output generation
+- Research workflow automation
+- Large-scale processing pipelines
+- Separation of concerns and reusable components
 
 ---
 
-## Implemented pipeline: trend-following
+## 🛠️ Tech Stack
 
-### Stage 1 — Trigger
-
-Entry signal generation
-
-### Stage 2 — Confirmation
-
-Signal validation
-
-### Stage 3 — Trendline
-
-Directional bias
-
-### Stage 4 — Volume
-
-Market activity filtering
-
-### Stage 5 — Exit
-
-Exit logic evaluation
+- **Language:** Python
+- **Configuration:** YAML
+- **Data Processing:** Pandas
+- **Architecture:** Modular pipelines
+- **Automation:** MT5 CLI integration
+- **Validation:** Custom validation framework
+- **Development:** Git
 
 ---
 
-## Pipeline workflow
+## 🔑 Key Features
 
+- Multi-stage optimisation pipelines
+- Dynamic branch generation
+- Candidate lineage tracking
+- Manifest-driven workflow state management
+- Automatic YAML generation and validation
+- Structured output generation
+- Modular stage processing
+- Automated compilation and execution workflows
+- In-sample / out-of-sample evaluation support
+
+---
+
+## 🧱 Engineering Practices
+
+This project evolved iteratively while exploring workflow automation and strategy research concepts. Development focused on improving maintainability and reducing complexity as the project grew.
+
+Key practices include:
+
+- Modular application design
+- Separation of concerns
+- Reusable software components
+- Configuration-driven behaviour
+- Validation layers
+- Incremental refactoring and improvement
+- Structured outputs for reproducibility
+
+---
+
+## 📈 Architecture
+
+A key focus of this project was designing a modular pipeline architecture that allows independent processing stages while maintaining full traceability between generated results.
+
+<p align="center">
+<img src="docs/images/architecture.png" width="800">
+</p>
+
+This architecture provides:
+
+- Independent stage execution
+- Candidate lineage tracking
+- Reproducible workflows
+- Modular configuration systems
+- Structured outputs
+- Scalable processing
+
+Full architecture documentation:
+
+[Architecture Document](docs/architecture.md)
+
+---
+
+## 🔄 Processing Workflow
+
+The currently implemented pipeline progressively builds complete systems using staged processing.
+
+Example workflow:
+
+```text
+Trigger
+    ↓
+Confirmation
+    ↓
+Trendline
+    ↓
+Volume
+    ↓
+Exit
+    ↓
+Results
+    ↓
+Resolved Configuration
 ```
-Strategy template + config
-        ↓
-Project scaffolding
-        ↓
-EA / init file rendering
-        ↓
-MetaEditor compilation
-        ↓
-MT5 Strategy Tester runs
-        ↓
-Result collection
-        ↓
-Post-processing
-        ↓
-Stage progression
+---
+
+## 📂 Example Output Structure
+
+```text
+outputs/
+└── Example_Run/
+    ├── Trigger/
+    │   └── branch_0001/
+    │       ├── results.yaml
+    │       └── .resolved.yaml
+    │
+    ├── Confirmation/
+    ├── Trendline/
+    ├── Volume/
+    └── Exit/
 ```
 
 ---
 
-## What gets automated
+## ⚙️ Running Locally
+Prerequisites
 
-* Project scaffolding
-* Code generation (MQL5)
-* Config generation (.ini files)
-* Batch execution
-* Result processing
-* Multi-stage strategy assembly
+Before running:
 
----
+- Python 3.8+, MetaTrader 5, Git
+- [MyLibs dependency](https://github.com/xMattC/mt5-quant-lib)
 
-## Repository structure
+```Bash
+# Clone repository:
 
-```
-mt5-strategy-factory/
-├── config/
-├── docs/
-├── indicators/
-├── strategy_factory/
-│   ├── gen_expert_advisor/
-│   ├── gen_initilisation_file/
-│   ├── gen_new_project/
-│   ├── pipelines/
-│   ├── post_processing/
-│   ├── renderer_tools/
-│   ├── stage_execution/
-│   └── utils/
-├── tests/
-├── main.py
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Entry point
-
-```
-python main.py
-```
-
-Creates a new strategy project using the configured pipeline.
-
----
-
-## Example workflow
-
-1. create project
-2. choose pipeline
-3. generate EA/config
-4. compile EA
-5. run MT5 optimisation
-6. process results
-7. review metrics
-8. progress to next stage
-
----
-
-## Configuration
-
-Configured in:
-
-```
-config/local_paths.yaml
-```
-
-Example:
-
-```yaml
-mt5_root: "..."
-mt5_terminal_exe: "..."
-mt5_meta_editor_exe: "..."
-strategy_factory_root: "..."
-```
-
----
-
-## Requirements
-
-* Python 3.8+
-* MetaTrader 5
-* MetaEditor
-* Access to MT5 Experts directory
-* MQL5 include library (`MyLibs`)
-
----
-
-## Installation
-
-```
 git clone https://github.com/xMattC/mt5-strategy-factory.git
 cd mt5-strategy-factory
 
+# Create virtual environment:
 python -m venv .venv
+
+# Activate:
 .venv\Scripts\activate
 
+# Install requirements:
 pip install -r requirements.txt
+
 ```
+## 📚 Documentation
+
+Additional documentation:
+
+| Document | Description |
+|-----------|-------------|
+| `architecture.md` | System architecture and workflow design |
+| `configuration.md` | YAML configuration system |
+| `strategy-pipeline.md` | Pipeline stages and processing |
+| `manifest-system.md` | Manifest and lineage tracking |
+| `testing.md` | Testing strategy |
+| `roadmap.md` | Future development plans |
+| `examples.md` | Example workflows and outputs |
+examples.md	Example workflows and outputs
 
 ---
 
-## Tech stack
-
-* Python
-* Jinja2
-* pandas / numpy
-* PyYAML
-* MQL5
-* MetaEditor
-* MT5 Strategy Tester
+## ⚠️ Current Limitations
+- Test coverage currently focuses on critical components and core workflows
+- Integration testing remains limited
+- Full execution currently requires a local MT5 installation
+- Workflow execution is research-oriented rather than cloud-native
+- Distributed processing is not implemented
 
 ---
 
-## Engineering focus
-
-* workflow automation
-* batch execution
-* template-driven code generation
-* staged data processing
-* experiment orchestration
-* structured result evaluation
-
----
-
-## Limitations
-
-* requires local MT5 installation
-* Windows-dependent
-* manual decisions still required between stages
-* limited test coverage
-
----
-
-## Summary
-
-MT5 Strategy Factory is a pipeline-driven framework that transforms manual MT5 strategy development into:
-
-* automated generation
-* repeatable execution
-* staged optimisation
-* structured evaluation
-
-A system designed for scalable and systematic strategy research.
+## 🚀 Future Improvements
+- Expanded automated testing coverage
+- Improved visualisation tooling
+- Distributed execution support
+- Additional processing pipelines
+- Dashboard and reporting system
+- Improved configuration tooling
