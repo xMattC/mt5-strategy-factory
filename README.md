@@ -16,13 +16,6 @@ The project focuses on workflow orchestration, configuration-driven architecture
 
 While the domain is quantitative strategy research, the primary engineering focus is on building scalable and maintainable software systems.
 
----
-
-## 🔍 Domain Context
-
-MetaTrader 5 (MT5) is a multi-asset trading platform widely used for developing and executing automated trading strategies. [Learn more](https://www.metatrader5.com/en)
-
-In this project, MT5 acts as the execution environment for optimisation and evaluation workflows, while the primary software focus is on orchestration, configuration management, and research automation.
 
 ---
 
@@ -51,6 +44,14 @@ The project focuses primarily on workflow orchestration, automation, code genera
 
 ---
 
+## 🔍 Domain Context
+
+MetaTrader 5 (MT5) is a multi-asset trading platform widely used for developing and executing automated trading strategies. [Learn more](https://www.metatrader5.com/en)
+
+In this project, MT5 acts as the execution environment for optimisation and evaluation workflows, while the primary software focus is on orchestration, configuration management, and research automation.
+
+---
+
 ## 🎯 Engineering Focus
 
 This project was built to demonstrate:
@@ -67,16 +68,18 @@ This project was built to demonstrate:
 - Separation of concerns
 
 ---
-
 ## 🛠️ Tech Stack
 
-- **Language:** Python
-- **Configuration:** YAML
-- **Data Processing:** Pandas
-- **Architecture:** Modular pipelines
-- **Automation:** MT5 CLI integration
-- **Validation:** Custom validation framework
-- **Development:** Git
+- **Core:** Python
+- **Data Processing:** Pandas, NumPy
+- **Configuration Management:** YAML, PyYAML
+- **Template Rendering:** Jinja2
+- **External Integration:** MetaTrader 5 CLI
+- **Architecture:** Modular pipeline design
+- **Workflow Automation:** Batch optimisation pipelines
+- **Result Processing:** XML parsing, CSV generation
+- **Validation:** Structured configuration validation
+- **Development:** Git, Pytest
 
 ---
 
@@ -139,7 +142,7 @@ D --> E
 E --> F
 ```
 
-The framework uses a staged pipeline that progressively constructs complete systems through independent optimisation and evaluation.
+The architecture separates configuration, orchestration, code generation, execution and result processing into independent components to improve maintainability and support repeatable workflows.
 
 Full architecture details:
 
@@ -161,13 +164,11 @@ B["Confirmation"]
 C["Trendline"]
 D["Volume"]
 E["Exit"]
-F["Final System"]
 
 A --> B
 B --> C
 C --> D
 D --> E
-E --> F
 ```
 
 Each stage:
