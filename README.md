@@ -1,8 +1,11 @@
 ![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
+![Pandas](https://img.shields.io/badge/Pandas-Data_Processing-150458?logo=pandas)
+![Jinja2](https://img.shields.io/badge/Jinja2-Code_Generation-B41717)
 ![YAML](https://img.shields.io/badge/YAML-Configuration_CB171E?logo=yaml)
-![Testing](https://img.shields.io/badge/Testing-pytest-0A9EDC)
+![Workflow](https://img.shields.io/badge/Workflow-Orchestration-blueviolet)
+![Simulation](https://img.shields.io/badge/Simulation-Optimisation-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-Modular-success)
-![CI](https://img.shields.io/badge/Workflow-Automation-orange)
+![Testing](https://img.shields.io/badge/Testing-pytest-0A9EDC)
 ![MT5](https://img.shields.io/badge/MT5-Research_Framework-green)
 
 # MT5 Strategy Factory
@@ -197,20 +200,16 @@ python -m venv .venv
 pip install -r requirements.txt
 
 ```
-## 📚 Documentation
-
-Additional documentation:
+## 📚 Additional Documentation
 
 | Document | Description |
 |-----------|-------------|
-| `architecture.md` | System architecture and workflow design |
-| `configuration.md` | YAML configuration system |
-| `strategy-pipeline.md` | Pipeline stages and processing |
-| `manifest-system.md` | Manifest and lineage tracking |
-| `testing.md` | Testing strategy |
-| `roadmap.md` | Future development plans |
-| `examples.md` | Example workflows and outputs |
-examples.md	Example workflows and outputs
+| [architecture.md](docs/architecture.md) | System architecture, component interactions, and design decisions |
+| [configuration.md](docs/configuration.md) | YAML configuration system and parameter definitions |
+| [execution-guide.md](docs/execution-guide.md) | End-to-end execution workflow and project lifecycle |
+| [mt5-integration.md](docs/mt5-integration.md) | MT5 integration layer, INI generation, and CLI automation |
+| [pipeline-workflow.md](docs/pipeline-workflow.md) | Progressive strategy construction and stage processing |
+| [testing.md](docs/testing.md) | Testing approach, current coverage, and future plans |
 
 ---
 
