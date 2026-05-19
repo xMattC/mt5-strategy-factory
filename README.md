@@ -86,9 +86,22 @@ Key practices include:
 
 A key focus of this project was designing a staged processing pipeline capable of progressively constructing and evaluating systems while maintaining repeatable workflows.
 
-<p align="center">
-<img src="docs/images/architecture.png" width="800">
-</p>
+```mermaid
+flowchart LR
+
+A["YAML Config"] --> B["Python Automation"]
+
+subgraph B2["MT5 Strategy Factory"]
+
+B --> C["EA Generation"]
+C --> D["MT5 Execution"]
+D --> E["Result Processing"]
+
+end
+
+E --> F["Review + Selection"]
+F --> G["Progressive Strategy Construction"]
+```
 
 This architecture provides:
 
