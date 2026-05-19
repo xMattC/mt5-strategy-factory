@@ -181,7 +181,7 @@ Each stage:
 - Parses and scores results
 - Produces structured outputs
 - Passes selected components to downstream stages
-```
+
 ---
 
 ## 📂 Example Output Structure
@@ -266,3 +266,9 @@ Future development plans include expanded testing, improved reporting, and great
 - Additional processing pipelines
 - Dashboard and reporting system
 - Improved configuration tooling
+
+## ⚠ Disclaimer
+
+This project was developed for research, experimentation, and software engineering purposes.
+
+The generated strategies and outputs are intended to demonstrate workflow automation, optimisation pipelines, and system design concepts. They should not be interpreted as financial advice or used as a basis for investment decisions without independent evaluation.
