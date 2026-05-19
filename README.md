@@ -114,34 +114,6 @@ Key practices include:
 ---
 ## 📈 System Architecture
 
-```mermaid
-flowchart TD
-
-A["Inputs
-(config.yaml + indicators)"]
-
-B["Generate
-Expert Advisors"]
-
-C["Optimise
-& Backtest"]
-
-D["Parse
-Results"]
-
-E["Select
-Best Candidate"]
-
-F["Build
-Final System"]
-
-A --> B
-B --> C
-C --> D
-D --> E
-E --> F
-```
-
 The architecture separates configuration, orchestration, code generation, execution and result processing into independent components to improve maintainability and support repeatable workflows.
 
 Full architecture details:
